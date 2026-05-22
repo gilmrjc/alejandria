@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 300px;
+    background: #16213e;
+    padding: 20px;
+    overflow-y: auto;
+    border-right: 2px solid #0f3460;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: #0f3460;
+    padding: 15px 20px;
+    border-bottom: 2px solid #1a1a2e;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.header p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+#cy {
+    flex: 1;
+    background: #1a1a2e;
+}
+
+.legend {
+    margin-bottom: 20px;
+}
+
+.legend h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #e94560;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: 2px solid;
+}
+
+.legend-color.estrategia {
+    background: #4A90E2;
+    border-color: #2E5C8A;
+}
+
+.legend-color.arquitectura {
+    background: #9B59B6;
+    border-color: #6C3483;
+}
+
+.legend-color.producto {
+    background: #E67E22;
+    border-color: #A04000;
+}
+
+.legend-color.implementacion {
+    background: #27AE60;
+    border-color: #1E8449;
+}
+
+.legend-color.depends { background: #e74c3c; border-color: #c0392b; }
+.legend-color.implements { background: #3498db; border-color: #2980b9; }
+.legend-color.references { background: #95a5a6; border-color: #7f8c8d; }
+.legend-color.explains { background: #2ecc71; border-color: #27ae60; }
+.legend-color.extends { background: #9b59b6; border-color: #8e44ad; }
+.legend-color.replaces { background: #f39c12; border-color: #e67e22; }
+.legend-color.reinforces { background: #1abc9c; border-color: #16a085; }
+.legend-color.contradicts { background: #e94560; border-color: #c0392b; }
+
+.physics-label {
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.physics-input {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.stats {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #0f3460;
+    border-radius: 8px;
+}
+
+.stats h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #e94560;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+}
+
+.node-info {
+    padding: 15px;
+    background: #0f3460;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.node-info h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #e94560;
+}
+
+.node-info p {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.node-info .label {
+    font-weight: bold;
+    color: #e94560;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+.controls h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #e94560;
+}
+
+.control-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #e94560;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.control-btn:hover {
+    background: #ff6b6b;
+}
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #e94560;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.filter-checkbox input {
+    margin-right: 8px;
+    cursor: pointer;
+}

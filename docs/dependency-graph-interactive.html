@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafo de Dependencias - Alejandria</title>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+    <link rel="stylesheet" href="dependency-graph.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="legend">
+                <h3>Leyenda - Grupos</h3>
+                <div class="legend-item"><div class="legend-color estrategia"></div><span>ESTRATEGIA</span></div>
+                <div class="legend-item"><div class="legend-color arquitectura"></div><span>ARQUITECTURA</span></div>
+                <div class="legend-item"><div class="legend-color producto"></div><span>PRODUCTO</span></div>
+                <div class="legend-item"><div class="legend-color implementacion"></div><span>IMPLEMENTACIÓN</span></div>
+            </div>
+            
+            <div class="legend">
+                <h3>Leyenda - Relaciones</h3>
+                <div class="legend-item"><div class="legend-color depends"></div><span>Depende de</span></div>
+                <div class="legend-item"><div class="legend-color implements"></div><span>Implementa</span></div>
+                <div class="legend-item"><div class="legend-color references"></div><span>Referencia</span></div>
+                <div class="legend-item"><div class="legend-color explains"></div><span>Explica</span></div>
+                <div class="legend-item"><div class="legend-color extends"></div><span>Extiende</span></div>
+                <div class="legend-item"><div class="legend-color replaces"></div><span>Reemplaza</span></div>
+                <div class="legend-item"><div class="legend-color reinforces"></div><span>Refuerza</span></div>
+                <div class="legend-item"><div class="legend-color contradicts"></div><span>Contradice</span></div>
+            </div>
+            
+            <div class="stats">
+                <h3>Estadísticas</h3>
+                <div class="stat-item"><span>Total nodos:</span><span id="total-nodes">0</span></div>
+                <div class="stat-item"><span>ESTRATEGIA:</span><span id="estrategia-nodes">0</span></div>
+                <div class="stat-item"><span>ARQUITECTURA:</span><span id="arquitectura-nodes">0</span></div>
+                <div class="stat-item"><span>PRODUCTO:</span><span id="producto-nodes">0</span></div>
+                <div class="stat-item"><span>IMPLEMENTACIÓN:</span><span id="implementacion-nodes">0</span></div>
+            </div>
+            
+            <div class="node-info" id="node-info">
+                <h3>Información del Nodo</h3>
+                <p>Haz clic en un nodo para ver detalles</p>
+            </div>
+            
+            <div class="controls">
+                <h3>Controles</h3>
+                <button class="control-btn" data-action="resetLayout">Restablecer Layout</button>
+                <button class="control-btn" data-action="fitToScreen">Ajustar a Pantalla</button>
+                <button class="control-btn" data-action="centerGraph">Centrar Grafo</button>
+            </div>
+            <div class="controls">
+                <h3>Espaciado del Grafo</h3>
+                <button class="control-btn" data-action="expandGraph">Expandir (Alejar)</button>
+                <button class="control-btn" data-action="compactGraph">Compactar (Acercar)</button>
+            </div>
+            
+            <div class="controls">
+                <h3>Física del Grafo</h3>
+                <label class="physics-label">Rechazo de nodos: <span id="repulsion-value">50000</span></label>
+                <input type="range" min="1000" max="200000" value="50000" step="1000" class="physics-input" data-param="nodeRepulsion">
+                <label class="physics-label">Gravedad: <span id="gravity-value">0.3</span></label>
+                <input type="range" min="0" max="5" value="0.3" step="0.1" class="physics-input" data-param="gravity">
+            </div>
+            
+            <div class="filter-section">
+                <h3>Filtros</h3>
+                <label class="filter-checkbox"><input type="checkbox" checked value="ESTRATEGIA"> Mostrar ESTRATEGIA</label>
+                <label class="filter-checkbox"><input type="checkbox" checked value="ARQUITECTURA"> Mostrar ARQUITECTURA</label>
+                <label class="filter-checkbox"><input type="checkbox" checked value="PRODUCTO"> Mostrar PRODUCTO</label>
+                <label class="filter-checkbox"><input type="checkbox" checked value="IMPLEMENTACIÓN"> Mostrar IMPLEMENTACIÓN</label>
+            </div>
+        </div>
+        
+        <div class="main">
+            <div class="header">
+                <h1>Grafo de Dependencias - Alejandria</h1>
+                <p>Visualización interactiva del mapa de dependencias de documentación</p>
+            </div>
+            <div id="cy"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { GraphDataLoader } from './graph-data.js';
+        import { GraphVisualizer } from './graph-visualizer.js';
+        import { GraphUI } from './graph-ui.js';
+
+        // Inicializar componentes
+        const dataLoader = new GraphDataLoader();
+        const visualizer = new GraphVisualizer('cy');
+        const ui = new GraphUI(visualizer, dataLoader);
+
+        // Cargar datos e inicializar
+        async function init() {
+            const graphData = await dataLoader.load();
+            visualizer.initialize(graphData);
+            ui.initialize();
+            ui.updateStats();
+            ui.setupPhysicsControls();
+            ui.setupFilterControls();
+        }
+
+        init();
+    </script>
+</body>
+</html>

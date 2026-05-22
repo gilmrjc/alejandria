@@ -1,0 +1,2734 @@
+{
+  "nodes": [
+    {
+      "id": "PROD-FUN-005",
+      "label": "5-phase-workflow.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-012",
+      "label": "requisitos-diff-viewer.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-003",
+      "label": "gap-catalog.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-008",
+      "label": "requisitos-integracion-git.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-007",
+      "label": "requisitos-onboarding-proyecto-legacy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-PRD-002",
+      "label": "prd-hito-02-api-mcp.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "PRODUCTO",
+      "milestone": "Hito 2"
+    },
+    {
+      "id": "PROD-REQ-009",
+      "label": "requisitos-versioning-documentos.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-013",
+      "label": "requisitos-secciones-ui.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-006",
+      "label": "requisitos-onboarding-proyecto-nuevo.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-011",
+      "label": "requisitos-dashboard-general.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-REQ-005",
+      "label": "requisitos-sistema-usuarios-organizaciones.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-PRD-003",
+      "label": "prd-hito-03-frontend-react.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": "Hito 3"
+    },
+    {
+      "id": "PROD-REQ-010",
+      "label": "requisitos-busqueda-semantica.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-PRD-001",
+      "label": "prd-hito-01-infraestructura-base.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "PRODUCTO",
+      "milestone": "Hito 1"
+    },
+    {
+      "id": "FEAT-008",
+      "label": "diff-viewer.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-007",
+      "label": "busqueda-semantica.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-009",
+      "label": "dashboard-general.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-006",
+      "label": "versioning-documentos.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "PROD-FUN-001",
+      "label": "5-phase-workflow.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-001",
+      "label": "sistema-usuarios-organizaciones.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-ONB-001",
+      "label": "onboarding-strategy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-UI-001",
+      "label": "ui-sections-specification.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "FEAT-005",
+      "label": "integracion-git.md",
+      "status": "pending",
+      "rating": null,
+      "group": "PRODUCTO",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TRD-001",
+      "label": "trd-milestone-1-infrastructure.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": "Hito 1"
+    },
+    {
+      "id": "ENG-TRD-002",
+      "label": "trd-milestone-2-api-mcp.md",
+      "status": "in-progress",
+      "rating": 8,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": "Hito 2"
+    },
+    {
+      "id": "ENG-ARC-020",
+      "label": "celery-retry-implementation.md",
+      "status": "in-progress",
+      "rating": 8.8,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-025",
+      "label": "mcp-server-implementation.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-003",
+      "label": "technical-specs-integracion-git.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-007",
+      "label": "technical-specs-onboarding-proyecto-nuevo.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-025",
+      "label": "concurrency-control-strategy.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-004",
+      "label": "technical-specs-dashboard-general.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-005",
+      "label": "technical-specs-diff-viewer.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-012",
+      "label": "api-architecture.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-022",
+      "label": "jwt-authentication-implementation.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-006",
+      "label": "mcp-server-specification.md",
+      "status": "in-progress",
+      "rating": 8.5,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-003",
+      "label": "technology-stack.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-002",
+      "label": "technical-specs-versioning-documentos.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-024",
+      "label": "production-configuration.md",
+      "status": "pending",
+      "rating": 2,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-004",
+      "label": "database-schema-design.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-015",
+      "label": "qdrant.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-002",
+      "label": "end-to-end-flow.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-011",
+      "label": "architecture-overview.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-007",
+      "label": "job-implementation-guide.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-013",
+      "label": "llm-evals-guide.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-023",
+      "label": "api-input-validation-strategy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-009",
+      "label": "document-relationships-strategy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-014",
+      "label": "development-setup.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-010",
+      "label": "git-integration-specification.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-021",
+      "label": "document-versioning-implementation.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-008",
+      "label": "frontend-specification.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-017",
+      "label": "debugging.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-001",
+      "label": "technical-brief.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-005",
+      "label": "api-specification.md",
+      "status": "completed",
+      "rating": 9.5,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-021",
+      "label": "testing-strategy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-006",
+      "label": "technical-specs-onboarding-proyecto-legacy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-TS-001",
+      "label": "technical-specs-busqueda-semantica.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-ARC-016",
+      "label": "database.md",
+      "status": "pending",
+      "rating": null,
+      "group": "ARQUITECTURA",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-003",
+      "label": "adr-003-local-infrastructure-docker-compose.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-005",
+      "label": "adr-005-job-idempotency.md",
+      "status": "completed",
+      "rating": 10,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-002",
+      "label": "adr-002-python-unified-stack.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-004",
+      "label": "adr-004-ephemeral-jobs.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-008",
+      "label": "adr-008-dependency-management.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-001",
+      "label": "adr-001-mcp-abstraction-layer.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-007",
+      "label": "adr-007-python-package-structure.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-006",
+      "label": "adr-006-document-versioning.md",
+      "status": "in-progress",
+      "rating": 8,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ADR-009",
+      "label": "adr-009-testing-strategy.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-002",
+      "label": "epica-02-api-rest-mcp-server.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-018",
+      "label": "T-018-implementar-api-endpoints-sessions.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-015",
+      "label": "T-015-configurar-database-migrations-alembic.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-004",
+      "label": "T-004-configurar-alembic-migrations.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-005",
+      "label": "T-005-crear-migration-inicial-schema.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-009",
+      "label": "T-009-verificar-configuracion-qdrant.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-003",
+      "label": "T-003-configurar-variables-entorno.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-006",
+      "label": "T-006-implementar-middleware-versioning.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-026",
+      "label": "T-026-implementar-health-checks.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-007",
+      "label": "epica-07-integraciones.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-003",
+      "label": "epica-03-frontend-react.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-012",
+      "label": "T-012-crear-readme-instrucciones-setup.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-001",
+      "label": "T-001-crear-estructura-base-proyecto.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-014",
+      "label": "T-014-configurar-estructura-proyecto-python.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-007",
+      "label": "T-007-crear-script-inicializacion-database.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-019",
+      "label": "T-019-implementar-api-endpoints-jobs.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-021",
+      "label": "T-021-configurar-celery-rq-jobs.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-010",
+      "label": "T-010-configurar-descarga-automatica-modelo-qwen.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-004",
+      "label": "epica-04-deteccion-agrupacion.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-002",
+      "label": "T-002-configurar-docker-compose-servicios-base.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-027",
+      "label": "T-027-implementar-testing-basico.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-025",
+      "label": "T-025-implementar-integracion-qdrant.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-013",
+      "label": "T-013-crear-script-setup-automatizado.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-022",
+      "label": "T-022-implementar-jobs-pipeline.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-020",
+      "label": "T-020-implementar-api-endpoints-users-auth.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-023",
+      "label": "T-023-implementar-mcp-server-fastmcp.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-016",
+      "label": "T-016-implementar-pydantic-schemas.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-008",
+      "label": "T-008-verificar-configuracion-redis.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-006",
+      "label": "epica-06-aplicacion.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-024",
+      "label": "T-024-implementar-integracion-ollama.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-001",
+      "label": "epica-01-infraestructura-base.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ENG-EPC-005",
+      "label": "epica-05-resolucion-verificacion.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-017",
+      "label": "T-017-implementar-api-endpoints-documents.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "T-011",
+      "label": "T-011-crear-script-health-check.md",
+      "status": "pending",
+      "rating": null,
+      "group": "IMPLEMENTACIÓN",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-CUL-001",
+      "label": "organizational-culture.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-POL-001",
+      "label": "dogfooding-validation-policy.md",
+      "status": "pending",
+      "rating": 6,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-STR-003",
+      "label": "technical-roadmap.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-STR-001",
+      "label": "vision-mission.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-STR-002",
+      "label": "technology-strategy.md",
+      "status": "completed",
+      "rating": 9,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-STR-004",
+      "label": "llm-evaluation.md",
+      "status": "pending",
+      "rating": 2,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    },
+    {
+      "id": "ESTR-STR-005",
+      "label": "frontend-strategy.md",
+      "status": "pending",
+      "rating": 2,
+      "group": "ESTRATEGIA",
+      "milestone": ""
+    }
+  ],
+  "edges": [
+    {
+      "source": "PROD-FUN-005",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la visión y misión definiendo el ciclo de vida de documentación"
+    },
+    {
+      "source": "PROD-FUN-005",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica mediante el workflow de 5 fases"
+    },
+    {
+      "source": "PROD-REQ-012",
+      "target": "FEAT-008",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de diff viewer"
+    },
+    {
+      "source": "PROD-REQ-012",
+      "target": "FEAT-006",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de versioning de documentos"
+    },
+    {
+      "source": "PROD-REQ-003",
+      "target": "PROD-FUN-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el workflow de 5 fases con catálogo de gaps"
+    },
+    {
+      "source": "PROD-REQ-003",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la visión y misión definiendo gaps de contexto"
+    },
+    {
+      "source": "PROD-REQ-008",
+      "target": "FEAT-005",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de integración Git"
+    },
+    {
+      "source": "PROD-REQ-008",
+      "target": "ENG-ARC-010",
+      "relationship_type": "references",
+      "reason": "Referencia el git-integration-specification para especificación técnica de integración Git"
+    },
+    {
+      "source": "PROD-REQ-007",
+      "target": "FEAT-ONB-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de onboarding strategy"
+    },
+    {
+      "source": "PROD-REQ-007",
+      "target": "FEAT-005",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de integración Git"
+    },
+    {
+      "source": "PROD-REQ-007",
+      "target": "ENG-TS-006",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-onboarding-proyecto-legacy para especificación técnica detallada"
+    },
+    {
+      "source": "PROD-PRD-002",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo el Hito 2 de API REST y MCP Server"
+    },
+    {
+      "source": "PROD-PRD-002",
+      "target": "ENG-TRD-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el TRD de Hito 2 con API y MCP"
+    },
+    {
+      "source": "PROD-PRD-002",
+      "target": "ENG-ARC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación de API REST"
+    },
+    {
+      "source": "PROD-PRD-002",
+      "target": "ENG-ARC-006",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación de MCP Server"
+    },
+    {
+      "source": "PROD-REQ-009",
+      "target": "FEAT-006",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de versioning de documentos"
+    },
+    {
+      "source": "PROD-REQ-009",
+      "target": "FEAT-008",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de diff viewer"
+    },
+    {
+      "source": "PROD-REQ-013",
+      "target": "FEAT-UI-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de UI sections specification"
+    },
+    {
+      "source": "PROD-REQ-013",
+      "target": "FEAT-009",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de dashboard general"
+    },
+    {
+      "source": "PROD-REQ-006",
+      "target": "FEAT-ONB-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de onboarding strategy"
+    },
+    {
+      "source": "PROD-REQ-006",
+      "target": "FEAT-005",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de integración Git"
+    },
+    {
+      "source": "PROD-REQ-006",
+      "target": "ENG-TS-007",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-onboarding-proyecto-nuevo para especificación técnica detallada"
+    },
+    {
+      "source": "PROD-REQ-011",
+      "target": "FEAT-009",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de dashboard general"
+    },
+    {
+      "source": "PROD-REQ-011",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo dashboard en Hito 3"
+    },
+    {
+      "source": "PROD-REQ-005",
+      "target": "FEAT-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de sistema de usuarios y organizaciones"
+    },
+    {
+      "source": "PROD-PRD-003",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo el Hito 3 de frontend React"
+    },
+    {
+      "source": "PROD-PRD-003",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la visión y misión con interfaz de usuario"
+    },
+    {
+      "source": "PROD-REQ-010",
+      "target": "FEAT-007",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de búsqueda semántica"
+    },
+    {
+      "source": "PROD-REQ-010",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo búsqueda semántica en Hitos 1, 2, 4"
+    },
+    {
+      "source": "PROD-PRD-001",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo el Hito 1 de infraestructura base"
+    },
+    {
+      "source": "PROD-PRD-001",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el Technology Stack con servicios de infraestructura"
+    },
+    {
+      "source": "FEAT-008",
+      "target": "FEAT-006",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de versioning con diff viewer"
+    },
+    {
+      "source": "FEAT-008",
+      "target": "ENG-TS-005",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-diff-viewer para especificación técnica detallada"
+    },
+    {
+      "source": "FEAT-007",
+      "target": "PROD-REQ-010",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de búsqueda semántica"
+    },
+    {
+      "source": "FEAT-007",
+      "target": "PROD-PRD-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el PRD de Hito 1 con búsqueda semántica"
+    },
+    {
+      "source": "FEAT-007",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el Technology Stack con Qdrant para búsqueda vectorial"
+    },
+    {
+      "source": "FEAT-007",
+      "target": "ENG-TS-001",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-busqueda-semantica para especificación técnica detallada"
+    },
+    {
+      "source": "FEAT-009",
+      "target": "PROD-REQ-011",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de dashboard general"
+    },
+    {
+      "source": "FEAT-009",
+      "target": "ENG-TS-004",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-dashboard-general para especificación técnica detallada"
+    },
+    {
+      "source": "FEAT-006",
+      "target": "PROD-REQ-009",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de versioning de documentos"
+    },
+    {
+      "source": "FEAT-006",
+      "target": "ENG-ARC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa el database schema para versioning"
+    },
+    {
+      "source": "PROD-FUN-001",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la visión y misión definiendo el workflow de 5 fases"
+    },
+    {
+      "source": "PROD-FUN-001",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica mediante el workflow de 5 fases"
+    },
+    {
+      "source": "FEAT-001",
+      "target": "PROD-PRD-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el PRD de Hito 2 con sistema de usuarios y organizaciones"
+    },
+    {
+      "source": "FEAT-001",
+      "target": "ENG-ARC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación de API para autenticación"
+    },
+    {
+      "source": "FEAT-001",
+      "target": "ENG-ARC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa el database schema para organizaciones y proyectos"
+    },
+    {
+      "source": "FEAT-001",
+      "target": "ADR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el stack unificado en Python definido en ADR-002"
+    },
+    {
+      "source": "FEAT-001",
+      "target": "PROD-REQ-005",
+      "relationship_type": "references",
+      "reason": "Referencia los requisitos de sistema de usuarios y organizaciones"
+    },
+    {
+      "source": "FEAT-ONB-001",
+      "target": "PROD-REQ-006",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de onboarding de proyecto nuevo"
+    },
+    {
+      "source": "FEAT-ONB-001",
+      "target": "PROD-REQ-007",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de onboarding de proyecto legacy"
+    },
+    {
+      "source": "FEAT-ONB-001",
+      "target": "ENG-TS-006",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-onboarding-proyecto-legacy para especificación técnica detallada"
+    },
+    {
+      "source": "FEAT-ONB-001",
+      "target": "ENG-TS-007",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-onboarding-proyecto-nuevo para especificación técnica detallada"
+    },
+    {
+      "source": "FEAT-UI-001",
+      "target": "PROD-FUN-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el workflow de 5 fases especificando secciones de UI"
+    },
+    {
+      "source": "FEAT-UI-001",
+      "target": "PROD-PRD-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el PRD de Hito 3 con especificaciones de UI"
+    },
+    {
+      "source": "FEAT-UI-001",
+      "target": "FEAT-007",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de búsqueda semántica en UI"
+    },
+    {
+      "source": "FEAT-UI-001",
+      "target": "PROD-REQ-013",
+      "relationship_type": "references",
+      "reason": "Referencia los requisitos de secciones de UI"
+    },
+    {
+      "source": "FEAT-005",
+      "target": "PROD-PRD-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el PRD de Hito 2 con integración Git"
+    },
+    {
+      "source": "FEAT-005",
+      "target": "ENG-ARC-010",
+      "relationship_type": "references",
+      "reason": "Referencia el git-integration-specification para especificación técnica de integración Git"
+    },
+    {
+      "source": "FEAT-005",
+      "target": "ENG-TS-003",
+      "relationship_type": "references",
+      "reason": "Referencia el technical-specs-integracion-git para especificación técnica detallada"
+    },
+    {
+      "source": "ENG-TRD-001",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el Hito 1 del roadmap técnico con requisitos detallados"
+    },
+    {
+      "source": "ENG-TRD-001",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el stack tecnológico con especificación de infraestructura"
+    },
+    {
+      "source": "ENG-TRD-001",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para configuración de servicios"
+    },
+    {
+      "source": "ENG-TRD-001",
+      "target": "ADR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión de Docker Compose con requisitos específicos"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ADR-001",
+      "relationship_type": "depends_on",
+      "reason": "Depende de ADR-001 para implementación de MCP Server"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ADR-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende de ADR-002 para stack unificado Python (FastAPI, Celery)"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ADR-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende de ADR-004 para estrategia de jobs efímeros"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ADR-005",
+      "relationship_type": "depends_on",
+      "reason": "Depende de ADR-005 para idempotencia de jobs"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ADR-006",
+      "relationship_type": "depends_on",
+      "reason": "Depende de ADR-006 para versioning de documentos"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para implementación de API"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ENG-ARC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación de API REST en requisitos funcionales"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ENG-ARC-006",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación de MCP Server en requisitos funcionales"
+    },
+    {
+      "source": "ENG-TRD-002",
+      "target": "ENG-ARC-002",
+      "relationship_type": "references",
+      "reason": "Referencia el flujo end-to-end para casos de uso del pipeline"
+    },
+    {
+      "source": "ENG-ARC-020",
+      "target": "ADR-004",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de retry con backoff exponencial definida en ADR-004"
+    },
+    {
+      "source": "ENG-ARC-020",
+      "target": "ENG-TRD-002",
+      "relationship_type": "references",
+      "reason": "Referencia el TRD de Hito 2 para requisitos de jobs"
+    },
+    {
+      "source": "ENG-ARC-020",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la configuración de Celery para la épica de API y MCP"
+    },
+    {
+      "source": "ENG-ARC-019",
+      "target": "ADR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión de MCP con guía de implementación"
+    },
+    {
+      "source": "ENG-ARC-019",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack con guía de implementación de MCP"
+    },
+    {
+      "source": "ENG-TS-003",
+      "target": "FEAT-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación técnica detallada del feature de integración Git"
+    },
+    {
+      "source": "ENG-TS-003",
+      "target": "PROD-REQ-008",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de integración Git"
+    },
+    {
+      "source": "ENG-TS-003",
+      "target": "ENG-ARC-010",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación de integración Git con detalles técnicos"
+    },
+    {
+      "source": "ENG-TS-007",
+      "target": "ENG-ARC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa el schema de base de datos con especificación de onboarding de proyectos nuevos"
+    },
+    {
+      "source": "ENG-ARC-019",
+      "target": "ENG-ARC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de manejo de concurrencia para endpoints de documentos"
+    },
+    {
+      "source": "ENG-ARC-019",
+      "target": "ADR-005",
+      "relationship_type": "contradicts",
+      "reason": "ADR-005 rechaza locks en base de datos en favor de Redis distributed locks; este documento evalúa ambas estrategias para contexto de edición de usuarios (distinto de jobs asíncronos)"
+    },
+    {
+      "source": "ENG-ARC-019",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para implementación de control de concurrencia"
+    },
+    {
+      "source": "ENG-ARC-019",
+      "target": "ADR-006",
+      "relationship_type": "references",
+      "reason": "ADR-006 menciona uso de SELECT FOR UPDATE para versioning de documentos; este documento alinea la estrategia de concurrencia con esa decisión"
+    },
+    {
+      "source": "ENG-TS-004",
+      "target": "FEAT-009",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación técnica detallada del feature de dashboard general"
+    },
+    {
+      "source": "ENG-TS-004",
+      "target": "PROD-REQ-011",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos del dashboard general"
+    },
+    {
+      "source": "ENG-TS-005",
+      "target": "FEAT-008",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación técnica detallada del feature de diff viewer"
+    },
+    {
+      "source": "ENG-TS-005",
+      "target": "PROD-REQ-012",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos del diff viewer"
+    },
+    {
+      "source": "ENG-ARC-012",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack definiendo arquitectura de API"
+    },
+    {
+      "source": "ENG-ARC-022",
+      "target": "ENG-ARC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la autenticación JWT definida en la especificación de API"
+    },
+    {
+      "source": "ENG-ARC-022",
+      "target": "ENG-TRD-002",
+      "relationship_type": "references",
+      "reason": "Referencia el TRD de Hito 2 para requisitos de autenticación"
+    },
+    {
+      "source": "ENG-ARC-022",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el sistema de autenticación para la épica de API y MCP"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ADR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa MCP como capa de abstracción para LLMs según ADR-001"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ADR-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende del stack unificado Python (FastMCP) definido en ADR-002"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ADR-004",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de jobs efímeros para ejecución asíncrona de tools MCP"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ADR-005",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de idempotencia y reintentos con backoff exponencial para manejo de errores"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ADR-006",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de versioning de documentos para snapshots automáticos y rollback"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para persistencia de datos MCP"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ENG-ARC-002",
+      "relationship_type": "references",
+      "reason": "Referencia el flujo end-to-end para definir tools de cada fase del pipeline"
+    },
+    {
+      "source": "ENG-ARC-006",
+      "target": "ENG-ARC-018",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de testing con pytest y FastMCP Client para testing de MCP servers"
+    },
+    {
+      "source": "ENG-ARC-003",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica con stack específico de tecnologías"
+    },
+    {
+      "source": "ENG-ARC-003",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo tecnologías por hito"
+    },
+    {
+      "source": "ENG-ARC-003",
+      "target": "ESTR-STR-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de frontend definiendo stack de frontend"
+    },
+    {
+      "source": "ENG-ARC-003",
+      "target": "ESTR-STR-004",
+      "relationship_type": "implements",
+      "reason": "Implementa la evaluación de LLM definiendo proveedores recomendados"
+    },
+    {
+      "source": "ENG-ARC-003",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para definir tecnologías de persistencia"
+    },
+    {
+      "source": "ENG-ARC-003",
+      "target": "ENG-ARC-024",
+      "relationship_type": "implements",
+      "reason": "Implementa la configuración de producción post-MVP"
+    },
+    {
+      "source": "ENG-TS-002",
+      "target": "ENG-ARC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa el schema de base de datos con especificación de versioning"
+    },
+    {
+      "source": "ENG-ARC-024",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack definiendo configuración de producción"
+    },
+    {
+      "source": "ENG-ARC-024",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo configuración de producción post-MVP"
+    },
+    {
+      "source": "ENG-ARC-004",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el stack tecnológico definiendo schema de base de datos PostgreSQL"
+    },
+    {
+      "source": "ENG-ARC-004",
+      "target": "ENG-ARC-009",
+      "relationship_type": "references",
+      "reason": "Referencia el document-relationships-strategy para estrategia de relaciones"
+    },
+    {
+      "source": "ENG-ARC-015",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack con guía de Qdrant"
+    },
+    {
+      "source": "ENG-ARC-015",
+      "target": "FEAT-007",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de búsqueda semántica con guía de Qdrant"
+    },
+    {
+      "source": "ENG-ARC-002",
+      "target": "ENG-ARC-001",
+      "relationship_type": "depends_on",
+      "reason": "Depende del technical brief para contexto de arquitectura general"
+    },
+    {
+      "source": "ENG-ARC-002",
+      "target": "ADR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la arquitectura de 5 fases descrita en ADR-002"
+    },
+    {
+      "source": "ENG-ARC-002",
+      "target": "ADR-004",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de jobs efímeros para manejo de jobs del pipeline"
+    },
+    {
+      "source": "ENG-ARC-002",
+      "target": "ADR-005",
+      "relationship_type": "references",
+      "reason": "Referencia la idempotencia de jobs para manejo de locks y reintentos"
+    },
+    {
+      "source": "ENG-ARC-011",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica con decisiones de diseño arquitectónico"
+    },
+    {
+      "source": "ENG-ARC-011",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack con decisiones específicas de arquitectura"
+    },
+    {
+      "source": "ENG-ARC-011",
+      "target": "ENG-ARC-019",
+      "relationship_type": "references",
+      "reason": "Referencia el mcp-server-implementation para implementación de MCP"
+    },
+    {
+      "source": "ENG-ARC-011",
+      "target": "ENG-ARC-015",
+      "relationship_type": "references",
+      "reason": "Referencia el qdrant para configuración de Qdrant"
+    },
+    {
+      "source": "ENG-ARC-007",
+      "target": "ADR-004",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión de jobs efímeros con guía de implementación"
+    },
+    {
+      "source": "ENG-ARC-007",
+      "target": "ADR-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión de idempotencia de jobs con guía de implementación"
+    },
+    {
+      "source": "ENG-ARC-007",
+      "target": "ENG-ARC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa el schema de base de datos con guía de implementación de jobs"
+    },
+    {
+      "source": "ENG-ARC-013",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica con guía de evals de LLM"
+    },
+    {
+      "source": "ENG-ARC-013",
+      "target": "ENG-ARC-007",
+      "relationship_type": "references",
+      "reason": "Referencia el job-implementation-guide para evals de jobs"
+    },
+    {
+      "source": "ENG-ARC-023",
+      "target": "ENG-ARC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la validación de input definida en la especificación de API"
+    },
+    {
+      "source": "ENG-ARC-023",
+      "target": "ENG-TRD-002",
+      "relationship_type": "references",
+      "reason": "Referencia el TRD de Hito 2 para requisitos de seguridad"
+    },
+    {
+      "source": "ENG-ARC-023",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la validación de input para la épica de API y MCP"
+    },
+    {
+      "source": "ENG-ARC-009",
+      "target": "ENG-ARC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa el schema de base de datos con estrategia de relaciones"
+    },
+    {
+      "source": "ENG-ARC-009",
+      "target": "PROD-FUN-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el workflow de 5 fases con estrategia de relaciones"
+    },
+    {
+      "source": "ENG-ARC-009",
+      "target": "PROD-FUN-005",
+      "relationship_type": "references",
+      "reason": "Referencia el 5-phase-workflow para detalles del workflow"
+    },
+    {
+      "source": "ENG-ARC-014",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack con setup de desarrollo"
+    },
+    {
+      "source": "ENG-ARC-014",
+      "target": "ADR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la infraestructura local Docker Compose con setup de desarrollo"
+    },
+    {
+      "source": "ENG-ARC-010",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica con especificación de integración Git"
+    },
+    {
+      "source": "ENG-ARC-010",
+      "target": "ENG-ARC-011",
+      "relationship_type": "implements",
+      "reason": "Implementa el architecture overview con detalles de integración Git"
+    },
+    {
+      "source": "ENG-ARC-018",
+      "target": "ADR-006",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de versioning de documentos definida en ADR-006"
+    },
+    {
+      "source": "ENG-ARC-018",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para implementación de snapshots"
+    },
+    {
+      "source": "ENG-ARC-018",
+      "target": "ENG-ARC-005",
+      "relationship_type": "references",
+      "reason": "Referencia la especificación de API para endpoints de versioning"
+    },
+    {
+      "source": "ENG-ARC-008",
+      "target": "ESTR-STR-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de frontend con especificaciones técnicas"
+    },
+    {
+      "source": "ENG-ARC-008",
+      "target": "ENG-EPC-003",
+      "relationship_type": "references",
+      "reason": "Referencia la épica de frontend React para implementación"
+    },
+    {
+      "source": "ENG-ARC-017",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el technology stack definiendo procedimientos de debugging"
+    },
+    {
+      "source": "ENG-ARC-001",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica describiendo la arquitectura del sistema"
+    },
+    {
+      "source": "ENG-ARC-001",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para definir persistencia de datos"
+    },
+    {
+      "source": "ENG-ARC-001",
+      "target": "ENG-ARC-007",
+      "relationship_type": "references",
+      "reason": "Referencia el job-implementation-guide para guía de implementación de jobs"
+    },
+    {
+      "source": "ENG-ARC-005",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para definir endpoints y modelos de datos"
+    },
+    {
+      "source": "ENG-ARC-005",
+      "target": "ADR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el stack unificado Python usando FastAPI para la API REST"
+    },
+    {
+      "source": "ENG-ARC-005",
+      "target": "ENG-ARC-002",
+      "relationship_type": "references",
+      "reason": "Referencia el flujo end-to-end para definir endpoints del pipeline"
+    },
+    {
+      "source": "ENG-ARC-005",
+      "target": "ADR-006",
+      "relationship_type": "implements",
+      "reason": "Implementa el versioning de documentos con snapshots en endpoints de documentos"
+    },
+    {
+      "source": "ENG-ARC-018",
+      "target": "ADR-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende del stack unificado Python (FastAPI, Celery, FastMCP) y la estrategia de testing con pytest y cobertura >90%"
+    },
+    {
+      "source": "ENG-ARC-018",
+      "target": "ADR-007",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura de paquetes Python que la estrategia de testing debe seguir"
+    },
+    {
+      "source": "ENG-ARC-018",
+      "target": "ADR-009",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estrategia de testing específica para el stack Python unificado"
+    },
+    {
+      "source": "ENG-TS-006",
+      "target": "FEAT-005",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la integración con Git para conectar repositorios y realizar arqueología de código"
+    },
+    {
+      "source": "ENG-TS-006",
+      "target": "PROD-REQ-007",
+      "relationship_type": "depends_on",
+      "reason": "Depende de los requisitos archivados de onboarding legacy como fuente de especificaciones técnicas"
+    },
+    {
+      "source": "ENG-TS-001",
+      "target": "FEAT-007",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación técnica detallada del feature de búsqueda semántica"
+    },
+    {
+      "source": "ENG-TS-001",
+      "target": "PROD-PRD-001",
+      "relationship_type": "depends_on",
+      "reason": "Depende del PRD Hito 1 que define los requisitos de configuración de Qdrant (BGE-M3, 1024 dimensiones, cosine similarity)"
+    },
+    {
+      "source": "ENG-TS-001",
+      "target": "ENG-ARC-003",
+      "relationship_type": "depends_on",
+      "reason": "Depende del Technology Stack que define Qdrant como la base de datos vectorial seleccionada"
+    },
+    {
+      "source": "ENG-ARC-016",
+      "target": "ENG-ARC-003",
+      "relationship_type": "depends_on",
+      "reason": "Depende del Technology Stack que define PostgreSQL como la base de datos relacional seleccionada"
+    },
+    {
+      "source": "ADR-003",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la arquitectura general con infraestructura local Docker Compose"
+    },
+    {
+      "source": "ADR-003",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para configuración de PostgreSQL"
+    },
+    {
+      "source": "ADR-003",
+      "target": "ADR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el stack unificado Python con servicios de datos orquestados"
+    },
+    {
+      "source": "ADR-003",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el Hito 1 - Infraestructura Base del roadmap técnico"
+    },
+    {
+      "source": "ADR-005",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para campos de locks en tabla documents"
+    },
+    {
+      "source": "ADR-005",
+      "target": "ADR-002",
+      "relationship_type": "extends",
+      "reason": "Extiende el stack unificado Python con estrategia de idempotencia de jobs"
+    },
+    {
+      "source": "ADR-005",
+      "target": "ADR-004",
+      "relationship_type": "extends",
+      "reason": "Extiende las decisiones de jobs efímeros con locks de idempotencia"
+    },
+    {
+      "source": "ADR-005",
+      "target": "ADR-006",
+      "relationship_type": "reinforces",
+      "reason": "Refuerza el versioning al prevenir duplicación de trabajo en reintentos"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la arquitectura general del sistema con stack unificado Python"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para persistencia"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ENG-ARC-018",
+      "relationship_type": "references",
+      "reason": "Referencia el testing-strategy para estrategia de testing del stack Python"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ADR-001",
+      "relationship_type": "reinforces",
+      "reason": "Refuerza la decisión de MCP al definir FastMCP como implementación específica"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ADR-004",
+      "relationship_type": "extends",
+      "reason": "Extiende las decisiones de jobs con estrategia específica de Celery"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ADR-005",
+      "relationship_type": "extends",
+      "reason": "Extiende las decisiones de jobs con estrategia de idempotencia"
+    },
+    {
+      "source": "ADR-002",
+      "target": "ADR-006",
+      "relationship_type": "extends",
+      "reason": "Extiende el stack con estrategia de versioning de documentos"
+    },
+    {
+      "source": "ADR-004",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para persistencia de jobs y locks"
+    },
+    {
+      "source": "ADR-008",
+      "target": "ADR-007",
+      "relationship_type": "implements",
+      "reason": "Implementa la estructura de paquetes con gestión de dependencias uv"
+    },
+    {
+      "source": "ADR-008",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la arquitectura general con estrategia de dependencias reproducibles"
+    },
+    {
+      "source": "ADR-001",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el principio estratégico de complementar LLMs mediante MCP como capa de abstracción"
+    },
+    {
+      "source": "ADR-001",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión tecnológica de MCP como capa de abstracción definida en technology-strategy"
+    },
+    {
+      "source": "ADR-001",
+      "target": "ENG-ARC-003",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la arquitectura general del sistema para integración de MCP"
+    },
+    {
+      "source": "ADR-001",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para almacenar configuración de MCP"
+    },
+    {
+      "source": "ADR-001",
+      "target": "ADR-002",
+      "relationship_type": "extends",
+      "reason": "Extiende el stack unificado Python al definir la implementación específica de MCP"
+    },
+    {
+      "source": "ADR-007",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la arquitectura general del sistema definiendo la estructura de paquetes Python"
+    },
+    {
+      "source": "ADR-007",
+      "target": "ADR-008",
+      "relationship_type": "implements",
+      "reason": "Implementa la estructura de paquetes con gestión de dependencias uv"
+    },
+    {
+      "source": "ADR-006",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para tabla document_snapshots"
+    },
+    {
+      "source": "ADR-006",
+      "target": "ADR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el stack unificado Python con middleware de versioning"
+    },
+    {
+      "source": "ADR-006",
+      "target": "ADR-005",
+      "relationship_type": "extends",
+      "reason": "Extiende las decisiones de arquitectura con estrategia de versioning específica"
+    },
+    {
+      "source": "ADR-009",
+      "target": "ENG-ARC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de arquitectura para testing del stack unificado Python"
+    },
+    {
+      "source": "ADR-009",
+      "target": "ENG-ARC-014",
+      "relationship_type": "references",
+      "reason": "Referencia el development-setup para documentación de fixtures y patrones de testing"
+    },
+    {
+      "source": "ENG-EPC-002",
+      "target": "ENG-TRD-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el TRD de Hito 2 con tareas de API REST y MCP Server"
+    },
+    {
+      "source": "ENG-EPC-002",
+      "target": "PROD-PRD-002",
+      "relationship_type": "implements",
+      "reason": "Implementa el PRD de Hito 2 con requisitos de API y MCP"
+    },
+    {
+      "source": "ENG-EPC-002",
+      "target": "T-018",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de API endpoints sessions"
+    },
+    {
+      "source": "ENG-EPC-002",
+      "target": "T-019",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de API endpoints jobs"
+    },
+    {
+      "source": "ENG-EPC-002",
+      "target": "T-020",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de API endpoints users auth"
+    },
+    {
+      "source": "T-018",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con endpoints de sessions"
+    },
+    {
+      "source": "T-018",
+      "target": "T-017",
+      "relationship_type": "depends_on",
+      "reason": "Depende de los endpoints de documents implementados en T-017 para sesiones"
+    },
+    {
+      "source": "T-015",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server configurando migrations"
+    },
+    {
+      "source": "T-015",
+      "target": "T-014",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura Python configurada en T-014 para configurar Alembic"
+    },
+    {
+      "source": "T-004",
+      "target": "T-001",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura base creada en T-001 para configurar Alembic"
+    },
+    {
+      "source": "T-004",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del diseño de schema de base de datos para configurar migrations"
+    },
+    {
+      "source": "T-005",
+      "target": "T-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Alembic en T-004 para crear migration inicial"
+    },
+    {
+      "source": "T-005",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del diseño de schema de base de datos para implementar migration"
+    },
+    {
+      "source": "T-009",
+      "target": "T-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Docker Compose para verificar Qdrant"
+    },
+    {
+      "source": "T-003",
+      "target": "T-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Docker Compose para definir variables de entorno de servicios"
+    },
+    {
+      "source": "T-006",
+      "target": "T-005",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la migration inicial creada en T-005 para implementar middleware"
+    },
+    {
+      "source": "T-006",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del diseño de schema de base de datos para implementar middleware"
+    },
+    {
+      "source": "T-026",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con health checks"
+    },
+    {
+      "source": "T-026",
+      "target": "T-017",
+      "relationship_type": "depends_on",
+      "reason": "Depende de los endpoints de documents en T-017 para health checks"
+    },
+    {
+      "source": "T-026",
+      "target": "T-021",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Celery/RQ en T-021 para health checks"
+    },
+    {
+      "source": "ENG-EPC-007",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia técnica de integraciones"
+    },
+    {
+      "source": "ENG-EPC-007",
+      "target": "FEAT-005",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de integración con Git"
+    },
+    {
+      "source": "ENG-EPC-007",
+      "target": "T-022",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de jobs pipeline"
+    },
+    {
+      "source": "ENG-EPC-007",
+      "target": "T-024",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de integración Ollama"
+    },
+    {
+      "source": "ENG-EPC-007",
+      "target": "T-025",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de integración Qdrant"
+    },
+    {
+      "source": "ENG-EPC-003",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia técnica de frontend React"
+    },
+    {
+      "source": "ENG-EPC-003",
+      "target": "ESTR-STR-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia de frontend"
+    },
+    {
+      "source": "ENG-EPC-003",
+      "target": "PROD-PRD-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el PRD de Hito 3 con requisitos de frontend"
+    },
+    {
+      "source": "ENG-EPC-003",
+      "target": "ENG-ARC-008",
+      "relationship_type": "references",
+      "reason": "Referencia el frontend-specification para especificación técnica"
+    },
+    {
+      "source": "T-012",
+      "target": "T-003",
+      "relationship_type": "depends_on",
+      "reason": "Depende de las variables de entorno configuradas para documentar en README"
+    },
+    {
+      "source": "T-012",
+      "target": "T-011",
+      "relationship_type": "depends_on",
+      "reason": "Depende del script de health check para documentar en README"
+    },
+    {
+      "source": "T-001",
+      "target": "ADR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión de infraestructura local con Docker Compose creando estructura base"
+    },
+    {
+      "source": "T-001",
+      "target": "ADR-007",
+      "relationship_type": "implements",
+      "reason": "Implementa la estructura de paquetes Python definida en el ADR"
+    },
+    {
+      "source": "T-014",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server configurando estructura Python"
+    },
+    {
+      "source": "T-007",
+      "target": "T-006",
+      "relationship_type": "depends_on",
+      "reason": "Depende del middleware de versioning implementado en T-006 para el script de inicialización"
+    },
+    {
+      "source": "T-019",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con endpoints de jobs"
+    },
+    {
+      "source": "T-019",
+      "target": "T-021",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Celery/RQ en T-021 para encolar jobs"
+    },
+    {
+      "source": "T-021",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server configurando Celery/RQ"
+    },
+    {
+      "source": "T-021",
+      "target": "T-014",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura Python configurada en T-014 para configurar Celery"
+    },
+    {
+      "source": "T-010",
+      "target": "T-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Docker Compose para configurar descarga de modelo Qwen"
+    },
+    {
+      "source": "ENG-EPC-004",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia técnica de detección y agrupación"
+    },
+    {
+      "source": "ENG-EPC-004",
+      "target": "PROD-FUN-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de 5-phase workflow"
+    },
+    {
+      "source": "ENG-EPC-004",
+      "target": "PROD-REQ-003",
+      "relationship_type": "implements",
+      "reason": "Implementa los requisitos de detección y agrupación"
+    },
+    {
+      "source": "ENG-EPC-004",
+      "target": "ENG-ARC-007",
+      "relationship_type": "references",
+      "reason": "Referencia el job-implementation-guide para implementación de jobs"
+    },
+    {
+      "source": "ENG-EPC-004",
+      "target": "ENG-ARC-013",
+      "relationship_type": "references",
+      "reason": "Referencia el llm-evals-guide para evals de LLM"
+    },
+    {
+      "source": "T-002",
+      "target": "T-001",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura base creada en T-001 para configurar Docker Compose"
+    },
+    {
+      "source": "T-002",
+      "target": "ADR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la decisión de infraestructura local con Docker Compose"
+    },
+    {
+      "source": "T-027",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con testing básico"
+    },
+    {
+      "source": "T-027",
+      "target": "T-016",
+      "relationship_type": "depends_on",
+      "reason": "Depende de los schemas Pydantic en T-016 para testing"
+    },
+    {
+      "source": "T-027",
+      "target": "T-023",
+      "relationship_type": "depends_on",
+      "reason": "Depende del MCP Server en T-023 para testing"
+    },
+    {
+      "source": "T-025",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con integración Qdrant"
+    },
+    {
+      "source": "T-025",
+      "target": "T-014",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura Python configurada en T-014 para integración Qdrant"
+    },
+    {
+      "source": "T-013",
+      "target": "T-012",
+      "relationship_type": "depends_on",
+      "reason": "Depende del README con instrucciones para crear script automatizado"
+    },
+    {
+      "source": "T-022",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con jobs del pipeline"
+    },
+    {
+      "source": "T-022",
+      "target": "T-021",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Celery/RQ en T-021 para implementar jobs"
+    },
+    {
+      "source": "T-022",
+      "target": "T-023",
+      "relationship_type": "depends_on",
+      "reason": "Depende del MCP Server implementado en T-023 para jobs del pipeline"
+    },
+    {
+      "source": "T-020",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con endpoints de users y auth"
+    },
+    {
+      "source": "T-020",
+      "target": "T-016",
+      "relationship_type": "depends_on",
+      "reason": "Depende de los schemas Pydantic implementados en T-016 para validación de users"
+    },
+    {
+      "source": "T-023",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con MCP Server FastMCP"
+    },
+    {
+      "source": "T-023",
+      "target": "T-015",
+      "relationship_type": "depends_on",
+      "reason": "Depende de las migrations configuradas en T-015 para persistencia de MCP"
+    },
+    {
+      "source": "T-016",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con schemas Pydantic"
+    },
+    {
+      "source": "T-016",
+      "target": "T-014",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura Python configurada en T-014 para implementar schemas"
+    },
+    {
+      "source": "T-008",
+      "target": "T-002",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la configuración de Docker Compose para verificar Redis"
+    },
+    {
+      "source": "ENG-EPC-006",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia técnica de fase de aplicación"
+    },
+    {
+      "source": "ENG-EPC-006",
+      "target": "PROD-FUN-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de 5-phase workflow"
+    },
+    {
+      "source": "ENG-EPC-006",
+      "target": "ENG-TS-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la especificación técnica de aplicación de cambios"
+    },
+    {
+      "source": "ENG-EPC-006",
+      "target": "T-027",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de testing básico"
+    },
+    {
+      "source": "T-024",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con integración Ollama"
+    },
+    {
+      "source": "T-024",
+      "target": "T-014",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la estructura Python configurada en T-014 para integración Ollama"
+    },
+    {
+      "source": "ENG-EPC-001",
+      "target": "ENG-TRD-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el TRD de Hito 1 con tareas de infraestructura base"
+    },
+    {
+      "source": "ENG-EPC-001",
+      "target": "T-007",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de script de inicialización de database"
+    },
+    {
+      "source": "ENG-EPC-001",
+      "target": "T-013",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de script de setup automatizado"
+    },
+    {
+      "source": "ENG-EPC-001",
+      "target": "T-011",
+      "relationship_type": "implements",
+      "reason": "Implementa la tarea de health checks"
+    },
+    {
+      "source": "ENG-EPC-005",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia técnica de resolución y verificación"
+    },
+    {
+      "source": "ENG-EPC-005",
+      "target": "PROD-FUN-001",
+      "relationship_type": "implements",
+      "reason": "Implementa el feature de 5-phase workflow"
+    },
+    {
+      "source": "ENG-EPC-005",
+      "target": "ENG-ARC-007",
+      "relationship_type": "references",
+      "reason": "Referencia el job-implementation-guide para implementación de jobs"
+    },
+    {
+      "source": "ENG-EPC-005",
+      "target": "ENG-ARC-013",
+      "relationship_type": "references",
+      "reason": "Referencia el llm-evals-guide para evals de LLM"
+    },
+    {
+      "source": "T-017",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server con endpoints de documents"
+    },
+    {
+      "source": "T-017",
+      "target": "T-015",
+      "relationship_type": "depends_on",
+      "reason": "Depende de las migrations configuradas en T-015 para persistencia de documents"
+    },
+    {
+      "source": "T-017",
+      "target": "T-016",
+      "relationship_type": "depends_on",
+      "reason": "Depende de los schemas Pydantic implementados en T-016 para validación"
+    },
+    {
+      "source": "T-011",
+      "target": "T-008",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la verificación de Redis para incluir en health check"
+    },
+    {
+      "source": "T-011",
+      "target": "T-009",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la verificación de Qdrant para incluir en health check"
+    },
+    {
+      "source": "T-011",
+      "target": "T-010",
+      "relationship_type": "depends_on",
+      "reason": "Depende de la verificación de Ollama para incluir en health check"
+    },
+    {
+      "source": "ESTR-CUL-001",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo cultura organizacional para fase bootstrapped"
+    },
+    {
+      "source": "ESTR-POL-001",
+      "target": "ESTR-STR-003",
+      "relationship_type": "implements",
+      "reason": "Implementa el roadmap técnico definiendo proceso de dogfooding"
+    },
+    {
+      "source": "ESTR-POL-001",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la visión y misión definiendo estrategia de validación"
+    },
+    {
+      "source": "ESTR-POL-001",
+      "target": "ESTR-CUL-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la cultura organizacional definiendo métricas de validación"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ESTR-STR-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la estrategia tecnológica definiendo el roadmap de hitos secuenciales"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ESTR-STR-005",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de frontend para Hito 3"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ESTR-STR-004",
+      "relationship_type": "references",
+      "reason": "Referencia la evaluación de LLM para decisiones de proveedores"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ESTR-POL-001",
+      "relationship_type": "references",
+      "reason": "Referencia la política de dogfooding para estrategia de validación"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-ARC-011",
+      "relationship_type": "references",
+      "reason": "Referencia el architecture overview para decisiones de diseño arquitectónico"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de infraestructura base para Hito 1"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-002",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de API REST y MCP Server para Hito 2"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de frontend React para Hito 3"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-004",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de detección y agrupación para Hito 4"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-005",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de resolución y verificación para Hito 5"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-006",
+      "relationship_type": "implements",
+      "reason": "Implementa la épica de aplicación para Hito 6"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-EPC-007",
+      "relationship_type": "implements",
+      "reason": "Referencia el architecture overview para decisiones de diseño arquitectónico"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-ARC-001",
+      "relationship_type": "references",
+      "reason": "Referencia el technical brief para descripción de arquitectura del sistema"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-ARC-012",
+      "relationship_type": "references",
+      "reason": "Referencia el api-architecture para arquitectura de API"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-ARC-016",
+      "relationship_type": "references",
+      "reason": "Referencia el database para configuración de base de datos"
+    },
+    {
+      "source": "ESTR-STR-003",
+      "target": "ENG-ARC-017",
+      "relationship_type": "references",
+      "reason": "Referencia el debugging para procedimientos de debugging"
+    },
+    {
+      "source": "ESTR-STR-001",
+      "target": "ESTR-STR-002",
+      "relationship_type": "explains",
+      "reason": "Explica el propósito estratégico y valores que guían las decisiones tecnológicas"
+    },
+    {
+      "source": "ESTR-STR-001",
+      "target": "ESTR-STR-003",
+      "relationship_type": "explains",
+      "reason": "Explica el horizonte temporal y estrategia de validación que informan el roadmap"
+    },
+    {
+      "source": "ESTR-STR-001",
+      "target": "ESTR-POL-001",
+      "relationship_type": "references",
+      "reason": "Referencia la política de dogfooding para estrategia de validación"
+    },
+    {
+      "source": "ESTR-STR-001",
+      "target": "ENG-ARC-001",
+      "relationship_type": "references",
+      "reason": "Referencia el technical brief para detalles de detección y resolución de gaps"
+    },
+    {
+      "source": "ESTR-STR-001",
+      "target": "ENG-ARC-016",
+      "relationship_type": "references",
+      "reason": "Referencia el database para configuración de base de datos"
+    },
+    {
+      "source": "ESTR-STR-001",
+      "target": "ADR-001",
+      "relationship_type": "reinforces",
+      "reason": "Refuerza la decisión de MCP como capa de abstracción al establecer el principio de complementar LLMs"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ESTR-STR-001",
+      "relationship_type": "implements",
+      "reason": "Implementa la visión y misión definiendo la arquitectura técnica del sistema"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ESTR-STR-003",
+      "relationship_type": "explains",
+      "reason": "Explica la arquitectura general que el roadmap implementa en hitos secuenciales"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ESTR-STR-005",
+      "relationship_type": "references",
+      "reason": "Referencia la estrategia de frontend para decisiones de stack"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ESTR-STR-004",
+      "relationship_type": "references",
+      "reason": "Referencia la evaluación de LLM para decisiones de proveedores"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-003",
+      "relationship_type": "implements",
+      "reason": "Implementa la arquitectura general del sistema con decisiones técnicas específicas"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-011",
+      "relationship_type": "references",
+      "reason": "Referencia el architecture overview para decisiones de diseño arquitectónico"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-001",
+      "relationship_type": "references",
+      "reason": "Referencia el technical brief para descripción de arquitectura del sistema"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-012",
+      "relationship_type": "references",
+      "reason": "Referencia el api-architecture para arquitectura de API"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-017",
+      "relationship_type": "references",
+      "reason": "Referencia el debugging para procedimientos de debugging"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-015",
+      "relationship_type": "references",
+      "reason": "Referencia el qdrant para configuración de búsqueda semántica"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ENG-ARC-004",
+      "relationship_type": "depends_on",
+      "reason": "Depende del schema de base de datos para persistencia de datos"
+    },
+    {
+      "source": "ESTR-STR-002",
+      "target": "ADR-001",
+      "relationship_type": "reinforces",
+      "reason": "Refuerza la decisión de MCP como capa de abstracción en la arquitectura general"
+    },
+    {
+      "source": "ESTR-STR-004",
+      "target": "ENG-ARC-003",
+      "relationship_type": "depends_on",
+      "reason": "Depende del Technology Stack que define los proveedores LLM recomendados"
+    },
+    {
+      "source": "ESTR-STR-005",
+      "target": "ENG-ARC-003",
+      "relationship_type": "depends_on",
+      "reason": "Depende del Technology Stack que define el stack de frontend recomendado"
+    }
+  ]
+}
