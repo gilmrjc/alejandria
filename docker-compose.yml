@@ -1,0 +1,81 @@
+services:
+  # Dev environment - Python shell for development and testing
+  dev:
+    image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+    container_name: alejandria-dev
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    environment:
+      - DATABASE_URL=postgresql://alejandria:changeme@postgresql:5432/alejandria
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_GRPC_URL=http://qdrant:6334
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: ["tail", "-f", "/dev/null"]  # Keep container running for interactive use
+    networks:
+      - alejandria-network
+    profiles:
+      - dev  # Solo se inicia con --profile dev
+
+  postgresql:
+    image: postgres:18.3-bookworm
+    container_name: alejandria-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-alejandria}
+      POSTGRES_USER: ${POSTGRES_USER:-alejandria}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-alejandria}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alejandria-network
+
+  redis:
+    image: redis:7.4.9-bookworm
+    container_name: alejandria-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - alejandria-network
+
+  qdrant:
+    image: qdrant/qdrant:v1.17.1
+    container_name: alejandria-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__LOG_LEVEL=INFO
+    networks:
+      - alejandria-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  qdrant_data:
+    driver: local
+
+networks:
+  alejandria-network:
+    driver: bridge

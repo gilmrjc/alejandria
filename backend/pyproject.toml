@@ -1,0 +1,100 @@
+[project]
+name = "alejandria"
+version = "0.1.0"
+description = "Alejandria - Document Management System with LLM Integration"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # FastAPI and web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+
+    # Database
+    "sqlalchemy>=2.0.40",
+    "alembic>=1.17.0",
+    "psycopg2-binary>=2.9.10",
+
+    # Async database
+    "asyncpg>=0.30.0",
+
+    # Redis
+    "redis>=5.2.1",
+
+    # Celery for background jobs
+    "celery>=5.5.0",
+
+    # MCP (Model Context Protocol)
+    "fastmcp>=3.2.0",
+
+    # Qdrant client
+    "qdrant-client>=1.13.0",
+
+    # HTTP client
+    "httpx>=0.28.1",
+    "aiohttp>=3.11.0",
+
+    # Pydantic for data validation
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.8.0",
+
+    # Environment variables
+    "python-dotenv>=1.1.0",
+
+    # Security
+    "python-jose[cryptography]>=3.4.0",
+    "passlib[bcrypt]>=1.7.4",
+
+    # Utilities
+    "structlog>=25.2.0",
+    "orjson>=3.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.26.0",
+    "pytest-cov>=6.1.0",
+    "testcontainers>=4.10.0",
+
+    # Linting and formatting
+    "ruff>=0.11.0",
+    "mypy>=1.15.0",
+
+    # Type stubs
+    "types-passlib>=1.7.0",
+    "types-python-jose>=3.4.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = [
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "W",   # pycodestyle warnings
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["api*", "mcp*", "jobs*", "shared*"]
+exclude = ["tests*"]
