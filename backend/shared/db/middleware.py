@@ -5,74 +5,92 @@ Implements automatic snapshot creation before document updates and
 automatic updated_at timestamp management, following ADR-006.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import event
-from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import get_history
 
 from .models import Document, DocumentSnapshot
 
+# Attribute key for tracking old content
+_OLD_CONTENT_ATTR = "_old_content"
 
-@event.listens_for(Document, 'before_update')
+
+@event.listens_for(Document, "before_update")
 def handle_document_update(mapper: Any, connection: Any, target: Document) -> None:
     """
-    Handle document updates: create snapshot if content changed and update timestamp.
+    Handle document updates: update timestamp and flag for snapshot creation.
 
-    This event listener automatically:
-    1. Creates a DocumentSnapshot if content has actually changed
-    2. Updates the updated_at timestamp on every update
+    This event listener:
+    1. Updates the updated_at timestamp on every update
+    2. Validates content is not None
+    3. Stores old content for comparison in after_update
     """
     # Always update timestamp
-    target.updated_at = datetime.now(timezone.utc)
+    target.updated_at = datetime.now(UTC)
 
-    # Check if content has actually changed
-    if target._old_content is None:
-        # First time tracking, store current content
-        target._old_content = target.content
-        return
-
-    # Only create snapshot if content actually changed
-    if target.content == target._old_content:
-        return
-
-    # Validate required fields
+    # Validate content is not None before attempting to create snapshot
     if target.content is None:
         raise ValueError("Document content cannot be None when creating snapshot")
 
-    # Create snapshot record
-    snapshot = DocumentSnapshot(
+    # Get history of content attribute to detect changes
+    history = get_history(target, "content")
+    if history.has_changes():
+        # Store both old and new content for after_update event
+        # Use instance attribute to avoid ClassVar issues
+        # Store as tuple (old_content, new_content) to handle multiple updates
+        old_content = history.deleted[0] if history.deleted else None
+        setattr(target, _OLD_CONTENT_ATTR, (old_content, target.content))
+
+
+@event.listens_for(Document, "after_update")
+def create_snapshot_after_update(
+    mapper: Any, connection: Any, target: Document
+) -> None:
+    """
+    Create snapshot after document update if content changed.
+
+    This event listener uses connection.execute() to insert the snapshot,
+    avoiding SQLAlchemy warnings about Session.add() during flush.
+    """
+    # Get snapshot data from instance attribute
+    snapshot_data = getattr(target, _OLD_CONTENT_ATTR, None)
+    if snapshot_data is None:
+        return
+
+    old_content, new_content = snapshot_data
+
+    # Only create snapshot if content actually changed
+    if old_content == new_content:
+        # Clean up the temporary attribute
+        delattr(target, _OLD_CONTENT_ATTR)
+        return
+
+    # Insert snapshot directly using connection.execute()
+    # This avoids Session.add() during flush process
+    from sqlalchemy import insert
+
+    stmt = insert(DocumentSnapshot).values(
         document_id=target.id,
-        old_content=target._old_content,
-        new_content=target.content,
-        diff_type='full',  # Full snapshot for recent changes (configurable)
+        old_content=old_content,
+        new_content=new_content,
+        diff_type="full",  # Full snapshot for recent changes (configurable)
         rating=target.rating,
         created_by=target.updated_by,
     )
+    connection.execute(stmt)
 
-    # Add to session within the same transaction
-    from sqlalchemy.orm import Session as ORMSession
-    session = ORMSession.object_session(target)
-    session.add(snapshot)
-
-
-@event.listens_for(Document, 'load')
-def track_old_content(target: Document, context: Any) -> None:
-    """
-    Track the original content when a document is loaded.
-
-    This allows us to compare and only create snapshots when
-    content actually changes.
-    """
-    target._old_content = target.content
+    # Clean up the temporary attribute
+    delattr(target, _OLD_CONTENT_ATTR)
 
 
-@event.listens_for(Document, 'before_insert')
+@event.listens_for(Document, "before_insert")
 def set_created_timestamp(mapper: Any, connection: Any, target: Document) -> None:
     """
     Set created_at timestamp on insert if not already set.
     """
     if target.created_at is None:
-        target.created_at = datetime.now(timezone.utc)
+        target.created_at = datetime.now(UTC)
     if target.updated_at is None:
-        target.updated_at = datetime.now(timezone.utc)
+        target.updated_at = datetime.now(UTC)

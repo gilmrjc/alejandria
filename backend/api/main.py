@@ -1,26 +1,47 @@
 """
-FastAPI Application - Placeholder
+FastAPI Application - Alejandria API
 
-This module will contain the main FastAPI application.
+Main application with document management, authentication, and health check endpoints.
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-# Placeholder for FastAPI app
+from api.routes import auth, documents, health, organizations, projects
+
+# FastAPI app
 app = FastAPI(
     title="Alejandria API",
     description="Document Management System with LLM Integration",
     version="0.1.0",
 )
 
+from shared.utils.logging import configure_logging  # noqa: E402
+
+configure_logging()
+
+from api.middleware.error_handler import setup_error_handling  # noqa: E402
+
+setup_error_handling(app)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure appropriately for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(documents.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(health.router, prefix="/api/v1")
+app.include_router(organizations.router, prefix="/api/v1")
+app.include_router(projects.router, prefix="/api/v1")
+
 
 @app.get("/")
 async def root():
-    """Root endpoint - placeholder."""
-    return {"message": "Alejandria API - Placeholder"}
-
-
-@app.get("/health")
-async def health():
-    """Health check endpoint."""
-    return {"status": "healthy"}
+    """Root endpoint."""
+    return {"message": "Alejandria API - Document Management System"}

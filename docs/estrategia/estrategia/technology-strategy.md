@@ -13,7 +13,7 @@ related:
   - target: STR-005
     relationship_type: references
     reason: Referencia la estrategia de frontend para decisiones de stack
-  - target: STR-004
+  - target: STR-006
     relationship_type: references
     reason: Referencia la evaluación de LLM para decisiones de proveedores
   - target: ARC-003

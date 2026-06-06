@@ -1,4 +1,60 @@
 services:
+  # API service - FastAPI application
+  api:
+    image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+    container_name: alejandria-api
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_GRPC_URL=http://qdrant:6334
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: ["uv", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8000:8000"
+    networks:
+      - alejandria-network
+
+  # MCP server service
+  mcp:
+    image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+    container_name: alejandria-mcp
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_GRPC_URL=http://qdrant:6334
+      - MCP_API_KEY_REQUIRED=false
+      - MCP_TRANSPORT=http
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: ["uv", "run", "python", "-m", "mcp_server.server"]
+    ports:
+      - "8001:8000"
+    networks:
+      - alejandria-network
+
   # Dev environment - Python shell for development and testing
   dev:
     image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
@@ -6,8 +62,10 @@ services:
     working_dir: /workspace
     volumes:
       - ./backend:/workspace
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=postgresql://alejandria:changeme@postgresql:5432/alejandria
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
       - REDIS_URL=redis://redis:6379/0
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_GRPC_URL=http://qdrant:6334
@@ -27,14 +85,16 @@ services:
   postgresql:
     image: postgres:18.3-bookworm
     container_name: alejandria-postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-alejandria}
-      POSTGRES_USER: ${POSTGRES_USER:-alejandria}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-alejandria}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,6 +107,8 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
+    env_file:
+      - .env
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -63,8 +125,10 @@ services:
       - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
+    env_file:
+      - .env
     environment:
-      - QDRANT__LOG_LEVEL=INFO
+      - QDRANT__LOG_LEVEL=${QDRANT_LOG_LEVEL}
     networks:
       - alejandria-network
 

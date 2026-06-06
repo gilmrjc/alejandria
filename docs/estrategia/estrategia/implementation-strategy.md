@@ -11,11 +11,11 @@ related:
     relationship_type: implements
     reason: Implementa la estrategia tecnológica con procesos de implementación
   - target: EPC-001
-    relationship_type: guides
-    reason: Guía la implementación de épicas con metodología y criterios
+    relationship_type: explains
+    reason: Explica la metodología y criterios para implementar épicas
   - target: EPC-002
-    relationship_type: guides
-    reason: Guía la implementación de épicas con metodología y criterios
+    relationship_type: explains
+    reason: Explica la metodología y criterios para implementar épicas
 ---
 
 # Implementation Strategy — Alejandria
@@ -162,7 +162,7 @@ Un hito NO se considera completo si:
 La estrategia de testing sigue el enfoque híbrido definido en technology-stack.md (ARC-003):
 
 - **Unit tests (70-80%)**: Prueban lógica de negocio, services, schemas sin dependencias externas
-- **Integration tests (15-20%)**: Prueban integración por capa con DB real (testcontainers)
+- **Integration tests (15-20%)**: Prueban integración por capa con DB real (bases de datos separadas en docker-compose)
 - **E2E tests (5-10%)**: Flujos completos (crear documento → ejecutar job → verificar resultado)
 
 ### Testing por Hito

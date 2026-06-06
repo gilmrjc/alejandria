@@ -68,21 +68,21 @@ Sistema de búsqueda que permite encontrar información por intención y context
 
 ### Estrategia de Chunking
 
-**Tamaño máximo de chunk:** 512 tokens
+**Tamaño máximo de chunk:** 256 tokens
 
-**Superposición entre chunks:** 50 tokens (10%)
+**Superposición entre chunks:** 25 tokens (10%)
 
 **Justificación:**
 
-- 512 tokens es el límite óptimo para BGE-M3 manteniendo calidad de embeddings
+- 256 tokens es el límite óptimo para BGE-M3 manteniendo calidad de embeddings para documentos técnicos
 - Superposición de 10% asegura que conceptos que cruzan límites de chunk no se pierdan
 - Chunking por párrafos y secciones para mantener contexto semántico
 
 **Algoritmo de chunking:**
 
 1. Dividir texto en párrafos
-2. Agrupar párrafos hasta alcanzar ~512 tokens
-3. Mantener superposición de 50 tokens entre chunks adyacentes
+2. Agrupar párrafos hasta alcanzar ~256 tokens
+3. Mantener superposición de 25 tokens entre chunks adyacentes
 4. Preservar estructura de secciones (títulos, subtítulos) en metadata
 
 ### Ciclo de Vida de Vectores

@@ -6,7 +6,6 @@ loading values from environment variables with sensible defaults.
 """
 
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -23,42 +22,35 @@ class Settings(BaseSettings):
     )
 
     # Application
-    app_env: str = Field(default="development", description="Application environment")
-    debug: bool = Field(default=True, description="Debug mode")
-    log_level: str = Field(default="INFO", description="Logging level")
+    app_env: str = Field(description="Application environment")
+    debug: bool = Field(description="Debug mode")
+    log_level: str = Field(description="Logging level")
 
     # Security
-    secret_key: str = Field(
-        default="your-secret-key-change-in-production",
-        description="Secret key for JWT token generation"
+    secret_key: str | None = Field(
+        default=None,
+        description="Secret key for JWT token generation (required in production)",
     )
-    algorithm: str = Field(default="HS256", description="JWT algorithm")
+    algorithm: str = Field(description="JWT algorithm")
     access_token_expire_minutes: int = Field(
-        default=30,
         description="Access token expiration time in minutes"
     )
 
     # Database
-    database_url: str = Field(
-        default="postgresql://alejandria:changeme@localhost:5432/alejandria",
-        description="PostgreSQL database URL"
+    database_url: str = Field(description="PostgreSQL database URL")
+    test_database_url: str | None = Field(
+        default=None, description="PostgreSQL test database URL"
     )
 
     # Redis
-    redis_url: str = Field(
-        default="redis://localhost:6379/0",
-        description="Redis connection URL"
-    )
+    redis_url: str = Field(description="Redis connection URL")
 
     # Qdrant
-    qdrant_url: str = Field(
-        default="http://localhost:6333",
-        description="Qdrant HTTP API URL"
-    )
-    qdrant_grpc_url: str = Field(
-        default="http://localhost:6334",
-        description="Qdrant gRPC URL"
-    )
+    qdrant_url: str = Field(description="Qdrant HTTP API URL")
+    qdrant_grpc_url: str = Field(description="Qdrant gRPC URL")
+
+    # Ollama
+    ollama_url: str = Field(description="Ollama API URL for LLM embeddings")
 
     @field_validator("log_level")
     @classmethod
@@ -78,8 +70,21 @@ class Settings(BaseSettings):
             raise ValueError(f"app_env must be one of {valid_envs}")
         return v.lower()
 
+    @field_validator("secret_key")
+    @classmethod
+    def validate_secret_key(cls, v: str | None, info) -> str:
+        """Validate secret key is provided in production."""
+        if info.data.get("app_env") == "production" and v is None:
+            raise ValueError("SECRET_KEY must be set in production environment")
+        if v is None:
+            # Generate a random key for development
+            import secrets
 
-@lru_cache()
+            return secrets.token_urlsafe(32)
+        return v
+
+
+@lru_cache
 def get_settings() -> Settings:
     """Get cached settings instance."""
     return Settings()

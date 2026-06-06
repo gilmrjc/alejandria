@@ -2,26 +2,25 @@
 """
 Alejandria - Unified Entry Point
 
-Este script es el punto de entrada unificado para ejecutar:
-- API FastAPI
+This script is the unified entry point to run:
+- FastAPI API
 - Celery Workers
 - MCP Server
 
 Usage:
-    python run.py api          # Inicia API FastAPI
-    python run.py worker       # Inicia Celery worker
-    python run.py mcp          # Inicia MCP server
-    python run.py scheduler    # Inicia Celery beat scheduler
+    python run.py api          # Start FastAPI API
+    python run.py worker       # Start Celery worker
+    python run.py mcp          # Start MCP server
+    python run.py scheduler    # Start Celery beat scheduler
 """
 
-import sys
 import argparse
+import sys
 
 
 def run_api():
-    """Inicia la API FastAPI."""
+    """Start the FastAPI API."""
     import uvicorn
-    from api.main import app
 
     uvicorn.run(
         "api.main:app",
@@ -33,24 +32,24 @@ def run_api():
 
 
 def run_worker():
-    """Inicia Celery worker."""
+    """Start Celery worker."""
     from jobs.celery_app import celery_app
 
     celery_app.worker_main(argv=["worker", "--loglevel=info"])
 
 
 def run_scheduler():
-    """Inicia Celery beat scheduler."""
+    """Start Celery beat scheduler."""
     from jobs.celery_app import celery_app
 
     celery_app.start(argv=["beat", "--loglevel=info"])
 
 
 def run_mcp():
-    """Inicia MCP server."""
-    from mcp.server import mcp
+    """Start MCP server."""
+    from mcp_server.server import main
 
-    mcp.run()
+    main()
 
 
 def main():

@@ -155,6 +155,21 @@ else
 fi
 
 # ============================================
+# Step 4.5: Crear base de datos de pruebas
+# ============================================
+print_warning "Creando base de datos de pruebas..."
+docker compose exec -T postgresql psql -U alejandria -c "CREATE DATABASE alejandria_test;" 2>/dev/null || print_warning "La base de datos de pruebas ya existe"
+
+print_success "Aplicando migrations a base de datos de pruebas..."
+docker compose --profile dev run --rm dev sh -c "cd /workspace && DATABASE_URL=postgresql://alejandria:changeme@postgresql:5432/alejandria_test uv run alembic upgrade head"
+if [ $? -eq 0 ]; then
+    print_success "Migrations de pruebas aplicados correctamente"
+else
+    print_error "Error aplicando migrations de pruebas"
+    exit 1
+fi
+
+# ============================================
 # Step 5: Health check
 # ============================================
 print_step 5 $TOTAL_STEPS "Ejecutando verificación de servicios"

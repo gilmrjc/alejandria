@@ -1,8 +1,8 @@
 ---
 id: ARC-008
 type: Frontend Specification
-rating:
-rating-phase:
+rating: 9
+rating-phase: document-editing
 dependency: [ARC-002, ARC-003, ARC-004]
 related:
   - target: STR-005
@@ -26,8 +26,9 @@ Este documento define la especificación del frontend de Alejandria. El frontend
 3. [Componentes](#3-componentes)
 4. [State Management](#4-state-management)
 5. [Integración con API](#5-integración-con-api)
-6. [UX Patterns](#6-ux-patterns)
-7. [Estructura de Proyecto](#7-estructura-de-proyecto)
+6. [Sistema de Diseño](#6-sistema-de-diseño)
+7. [UX Patterns](#7-ux-patterns)
+8. [Estructura de Proyecto](#8-estructura-de-proyecto)
 
 ---
 
@@ -41,14 +42,83 @@ El frontend de Alejandria proporciona tres interfaces principales:
 2. **Sesión de Resolución**: Interfaz interactiva para responder gaps con Agente 3
 3. **Document Editor**: Visualizador y editor de documentos con historial de versiones
 
+### User Personas
+
+Los usuarios principales del frontend son roles técnicos involucrados en el desarrollo y operación del sistema:
+
+- **CTO/VP Engineering**: Responsable de arquitectura técnica y decisiones estratégicas
+- **Senior Developer/Tech Lead**: Desarrollador senior que implementa features y revisa código
+- **DevOps/SRE**: Responsable de infraestructura, deployment y operaciones
+- **Arquitecto Senior**: Responsable de diseño de sistema y decisiones de arquitectura
+
+**Referencia**: Ver [FEA-003](../../ingenieria/tareas/epica-03-frontend-react.md) (líneas 37-40, 77-80, 116-120, 156-160, 194-198) para detalles adicionales sobre user personas.
+
+### Casos de Uso
+
+El frontend habilita los siguientes casos de uso clave para los usuarios:
+
+- **Revisar estado del proyecto via Dashboard**: Obtener vista general de métricas agregadas (documentos, sesiones, gaps)
+- **Navegar documentos**: Explorar documentos con filtros y búsqueda para encontrar información específica
+- **Revisar gaps detectados**: Ver gaps agrupados por tema con contexto faltante identificado
+- **Revisar y aprobar cambios**: Revisar propuestas de cambios con diff viewer integrado y aprobar/rechazar
+- **Navegación rápida**: Acceso rápido desde Dashboard a secciones específicas del sistema
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 45-47) y [FEA-003](../../ingenieria/tareas/epica-03-frontend-react.md) (workflow de 5 fases) para detalles adicionales sobre casos de uso.
+
+### Priorización de Features
+
+La priorización de features distingue entre funcionalidades esenciales para MVP Bootstrapped y features que pueden postponerse a versiones posteriores.
+
+**MVP Esenciales** (requeridas para dogfooting temprano):
+- Estructura base del proyecto React
+- Routing con React Router
+- Cliente HTTP (Axios)
+- State management con Zustand
+- Dashboard con estadísticas básicas
+- Sección de Documentos (lista, filtros, búsqueda)
+- Sección de Gaps (visualización de gaps detectados)
+- Sección de Propuestas (diff viewer para cambios)
+- Diff Viewer integrado
+
+**Features que pueden postponerse** (nice-to-have o post-MVP):
+- Sección de Grafo (visualización de dependencias)
+- Sección de Preguntas (depende de backend Hito 4)
+- Interfaz de Sesión Interactiva (POST-MVP)
+
+**Referencia**: Ver [EPC-003](../../ingenieria/tareas/epica-003-b-dashboard-mvp-core.md) (líneas 75-92) y [PRD-003](../../producto/requisitos/prd-003.md) (líneas 86-92) para detalles adicionales sobre priorización.
+
+### Métricas de Éxito
+
+Para MVP Bootstrapped, el enfoque es funcionalidad básica sobre métricas cuantitativas. La validación temprana se realizará cualitativamente mediante dogfooting y feedback en retrospectivas de desarrollo.
+
+**Enfoque MVP**: Funcionalidad básica sobre métricas cuantitativas extensas. El objetivo es validar que el frontend habilita los workflows críticos de manera efectiva.
+
+**Validación Cualitativa**:
+- Dogfooting temprano por el equipo de desarrollo
+- Retrospectivas de desarrollo para identificar fricciones
+- Feedback directo de usuarios técnicos (user personas definidas)
+
+**Métricas Cualitativas**:
+- Tiempo promedio para encontrar información en documentos
+- Satisfacción subjetiva (escala 1-10) con la interfaz
+- Fricciones percibidas en workflows clave
+
+**Umbrales de Éxito**:
+- Satisfacción ≥ 7/10 en encuestas de dogfooting
+- Reducción de fricciones ≥ 30% en 3 meses (medido cualitativamente)
+
+**Métricas Post-MVP**: Métricas formales de adopción, satisfacción, y KPIs se definirán post-MVP cuando se valide problem-solution fit.
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 72-78, 495-502) para detalles adicionales sobre métricas de éxito.
+
 ### Stack Tecnológico
 
 - **Framework**: React (opción principal para MVP). Ver [frontend-strategy.md](../../estrategia/estrategia/frontend-strategy.md) para contexto estratégico de implementación de diseño con React.
-- **State Management**: React Context API o Zustand (pendiente de decisión)
+- **State Management**: Zustand seleccionado para MVP por overhead mínimo, optimización automática de performance, y bundle size ~1KB. Estado global: user (auth), documents (lista), sessions (activas), loading/error globales. Estado local: componentes específicos (filtros, modales, forms). Patrones: Zustand stores separados por dominio (authStore, documentsStore, sessionsStore).
 - **HTTP Client**: Axios o Fetch API
 - **Routing**: React Router
-- **UI Components**: shadcn/ui o Material-UI (pendiente de decisión)
-- **Styling**: TailwindCSS (si se usa shadcn/ui) o CSS Modules
+- **UI Components**: shadcn/ui seleccionado (componentes copiados al proyecto, full control, moderno, integración con TailwindCSS). Material-UI es la alternativa mencionada pero no seleccionada.
+- **Styling**: TailwindCSS (integrado con shadcn/ui)
 - **Build Tool**: Vite
 
 ### Referencias
@@ -339,43 +409,83 @@ interface ContextEntriesViewState {
 
 ## 4. State Management
 
-### Global State (React Context)
+### Global State (Zustand)
+
+Zustand seleccionado para MVP por overhead mínimo, optimización automática de performance, y bundle size ~1KB. Los stores se organizan por dominio para mantener el estado modular y escalable.
 
 ```typescript
-// contexts/AppContext.tsx
-interface AppState {
+// stores/authStore.ts
+import { create } from 'zustand';
+
+interface AuthState {
   user: User | null;
-  documents: Document[];
-  sessions: Session[];
   loading: boolean;
   error: string | null;
-  
-  // Actions
   setUser: (user: User | null) => void;
-  fetchDocuments: () => Promise<void>;
-  fetchSessions: () => Promise<void>;
   logout: () => void;
 }
 
-const AppContext = createContext<AppState | null>(null);
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  loading: false,
+  error: null,
+  setUser: (user) => set({ user }),
+  logout: () => set({ user: null }),
+}));
 
-export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [state, setState] = useState<AppState>({
-    user: null,
-    documents: [],
-    sessions: [],
-    loading: false,
-    error: null,
-  });
-  
-  // Implementación de actions...
-  
-  return (
-    <AppContext.Provider value={state}>
-      {children}
-    </AppContext.Provider>
-  );
-};
+// stores/documentsStore.ts
+import { create } from 'zustand';
+
+interface DocumentsState {
+  documents: Document[];
+  loading: boolean;
+  error: string | null;
+  fetchDocuments: () => Promise<void>;
+  setDocuments: (documents: Document[]) => void;
+}
+
+export const useDocumentsStore = create<DocumentsState>((set) => ({
+  documents: [],
+  loading: false,
+  error: null,
+  fetchDocuments: async () => {
+    set({ loading: true });
+    try {
+      const response = await documentsService.list({});
+      set({ documents: response.data, loading: false });
+    } catch (error) {
+      set({ error: 'Failed to fetch documents', loading: false });
+    }
+  },
+  setDocuments: (documents) => set({ documents }),
+}));
+
+// stores/sessionsStore.ts
+import { create } from 'zustand';
+
+interface SessionsState {
+  sessions: Session[];
+  loading: boolean;
+  error: string | null;
+  fetchSessions: () => Promise<void>;
+  setSessions: (sessions: Session[]) => void;
+}
+
+export const useSessionsStore = create<SessionsState>((set) => ({
+  sessions: [],
+  loading: false,
+  error: null,
+  fetchSessions: async () => {
+    set({ loading: true });
+    try {
+      const response = await sessionsService.list({});
+      set({ sessions: response.data, loading: false });
+    } catch (error) {
+      set({ error: 'Failed to fetch sessions', loading: false });
+    }
+  },
+  setSessions: (sessions) => set({ sessions }),
+}));
 ```
 
 ### Local State (Component Level)
@@ -530,7 +640,121 @@ export const sessionsService = {
 
 ---
 
-## 6. UX Patterns
+## 6. Sistema de Diseño
+
+El sistema de diseño del frontend se basa en shadcn/ui como biblioteca principal de componentes, proporcionando una base consistente y moderna para la interfaz de usuario.
+
+### Biblioteca de Componentes
+
+- **shadcn/ui**: Componentes copiados directamente al proyecto, ofreciendo full control sobre el código, diseño moderno, y perfecta integración con TailwindCSS. Esta aproximación permite personalización completa sin dependencias externas opacas.
+
+### Design Tokens
+
+- **Paleta de colores**: Sistema de colores consistente para estados (primary, secondary, success, error, warning) y elementos de UI
+- **Tipografía**: Escala tipográfica definida para headings, body text, y captions
+- **Espaciado**: Scale de 4px para mantener consistencia en márgenes y padding (4px, 8px, 12px, 16px, 24px, 32px, etc.)
+
+### Consistencia Visual
+
+Para MVP Bootstrapped, la consistencia se mantiene mediante convenciones de código y patrones de uso de componentes, sin herramientas adicionales de design system management. La estructura de componentes de shadcn/ui proporciona la base para mantener coherencia visual.
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 526-533) para detalles adicionales sobre sistema de diseño.
+
+---
+
+## 7. UX Patterns
+
+### Responsive Design
+
+La estrategia de responsive design prioriza el soporte para desktop en MVP Bootstrapped, con planes para extender responsividad completa post-MVP.
+
+**Breakpoints de Diseño**:
+- **Desktop**: > 1024px (prioridad para MVP - desarrollo local)
+- **Tablet**: 768px - 1024px (nice-to-have para MVP)
+- **Mobile**: < 768px (NO APLICA para MVP Bootstrapped - POST-MVP)
+
+**Prioridad MVP**: El foco principal es desktop para desarrollo local y validación temprana del producto. La responsividad completa (tablet y mobile) se implementará post-MVP cuando se valide problem-solution fit.
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 390-398) para detalles adicionales sobre responsive design.
+
+### Accesibilidad
+
+La estrategia de accesibilidad busca cumplir con estándares WCAG para asegurar que el frontend sea usable por personas con discapacidades.
+
+**Compliance WCAG**: Nivel AA (objetivo para MVP Bootstrapped)
+
+**Soporte para Navegación por Teclado**:
+- Tab navigation entre elementos interactivos
+- Focus visible en elementos interactivos
+- Atajos de teclado para acciones comunes
+
+**Contraste de Colores**:
+- Mínimo 4.5:1 para texto normal (WCAG AA)
+- Mínimo 3:1 para texto grande (WCAG AA)
+- Verificación de contraste en componentes shadcn/ui
+
+**Texto Alternativo para Imágenes**:
+- Alt text descriptivo para imágenes informativas
+- Alt text vacío para imágenes decorativas
+
+**Validación**: La accesibilidad completa se validará post-MVP. Para MVP, se seguirán mejores prácticas básicas y se verificará cumplimiento de WCAG AA en componentes críticos.
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 400-408) para detalles adicionales sobre accesibilidad.
+
+### Flujo de Usuario End-to-End
+
+El frontend habilita workflows típicos que permiten a los usuarios navegar el sistema de manera eficiente. Los workflows principales son:
+
+**Workflow 1: Revisar estado del proyecto via Dashboard**
+- Usuario accede al Dashboard
+- Ve métricas agregadas (documentos totales, sesiones activas, gaps pendientes)
+- Navega a secciones específicas desde el Dashboard
+
+**Workflow 2: Navegar documentos**
+- Usuario accede a la Sección de Documentos
+- Usa filtros y búsqueda para encontrar documentos específicos
+- Ve lista de documentos con estado healthy
+- Accede a detalle de documento para ver contenido y snapshots
+
+**Workflow 3: Revisar gaps detectados**
+- Usuario accede a la Sección de Gaps
+- Ve gaps agrupados por tema
+- Revisa contexto faltante identificado para cada gap
+- Navega entre grupos de gaps
+
+**Workflow 4: Revisar y aprobar cambios**
+- Usuario accede a la Sección de Propuestas
+- Ve lista de cambios sugeridos (context_entries)
+- Usa diff viewer integrado para comparar old vs new content
+- Aprueba o rechaza cambios individuales
+
+**Workflow 5: Navegación rápida**
+- Usuario accede desde Dashboard a secciones específicas
+- Usa breadcrumbs para navegar jerarquía
+- Accede rápidamente a información crítica
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 45-47) y [FEA-003](../../ingenieria/tareas/epica-03-frontend-react.md) (workflow de 5 fases) para detalles adicionales sobre flujo de usuario.
+
+### Layout y Estructura Visual
+
+El layout del frontend sigue una estructura estándar de aplicación web moderna, optimizada para desktop en MVP Bootstrapped.
+
+**Especificación de Layout**:
+- Grid system basado en TailwindCSS para consistencia
+- Breakpoints alineados con estrategia de responsive design (desktop >1024px prioritario)
+
+**Estructura de Layout**:
+- **Sidebar izquierda**: Navegación principal entre secciones (Dashboard, Documentos, Gaps, Propuestas, Settings)
+- **Header superior**: Breadcrumbs para navegación jerárquica, información de usuario, notificaciones
+- **Content area**: Área principal para contenido específico de cada sección
+
+**Patrones Visuales**:
+- **Hover states**: Feedback visual al pasar cursor sobre elementos interactivos
+- **Active states**: Indicación visual de elemento seleccionado o activo
+- **Loading states**: Indicadores de carga definidos ad-hoc según necesidad durante implementación
+- **Error states**: Mensajes de error definidos ad-hoc según necesidad durante implementación
+
+**Referencia**: Ver [PRD-003](../../producto/requisitos/prd-003.md) (líneas 535-542) para detalles adicionales sobre layout y estructura visual.
 
 ### Sesión de Resolución de Gaps
 
@@ -717,12 +941,15 @@ El documento define claramente el stack tecnológico (React, Context API/Zustand
 
 **IMPLEMENTACIÓN TÉCNICA**
 
-**GAP: Decisión entre Context API y Zustand** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
+**GAP: Decisión entre Context API y Zustand** [PRIORIDAD: Alto] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Por qué la decisión entre Context API y Zustand está pendiente? ¿Qué criterios se usarán para decidir? ¿Cuáles son los trade-offs entre ambos para este proyecto?
 - **Contexto faltante**: El documento menciona "Context API o Zustand" pero no proporciona análisis comparativo ni criterios para la decisión de state management.
 - **Rol afectado**: Desarrollador Frontend Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Usar Zustand para MVP (justificado por investigación: ideal para startups/MVPs, overhead mínimo, optimización automática de performance, bundle size ~1KB). Estado global: user (auth), documents (lista), sessions (activas), loading/error globales. Local: estado de componentes específicos (filtros, modales, forms). Patrones: Zustand stores separados por dominio (authStore, documentsStore, sessionsStore).
+- **Referencia**: PRD-003 (líneas 515-522)
+- **Fecha de resolución**: 2026-06-05
 
 **GAP: Estrategia de manejo de estado offline** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
 
@@ -744,19 +971,25 @@ El documento define claramente el stack tecnológico (React, Context API/Zustand
 
 **IMPLEMENTACIÓN TÉCNICA**
 
-**GAP: Explicación de React Context vs Zustand** [PRIORIDAD: Medio] [ESTADO: PENDIENTE]
+**GAP: Explicación de React Context vs Zustand** [PRIORIDAD: Medio] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Qué es React Context y qué es Zustand? ¿Cuándo se usa uno vs el otro? ¿Cuáles son las ventajas y desventajas de cada uno?
 - **Contexto faltante**: El documento menciona ambas opciones pero no explica qué son, cuándo es apropiado usar cada una, o las diferencias entre ellas.
 - **Rol afectado**: Desarrollador Frontend Junior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Zustand seleccionado para MVP por overhead mínimo, optimización automática de performance, bundle size ~1KB. Context API es la alternativa nativa de React pero puede causar re-renders innecesarios. Zustand es ideal para startups/MVPs.
+- **Referencia**: PRD-003 (líneas 515-522)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Explicación de shadcn/ui vs Material-UI** [PRIORIDAD: Bajo] [ESTADO: PENDIENTE]
+**GAP: Explicación de shadcn/ui vs Material-UI** [PRIORIDAD: Bajo] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Qué es shadcn/ui y qué es Material-UI? ¿Por qué se mencionan ambos? ¿Cuál se elige y por qué?
 - **Contexto faltante**: El documento menciona ambas librerías de UI pero no explica qué son, por qué se mencionan ambas, o cuál se elige para el proyecto.
 - **Rol afectado**: Desarrollador Frontend Junior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: shadcn/ui seleccionado (componentes copiados al proyecto, full control, moderno, integración con TailwindCSS). Material-UI es la alternativa mencionada pero no seleccionada.
+- **Referencia**: PRD-003 (líneas 526-533)
+- **Fecha de resolución**: 2026-06-05
 
 ### Revisión por Rol: Diseñador UI/UX (Senior)
 
@@ -767,26 +1000,35 @@ El documento define patrones de UX (progressive disclosure, inline editing, diff
 
 **DISEÑO DE INTERFAZ**
 
-**GAP: Sistema de diseño y design tokens** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
+**GAP: Sistema de diseño y design tokens** [PRIORIDAD: Alto] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Hay un sistema de diseño definido? ¿Qué design tokens se usan (colores, tipografía, espaciado)? ¿Cómo se mantiene consistencia visual entre componentes?
 - **Contexto faltante**: No hay información sobre sistema de diseño, design tokens, o guía de estilo visual para mantener consistencia.
 - **Rol afectado**: Diseñador UI/UX Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Biblioteca: shadcn/ui (componentes copiados al proyecto, full control, moderno, integración con TailwindCSS). Tokens: paleta de colores + tipografía + espaciado (scale de 4px). Consistencia: solo convenciones de código sin herramientas adicionales para MVP.
+- **Referencia**: PRD-003 (líneas 526-533)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Estrategia de responsive design** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
+**GAP: Estrategia de responsive design** [PRIORIDAD: Alto] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Cómo se adapta la UI a diferentes tamaños de pantalla (mobile, tablet, desktop)? ¿Qué breakpoints se usan? ¿Hay wireframes para diferentes viewports?
 - **Contexto faltante**: No hay información sobre responsive design, breakpoints, o adaptación de la UI a diferentes tamaños de pantalla.
 - **Rol afectado**: Diseñador UI/UX Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Soporte para desktop: > 1024px (prioridad para MVP). Soporte para tablet: 768px - 1024px (nice-to-have para MVP). Soporte para mobile: < 768px (NO APLICA para MVP Bootstrapped - POST-MVP). Breakpoints de diseño: desktop (>1024px), tablet (768-1024px), mobile (<768px). Para MVP Bootstrapped, el foco es desktop para desarrollo local. Responsividad completa se implementará post-MVP.
+- **Referencia**: PRD-003 (líneas 390-398)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Accesibilidad y WCAG compliance** [PRIORIDAD: Medio] [ESTADO: PENDIENTE]
+**GAP: Accesibilidad y WCAG compliance** [PRIORIDAD: Medio] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Qué nivel de WCAG compliance se busca? ¿Cómo se maneja accesibilidad (keyboard navigation, screen readers, contrast ratios)? ¿Hay herramientas de testing de accesibilidad?
 - **Contexto faltante**: No hay información sobre accesibilidad, WCAG compliance, o estrategias para soportar usuarios con discapacidades.
 - **Rol afectado**: Diseñador UI/UX Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Compliance WCAG: Nivel AA (objetivo para MVP Bootstrapped). Soporte para navegación por teclado: Tab navigation entre elementos interactivos. Contraste de colores: Mínimo 4.5:1 para texto normal, 3:1 para texto grande (WCAG AA). Texto alternativo para imágenes: Alt text descriptivo para imágenes informativas. Accesibilidad completa se validará post-MVP. Para MVP, seguir mejores prácticas básicas.
+- **Referencia**: PRD-003 (líneas 400-408)
+- **Fecha de resolución**: 2026-06-05
 
 ### Revisión por Rol: Diseñador UI/UX (Junior)
 
@@ -794,19 +1036,24 @@ El documento define patrones de UX (progressive disclosure, inline editing, diff
 
 **DISEÑO DE INTERFAZ**
 
-**GAP: Wireframes y mockups** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
+**GAP: Wireframes y mockups** [PRIORIDAD: Alto] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Dónde están los wireframes o mockups de los componentes principales? ¿Hay prototipos interactivos para validar el diseño?
 - **Contexto faltante**: El documento describe componentes pero no incluye wireframes, mockups, o prototipos visuales de la UI.
 - **Rol afectado**: Diseñador UI/UX Junior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Especificación: solo especificación de layout (grid system, breakpoints) sin wireframes específicos para MVP. Estructura: layout estándar con sidebar izquierda (navegación) + header superior (breadcrumbs, user) + content area. Patrones: solo hover y active states para MVP, loading/error states se definen ad-hoc.
+- **Referencia**: PRD-003 (líneas 535-542)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Explicación de patrones de UX** [PRIORIDAD: Medio] [ESTADO: PENDIENTE]
+**GAP: Explicación de patrones de UX** [PRIORIDAD: Medio] [ESTADO: NO APLICA]
 
 - **Pregunta**: ¿Qué es progressive disclosure y por qué se usa? ¿Qué es inline editing y cuándo es apropiado? ¿Cómo se diseñan notificaciones efectivas?
 - **Contexto faltante**: El documento menciona patrones de UX pero no explica qué son, por qué se usan, o cómo se implementan correctamente.
 - **Rol afectado**: Diseñador UI/UX Junior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Estos son conceptos estándar de UX/UI que se consideran conocimiento básico del dominio. Progressive disclosure, inline editing, y notificaciones son patrones bien documentados en la industria. No es responsabilidad de este documento de especificación técnica explicar conceptos fundamentales de UX.
+- **Fecha de resolución**: 2026-06-05
 
 ### Revisión por Rol: Product Manager (Senior)
 
@@ -817,26 +1064,35 @@ El documento define el propósito del frontend (Dashboard, Session Resolution, D
 
 **NEGOCIO Y PRODUCTO**
 
-**GAP: User personas y casos de uso** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
+**GAP: User personas y casos de uso** [PRIORIDAD: Alto] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Quiénes son los usuarios principales del frontend? ¿Qué personas se han definido? ¿Qué casos de uso clave se soportan?
 - **Contexto faltante**: No hay información sobre user personas, casos de uso específicos, o quién es el usuario objetivo del frontend.
 - **Rol afectado**: Product Manager Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: User personas definidas en FEA-003: CTO/VP Engineering, Senior Developer/Tech Lead, DevOps/SRE, Arquitecto Senior. Casos de uso: Revisar estado del proyecto via Dashboard, Navegar documentos, Revisar gaps detectados, Revisar y aprobar cambios, Navegación rápida (PRD-003 líneas 45-47).
+- **Referencia**: PRD-003 (líneas 45-47), FEA-003 (líneas 37-40, 77-80, 116-120, 156-160, 194-198)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Priorización de features** [PRIORIDAD: Medio] [ESTADO: PENDIENTE]
+**GAP: Priorización de features** [PRIORIDAD: Medio] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Qué features son MVP vs roadmap futuro? ¿Cómo se priorizan las funcionalidades del frontend? ¿Qué se incluye en la primera versión?
 - **Contexto faltante**: No hay información sobre priorización de features, MVP vs roadmap, o qué funcionalidades se incluyen en la primera versión.
 - **Rol afectado**: Product Manager Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: MVP esenciales para dogfooting: Estructura base, Routing, Cliente HTTP, State management, Dashboard, Sección de Documentos, Sección de Gaps, Sección de Propuestas, Diff Viewer. Features que pueden postponerse: Sección de Grafo (nice-to-have), Sección de Preguntas (depende de backend Hito 4), Interfaz de Sesión Interactiva (POST-MVP). Referencia: EPC-003 (líneas 75-92).
+- **Referencia**: EPC-003 (líneas 75-92), PRD-003 (líneas 86-92)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Métricas de éxito del frontend** [PRIORIDAD: Medio] [ESTADO: PENDIENTE]
+**GAP: Métricas de éxito del frontend** [PRIORIDAD: Medio] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Qué métricas se usan para medir el éxito del frontend (engagement, time to resolution, error rates)? ¿Cómo se trackea el uso de features?
 - **Contexto faltante**: No hay información sobre métricas de éxito, analytics, o cómo se mide la efectividad del frontend.
 - **Rol afectado**: Product Manager Senior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Para MVP Bootstrapped, el enfoque es funcionalidad básica sobre métricas cuantitativas. El dogfooting temprano se validará cualitativamente mediante feedback en retrospectivas de desarrollo. Métricas de éxito formales (adopción, satisfacción, KPIs) se definirán post-MVP cuando se valide problem-solution fit. Métricas cualitativas: tiempo promedio para encontrar información + satisfacción subjetiva (escala 1-10) + fricciones percibidas. Umbrales: satisfacción ≥ 7/10 + reducción de fricciones ≥ 30% en 3 meses.
+- **Referencia**: PRD-003 (líneas 72-78, 495-502)
+- **Fecha de resolución**: 2026-06-05
 
 ### Revisión por Rol: Product Manager (Junior)
 
@@ -844,31 +1100,40 @@ El documento define el propósito del frontend (Dashboard, Session Resolution, D
 
 **NEGOCIO Y PRODUCTO**
 
-**GAP: Flujo de usuario end-to-end** [PRIORIDAD: Medio] [ESTADO: PENDIENTE]
+**GAP: Flujo de usuario end-to-end** [PRIORIDAD: Medio] [ESTADO: IMPLEMENTADO]
 
 - **Pregunta**: ¿Cuál es el flujo completo de un usuario desde login hasta resolución de un gap? ¿Qué pasos sigue? ¿Dónde pueden haber fricciones?
 - **Contexto faltante**: El documento describe componentes individuales pero no el flujo completo de usuario end-to-end a través del sistema.
 - **Rol afectado**: Product Manager Junior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: Workflows típicos habilitados por el frontend React: (1) Revisar estado del proyecto via Dashboard con métricas agregadas, (2) Navegar documentos via Sección de Documentos con filtros y búsqueda, (3) Revisar gaps detectados via Sección de Gaps con agrupación por tema, (4) Revisar y aprobar cambios via Sección de Propuestas con diff viewer integrado, (5) Navegación rápida desde Dashboard a secciones específicas. Flujo detallado de 5 fases en FEA-003.
+- **Referencia**: PRD-003 (líneas 45-47), FEA-003 (workflow de 5 fases)
+- **Fecha de resolución**: 2026-06-05
 
-**GAP: Escenarios de edge cases en UX** [PRIORIDAD: Bajo] [ESTADO: PENDIENTE]
+**GAP: Escenarios de edge cases en UX** [PRIORIDAD: Bajo] [ESTADO: NO APLICA]
 
 - **Pregunta**: ¿Cómo se manejan edge cases en la UX (documentos muy largos, muchos gaps, errores de API, sesiones expiradas)? ¿Qué mensajes se muestran?
 - **Contexto faltante**: No hay información sobre manejo de edge cases en la UX, mensajes de error, o comportamiento en situaciones excepcionales.
 - **Rol afectado**: Product Manager Junior
 - **Fecha de identificación**: 2026-05-22
+- **Respuesta**: PRD-003 define manejo de errores de API (401: redirigir a login, 500: mostrar error genérico, 404: mostrar not found) y estados de carga/error. Edge cases específicos se definirán durante implementación según necesidad. Este nivel de detalle es apropiado para fase de implementación, no para especificación de alto nivel.
+- **Referencia**: PRD-003 (líneas 353-355, 386)
+- **Fecha de resolución**: 2026-06-05
 
-### CALIFICACIÓN DEL DOCUMENTO: 7/10
+### CALIFICACIÓN DEL DOCUMENTO: 9/10
+
+**Fecha de Reevaluación**: 2026-06-06
+**Versión del Análisis**: 3
 
 **Desglose**:
 
-- Completitud de Respuestas: 7/10 - Cubre stack tecnológico, arquitectura de capas, componentes principales, y patrones de UX. Falta contexto sobre decisiones técnicas (Context API vs Zustand), sistema de diseño, y user personas.
-- Contexto Multi-Rol: 7/10 - Proporciona contexto técnico para desarrolladores frontend. Falta contexto para Diseñador UI/UX (sistema de diseño, wireframes) y Product Manager (user personas, casos de uso).
-- Calidad de Referencias: 7/10 - Referencias a otros documentos de arquitectura son relevantes. Faltan referencias a documentación de React, best practices de frontend, o sistemas de diseño.
-- Estructura y Organización: 8/10 - Estructura clara con índice, secciones bien organizadas, descripciones detalladas de componentes.
-- Consistencia: 8/10 - No se detectaron contradicciones, la especificación es consistente con el API y el pipeline descrito.
+- Completitud de Respuestas: 9/10 - Cubre stack tecnológico con decisiones implementadas (Zustand, shadcn/ui), arquitectura de capas, componentes principales, patrones de UX, sistema de diseño, responsive design, accesibilidad, user personas, casos de uso, priorización de features, métricas de éxito, y flujo de usuario end-to-end. Las 11 respuestas de gaps han sido integradas en el contenido principal.
+- Contexto Multi-Rol: 9/10 - Proporciona contexto técnico completo para desarrolladores frontend (Zustand stores, API services). Contexto para Diseñador UI/UX (sistema de diseño, responsive design, accesibilidad, layout) y Product Manager (user personas, casos de uso, priorización, métricas) integrado directamente en el documento con referencias a PRD-003, EPC-003, y FEA-003.
+- Calidad de Referencias: 9/10 - Referencias a otros documentos de arquitectura son relevantes. Referencias cruzadas con PRD-003, EPC-003, y FEA-003 proporcionan contexto completo para roles funcionales.
+- Estructura y Organización: 9/10 - Estructura clara con índice actualizado, secciones bien organizadas incluyendo nuevas secciones (Sistema de Diseño, User Personas, Casos de Uso, Priorización de Features, Métricas de Éxito, Flujo de Usuario End-to-End, Layout y Estructura Visual).
+- Consistencia: 9/10 - No se detectaron contradicciones, la especificación es consistente con el API, el pipeline descrito, y documentos relacionados (PRD-003, EPC-003, FEA-003). Las decisiones técnicas (Zustand, shadcn/ui) están consistentemente aplicadas en todo el documento.
 
-**Resumen**: Especificación de frontend completa con definición clara de stack tecnológico, arquitectura de capas, componentes principales, y patrones de UX. Falta contexto estratégico para decisiones técnicas (Context API vs Zustand), aspectos de diseño (sistema de diseño, wireframes, responsive design), y contexto de producto (user personas, casos de uso). El documento es útil para implementación pero requiere complemento con documentos de diseño y producto.
+**Resumen**: Especificación de frontend completa con definición clara de stack tecnológico (Zustand, shadcn/ui), arquitectura de capas, componentes principales, patrones de UX, sistema de diseño, responsive design, accesibilidad, user personas, casos de uso, priorización de features, métricas de éxito, flujo de usuario end-to-end, y layout visual. Las 11 respuestas de gaps han sido integradas en el contenido principal, proporcionando contexto completo para todos los roles relevantes. El documento está en su forma final y es útil para implementación con trazabilidad completa con PRD-003, EPC-003, y FEA-003.
 
 ---
 

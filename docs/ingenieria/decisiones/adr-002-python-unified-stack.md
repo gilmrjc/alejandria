@@ -248,9 +248,9 @@ FastMCP se eligió sobre el SDK oficial de MCP y otras implementaciones por las 
 
 - Cobertura objetivo: >90% con pytest
 - Unit tests (70-80%, <1s cada uno): lógica de negocio, services, schemas sin dependencias externas
-- Integration tests (15-20%): DB real (testcontainers PostgreSQL, Redis) y mocks hacia otras capas
+- Integration tests (15-20%): DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL) y mocks hacia otras capas
 - E2E tests (5-10%): flujos completos del pipeline de 5 fases, solo happy paths
-- Testing de jobs asíncronos (Celery): pytest-asyncio, mockear broker Redis para unit tests, usar Redis real (testcontainers) para integration tests
+- Testing de jobs asíncronos (Celery): pytest-asyncio, mockear broker Redis para unit tests, usar Redis real (REDIS_TEST_URL) para integration tests
 - Testing de MCP servers: FastMCP Client con pytest-asyncio y fixtures async que crean Client in-memory para interactuar con servidor MCP sin overhead de red
 - Configuración pytest: `asyncio_mode = "auto"` en pyproject.toml
 

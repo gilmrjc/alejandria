@@ -1,11 +1,11 @@
 ---
-id: ARC-036
+id: ARC-040
 type: API Specification
 rating: 9
 rating-phase: document-editing
 related:
   - target: ARC-005
-    relationship_type: splits
+    relationship_type: extends
     reason: Separa las estrategias de testing y logging de la especificación de endpoints para mejor organización
   - target: ARC-034
     relationship_type: references
@@ -117,10 +117,10 @@ Endpoint /api/v1/health verifica estado de servicios (database, redis, qdrant, c
 
 #### Integration Tests
 
-- 15-20% de coverage con DB real (testcontainers PostgreSQL, Redis)
+- 15-20% de coverage con DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL)
 - Mocks hacia otras capas (LLM providers, etc.)
 - Testing de jobs asíncronos (Celery) con pytest-asyncio
-- Mockear broker Redis para unit tests, usar Redis real (testcontainers) para integration tests
+- Mockear broker Redis para unit tests, usar Redis real (REDIS_TEST_URL) para integration tests
 - Testing de MCP servers con FastMCP Client y pytest-asyncio
 
 #### Cobertura de Testing Crítica

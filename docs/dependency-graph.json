@@ -841,7 +841,7 @@
       "milestone": ""
     },
     {
-      "id": "ESTR-STR-004",
+      "id": "ESTR-STR-006",
       "label": "llm-evaluation.md",
       "status": "pending",
       "rating": 2,
@@ -1484,7 +1484,7 @@
     },
     {
       "source": "ENG-ARC-003",
-      "target": "ESTR-STR-004",
+      "target": "ESTR-STR-006",
       "relationship_type": "implements",
       "reason": "Implementa la evaluación de LLM definiendo proveedores recomendados"
     },
@@ -2528,7 +2528,7 @@
     },
     {
       "source": "ESTR-STR-003",
-      "target": "ESTR-STR-004",
+      "target": "ESTR-STR-006",
       "relationship_type": "references",
       "reason": "Referencia la evaluación de LLM para decisiones de proveedores"
     },
@@ -2666,7 +2666,7 @@
     },
     {
       "source": "ESTR-STR-002",
-      "target": "ESTR-STR-004",
+      "target": "ESTR-STR-006",
       "relationship_type": "references",
       "reason": "Referencia la evaluación de LLM para decisiones de proveedores"
     },
@@ -2719,7 +2719,7 @@
       "reason": "Refuerza la decisión de MCP como capa de abstracción en la arquitectura general"
     },
     {
-      "source": "ESTR-STR-004",
+      "source": "ESTR-STR-006",
       "target": "ENG-ARC-003",
       "relationship_type": "depends_on",
       "reason": "Depende del Technology Stack que define los proveedores LLM recomendados"

@@ -33,9 +33,11 @@ El diff viewer muestra diferencias lado a lado entre la versión actual y la pro
 - Validar que cambios sean correctos
 
 ## Componentes y Referencias
-- Motor de comparación de texto → [PENDIENTE]
-- Interfaz visual de diff → [PENDIENTE]
-- Navegación por secciones → [PENDIENTE]
+- Motor de comparación de texto → NOTA: Evaluar librerías (react-diff-viewer, monaco-editor, diff2html) - decisión en fase de implementación (según PRD-003)
+- Interfaz visual de diff → NOTA: Diferencias lado a lado, resaltar adiciones/eliminaciones/modificaciones (según PRD-003)
+- Navegación por secciones → NOTA: Permitir navegar por secciones específicas para entender impacto completo (según PRD-003)
 
 ## Decisiones Relacionadas
-- [PENDIENTE]
+- Algoritmo de diff: Myers diff algorithm es estándar - decisión en fase de implementación (según PRD-003)
+- Esquema de colores: Adiciones (verde), eliminaciones (rojo), modificaciones (amarillo) (según PRD-003)
+- Sincronización de scroll: Scroll simultáneo en ambos paneles (según PRD-003)

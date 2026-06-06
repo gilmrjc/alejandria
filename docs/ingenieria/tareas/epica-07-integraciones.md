@@ -8,12 +8,6 @@ related:
   - target: FEAT-005
     relationship_type: implements
     reason: Implementa el feature de integración con Git
-  - target: T-022
-    relationship_type: implements
-    reason: Implementa la tarea de jobs pipeline
-  - target: T-024
-    relationship_type: implements
-    reason: Implementa la tarea de integración Ollama
   - target: T-025
     relationship_type: implements
     reason: Implementa la tarea de integración Qdrant

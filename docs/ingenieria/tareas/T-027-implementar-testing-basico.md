@@ -1,8 +1,8 @@
 ---
 id: T-027
 type: Task
-rating: 8
-rating-phase: final
+rating: 9.0
+rating-phase: document-editing
 related:
   - target: EPC-002
     relationship_type: implements
@@ -24,14 +24,14 @@ related:
 
 ## Descripción
 
-Implementar unit tests básicos para componentes principales. Integration tests usan bases de datos reales con testcontainers (PostgreSQL y Redis). Testing de MCP servers usa FastMCP Client in-memory. Testing de jobs asíncronos usa pytest-asyncio con modo automático.
+Implementar unit tests básicos para componentes principales. Integration tests usan bases de datos separadas para testing (POSTGRES_TEST_DB y REDIS_TEST_URL) para aislar el ambiente de pruebas del ambiente de desarrollo. Testing de MCP servers usa FastMCP Client in-memory. Testing de jobs asíncronos usa pytest-asyncio con modo automático.
 
 ## Criterios de Aceptación
 
 - [ ] pytest configurado
 - [ ] Unit tests para Pydantic schemas
 - [ ] Unit tests para services de negocio
-- [ ] Integration tests con testcontainers (PostgreSQL y Redis reales)
+- [ ] Integration tests usando bases de datos separadas (POSTGRES_TEST_DB y REDIS_TEST_URL)
 - [ ] Testing de MCP servers con FastMCP Client in-memory
 - [ ] Testing de funciones async de FastMCP con pytest-asyncio (asyncio_mode = auto, testing directo de funciones async, fixture genérica para async + fixtures específicas para dependencias, estrategia mixta: mockear para unit tests, usar reales para integration tests async)
 - [ ] Cobertura >70% objetivo inicial
@@ -56,16 +56,16 @@ pytest.ini
 
 ### Estrategia de Integration Tests
 
-Los integration tests utilizan testcontainers para PostgreSQL y Redis. Qdrant NO se testea con testcontainers. La configuración de fixtures pytest sigue la opción C (mixto): contenedores por sesión con cleanup de datos entre tests. Para los datos de prueba se utiliza factory pattern.
+Los integration tests utilizan bases de datos separadas para aislar el ambiente de pruebas del ambiente de desarrollo. PostgreSQL usa POSTGRES_TEST_DB y Redis usa REDIS_TEST_URL (database 1 en lugar de 0). Qdrant NO se testea en integration tests. La configuración de fixtures pytest usa transaction rollback para asegurar aislamiento entre tests. Para los datos de prueba se utiliza factory pattern.
 
 **Servicios a testear:**
-- PostgreSQL: Base de datos relacional para persistencia
-- Redis: Cache y gestión de sesiones
-- Qdrant: NO se testea con testcontainers
+- PostgreSQL: Base de datos relacional para persistencia (POSTGRES_TEST_DB)
+- Redis: Cache y gestión de sesiones (REDIS_TEST_URL con database 1)
+- Qdrant: NO se testea en integration tests
 
 **Configuración de fixtures pytest:**
-- Contenedores por sesión: Los contenedores se inician una vez por sesión de tests
-- Cleanup de datos entre tests: Los datos se limpian entre cada test individual para asegurar aislamiento
+- Bases de datos separadas: POSTGRES_TEST_DB para PostgreSQL, REDIS_TEST_URL para Redis
+- Transaction rollback: Los datos se rollback entre cada test individual para asegurar aislamiento
 - Factory pattern: Se utiliza factory pattern para generar datos de prueba consistentes
 
 ### Estrategia de Testing MCP
@@ -81,5 +81,5 @@ El testing de MCP servers utiliza FastMCP Client en modo memory. Se implementa u
 
 ## Referencias
 
-- [TRD - Hito 2](../propuestas/trd-milestone-2-api-mcp.md): RNF-004: Testing
+- [TRD - Hito 2](../propuestas/trd-milestone-2-api-rest.md): RNF-004: Testing
 - [ADR-002](../decisiones/adr-002-python-unified-stack.md): Stack Unificado en Python

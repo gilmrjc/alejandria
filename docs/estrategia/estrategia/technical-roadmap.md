@@ -10,7 +10,7 @@ related:
   - target: STR-005
     relationship_type: references
     reason: Referencia la estrategia de frontend para Hito 3
-  - target: STR-004
+  - target: STR-006
     relationship_type: references
     reason: Referencia la evaluación de LLM para decisiones de proveedores
   - target: POL-001
@@ -171,6 +171,10 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 **Dependencias**: Hito 2 (API REST y MCP Server)
 
 **Nota**: Este hito se movió desde la posición original del Hito 6 para facilitar dogfooting y validación temprana de UX desde el inicio del ciclo.
+
+**Nota**: Para detalles de implementación específicos, consulte [EPC-003](../../ingenieria/tareas/epica-03-frontend-react.md) que incluye información detallada sobre recursos y habilidades requeridas, priorización de features (MVP vs roadmap futuro), y casos de uso habilitados por el frontend React.
+
+**Nota**: Para priorización de componentes dentro del Hito 3 (MVP esenciales vs roadmap futuro), consulte [PRD-003](../../producto/requisitos/prd-hito-03-frontend-react.md) (sección 3, subsección Priorización de Implementación).
 
 ---
 

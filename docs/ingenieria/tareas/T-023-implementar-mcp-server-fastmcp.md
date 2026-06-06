@@ -37,9 +37,8 @@ Implementar MCP Server con tools según mcp-tools-specification.md.
 ## Criterios de Aceptación
 
 - [ ] MCP Server implementado con FastMCP 3.2.0
-- [ ] Tools: read_document, write_document, list_gaps, create_gap, answer_gap, create_proposal, apply_proposal, search_similar_documents
-- [ ] Transporte stdio para desarrollo local
-- [ ] Transporte HTTP para producción: Configuración MCP_TRANSPORT=http con variables opcionales MCP_HOST (default: 0.0.0.0) y MCP_PORT (default: 8000). Se usa HTTP para producción (multi-tenancy, auth centralizada, escalabilidad) y stdio para desarrollo local. Seguridad: autenticación mediante API Keys con tabla api_keys, validación en cada request, header Authorization: Bearer <api_key>.
+- [ ] Tools: read_document, write_document, list_gaps, create_gap, answer_gap, create_proposal, search_similar_documents
+- [ ] Transporte stdio para desarrollo local (transporte HTTP fuera de alcance para MVP)
 - [ ] Integración con PostgreSQL, Qdrant, Redis
 
 ## Archivos a Crear

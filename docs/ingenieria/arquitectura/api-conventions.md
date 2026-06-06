@@ -5,7 +5,7 @@ rating: 9
 rating-phase: document-editing
 related:
   - target: ARC-005
-    relationship_type: splits
+    relationship_type: extends
     reason: Separa las convenciones de la especificación de endpoints para mejor organización
   - target: ADR-002
     relationship_type: implements

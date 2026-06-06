@@ -10,7 +10,7 @@ related:
   - target: ARC-035
     relationship_type: references
     reason: Referencia la especificación de endpoints
-  - target: ARC-036
+  - target: ARC-040
     relationship_type: references
     reason: Referencia las estrategias de testing y logging
   - target: ARC-004

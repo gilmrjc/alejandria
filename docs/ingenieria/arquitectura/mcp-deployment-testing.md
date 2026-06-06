@@ -25,7 +25,7 @@ Este documento define la estrategia de deployment, monitoreo y testing del MCP S
 
 ## 1. Despliegue
 
-El MCP Server se despliega en producción usando Docker Compose, alineado con la estrategia de infraestructura local definida en ADR-003. La configuración del transporte (stdio vs HTTP) se maneja mediante variables de entorno.
+El MCP Server se despliega en producción usando Docker Compose, alineado con la estrategia de infraestructura local definida en ADR-003. El servidor utiliza exclusivamente transporte HTTP para todos los entornos (desarrollo y producción).
 
 ### Estrategia de Despliegue
 
@@ -33,20 +33,29 @@ El MCP Server se despliega en producción usando Docker Compose, alineado con la
 
 El MCP Server se despliega como servicio en Docker Compose, junto con FastAPI, PostgreSQL, Redis y Qdrant. Según la arquitectura definida en mcp-server-architecture.md sección 5, FastAPI y FastMCP se ejecutan como procesos separados pero pueden estar en el mismo container o containers separados según requerimientos de escalabilidad.
 
-**Configuración de Transporte**:
+**Transporte HTTP Exclusivo**:
 
-El modo de transporte se configura mediante variable de entorno:
+El servidor MCP utiliza exclusivamente transporte HTTP por las siguientes razones:
 
-- `MCP_TRANSPORT=stdio`: Para desarrollo local (cliente lanza servidor como subprocess)
-- `MCP_TRANSPORT=http`: Para producción (servidor maneja múltiples conexiones concurrentes)
+1. **Compatibilidad FastMCP-SQLAlchemy**: El transporte stdio tenía problemas fundamentales con los tipos `Session` de SQLAlchemy en pydantic-core. Se resolvió eliminando los parámetros `session` de las firmas de las funciones MCP
+2. **Autenticación API KEY nativa**: HTTP permite autenticación vía headers de forma estándar
+3. **Mejor integración con IDEs**: Los IDEs modernos tienen mejor soporte para servidores MCP HTTP
+4. **Arquitectura más apropiada para producción**: HTTP es el estándar para servidores MCP
+
+**Estado de Implementación**:
+
+✅ **Completado**: Migración a transporte HTTP exitosa
+- Servidor MCP funcionando en `http://localhost:8000/mcp`
+- Todas las herramientas MCP disponibles y funcionando
+- Configuración actualizada en Devin IDE (Windsurf)
+- Documentación actualizada
 
 ### Variables de Entorno
 
-La configuración del MCP Server se maneja mediante variables de entorno que controlan el modo de transporte, conexiones a bases de datos y comportamiento del logging.
+La configuración del MCP Server se maneja mediante variables de entorno que controlan las conexiones a bases de datos y comportamiento del logging.
 
 **Variables requeridas** controlan aspectos fundamentales del funcionamiento del servidor:
 
-- `MCP_TRANSPORT`: Define el modo de transporte (stdio para desarrollo local, http para producción)
 - `DATABASE_URL`: URL de conexión a PostgreSQL para persistencia de datos
 - `REDIS_URL`: URL de conexión a Redis para cache y message broker
 - `QDRANT_URL`: URL de conexión a Qdrant para búsqueda semántica
@@ -239,7 +248,7 @@ Esta alineación con ADR-002 (líneas 198-203) reduce complejidad operacional pa
 
 ## 3. Estrategia de Testing
 
-El MCP Server usa una estrategia de testing alineada con ADR-002, basada en pytest, testcontainers y FastMCP Client. La distribución de tests es unit (70-80%), integration (15-20%), E2E (5-10%) con cobertura objetivo >90%.
+El MCP Server usa una estrategia de testing alineada con ADR-002, basada en pytest, bases de datos separadas en docker-compose y FastMCP Client. La distribución de tests es unit (70-80%), integration (15-20%), E2E (5-10%) con cobertura objetivo >90%.
 
 ### Stack de Testing
 
@@ -249,7 +258,7 @@ El stack de testing combina herramientas estándar de Python con FastMCP Client 
 
 - **pytest**: Framework de testing principal para organizar y ejecutar tests
 - **pytest-asyncio**: Soporte para tests asíncronos necesario para MCP operations
-- **testcontainers**: Bases de datos reales para integration tests (PostgreSQL, Redis)
+- **Bases de datos separadas en docker-compose**: POSTGRES_TEST_DB y REDIS_TEST_URL para integration tests
 - **FastMCP Client**: Cliente MCP para testing de servers in-memory sin overhead de red
 
 **Configuración**:
@@ -272,7 +281,7 @@ Unit tests validan lógica de negocio de tools sin dependencias externas, incluy
 
 **Integration Tests (15-20%)**:
 
-Integration tests validan la integración del MCP Server con FastMCP Client in-memory y bases de datos reales usando testcontainers (PostgreSQL, Redis). Se mockean otras capas cuando no son críticas para el test. Estos tests toman 1-5s cada uno y validan que los componentes funcionen correctamente juntos.
+Integration tests validan la integración del MCP Server con FastMCP Client in-memory y bases de datos reales usando bases de datos separadas en docker-compose (POSTGRES_TEST_DB, REDIS_TEST_URL). Se mockean otras capas cuando no son críticas para el test. Estos tests toman 1-5s cada uno y validan que los componentes funcionen correctamente juntos.
 
 **E2E Tests (5-10%)**:
 
@@ -310,28 +319,64 @@ async def mcp_client():
 
 El fixture crea un servidor de prueba, inicializa el cliente, lo yield al test, y asegura que el cliente se cierre correctamente después del test.
 
-### Testing con Testcontainers
+### Testing con Bases de Datos Separadas en Docker Compose
 
 **PostgreSQL y Redis Reales**:
 
-Integration tests usan bases de datos reales con testcontainers para validar que el código funciona con bases de datos reales, no solo mocks. Testcontainers maneja el ciclo de vida de los contenedores automáticamente.
+Integration tests usan bases de datos reales separadas en docker-compose (POSTGRES_TEST_DB y REDIS_TEST_URL) para validar que el código funciona con bases de datos reales, no solo mocks. Las bases de datos se configuran en docker-compose y se usan directamente en los tests.
 
 ```python
-from testcontainers.postgres import PostgresContainer
-from testcontainers.redis import RedisContainer
+from shared.config.settings import settings
+from shared.db.session import get_engine, get_session_maker
+import redis
 
 @pytest_asyncio.fixture
-async def postgres_container():
-    with PostgresContainer("postgres:15") as postgres:
-        yield postgres.get_connection_url()
+async def db_session():
+    """
+    Fixture to provide a database session using docker-compose test PostgreSQL.
+    Uses transaction rollback for test isolation.
+    """
+    from alembic.config import Config
+    from alembic import command
+
+    # Create engine with test database URL
+    test_db_url = settings.test_database_url or settings.database_url
+    test_db_url = test_db_url.replace("localhost", "postgresql")
+    engine = get_engine(test_db_url)
+
+    # Apply Alembic migrations to test database
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", test_db_url)
+    command.upgrade(alembic_cfg, "head")
+
+    # Create session with transaction rollback
+    session_local = get_session_maker(engine)
+    session = session_local()
+
+    yield session
+
+    # Cleanup: rollback transaction
+    session.rollback()
+    session.close()
 
 @pytest_asyncio.fixture
-async def redis_container():
-    with RedisContainer("redis:7") as redis:
-        yield redis.get_connection_url()
+async def redis_session():
+    """
+    Fixture to provide a Redis session using docker-compose test Redis.
+    Uses REDIS_TEST_URL (database 1) for test isolation.
+    """
+    # Use test database (database 1 instead of 0)
+    test_redis_url = settings.redis_test_url or settings.redis_url
+    client = redis.from_url(test_redis_url)
+
+    yield client
+
+    # Cleanup: flush test database
+    client.flushdb()
+    client.close()
 ```
 
-Los fixtures crean contenedores temporales, yield la URL de conexión, y aseguran que los contenedores se detengan y limpien después del test.
+Los fixtures usan las bases de datos separadas configuradas en docker-compose, aplican migrations cuando es necesario, y aseguran aislamiento entre tests con transaction rollback y flush de Redis.
 
 ### Estrategia de Mocking
 

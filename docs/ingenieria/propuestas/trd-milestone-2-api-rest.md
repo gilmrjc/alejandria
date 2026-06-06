@@ -228,9 +228,9 @@ Implementar sistema de autenticación y autorización para la API REST.
 
 - [ ] Cobertura objetivo: >90% con pytest (según ADR-002)
 - [ ] Unit tests (70-80%): lógica de negocio, services, schemas
-- [ ] Integration tests (15-20%): DB real (testcontainers PostgreSQL, Redis)
+- [ ] Integration tests (15-20%): DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL)
 - [ ] E2E tests (5-10%): flujos completos del pipeline
-- [ ] Estrategia de testing de API específica (pytest, testcontainers, FastMCP Client)
+- [ ] Estrategia de testing de API específica (pytest, bases de datos separadas en docker-compose, FastMCP Client)
 - [ ] Testing de MCP servers con FastMCP Client (pytest-asyncio)
 
 ---

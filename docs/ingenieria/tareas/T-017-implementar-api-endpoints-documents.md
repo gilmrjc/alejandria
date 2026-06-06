@@ -1,8 +1,8 @@
 ---
 id: T-017
 type: Task
-rating:
-rating-phase:
+rating: 9
+rating-phase: document-editing
 related:
   - target: EPC-002
     relationship_type: implements
@@ -26,6 +26,12 @@ related:
 
 Implementar endpoints CRUD para documentos según api-specification.md.
 
+### Detalles de Implementación
+
+**Middleware de Versioning Automático**: Se implementa usando SQLAlchemy event listeners con `@event.listens_for(Document, 'before_update')`. Captura el estado actual antes de cada UPDATE, verifica cambio de contenido antes de crear snapshot (evita duplicados), y garantiza transacción atómica entre snapshot y UPDATE según ADR-006.
+
+**Manejo de Concurrencia**: Se usa pessimistic locking con SQLAlchemy `with_for_update()`. Configuración: timeout 5 segundos, 3 reintentos con backoff exponencial (100ms, 500ms, 1000ms). Manejo de deadlock detection: PostgreSQL detecta deadlocks automáticamente, rollback transacción y reintentar con backoff según ADR-006.
+
 ## Criterios de Aceptación
 
 - [ ] POST /api/v1/documents - Crear documento
@@ -35,8 +41,8 @@ Implementar endpoints CRUD para documentos según api-specification.md.
 - [ ] DELETE /api/v1/documents/{id} - Eliminar documento
 - [ ] GET /api/v1/documents/{id}/snapshots - Obtener snapshots
 - [ ] POST /api/v1/documents/{id}/snapshots/{snapshot_id}/restore - Restaurar snapshot
-- [ ] **GAP**: Middleware de versioning automático antes de cada UPDATE
-- [ ] **GAP**: Manejo de concurrencia para ediciones simultáneas
+- [ ] Middleware de versioning automático antes de cada UPDATE (implementado con SQLAlchemy event listeners)
+- [ ] Manejo de concurrencia para ediciones simultáneas (pessimistic locking con with_for_update)
 
 ## Archivos a Crear
 
@@ -54,55 +60,3 @@ app/services/
 - [API Specification](../arquitectura/api-specification.md): Endpoints de Documents
 - [ADR-006](../decisiones/adr-006-document-versioning.md): Versioning de Documentos
 
----
-
-## Análisis de Documento
-
-**ESTADO DEL ANÁLISIS**
-
-- Análisis previo: NO
-- Fecha del análisis: 2026-05-27
-- Versión del análisis: 1
-- Gaps pendientes: 3
-- Gaps respondidos: 0
-- Gaps NO APLICA: 0
-
-**CLASIFICACIÓN DEL DOCUMENTO**
-
-- Tipo: Documento de Proyecto (Task)
-- Rol Principal: Desarrollador/Ingeniero
-- Roles a Revisar: Desarrollador + Arquitecto + Gerente de Proyecto
-- Enfoque: Implementación de endpoints CRUD para documentos
-- Perspectiva: Senior + Junior
-- Fecha de análisis: 2026-05-27
-- Versión del análisis: 1
-
-### Gaps Identificados
-
-**IMPLEMENTACIÓN TÉCNICA**
-
-**GAP: Middleware de versioning automático antes de cada UPDATE** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
-
-- **Pregunta**: La tarea menciona "Middleware de versioning automático antes de cada UPDATE" como GAP. ¿Cómo se implementa este middleware? ¿Se integra con SQLAlchemy event listeners? ¿Cuál es el mecanismo exacto para capturar el estado antes de cada UPDATE?
-- **Contexto faltante**: Detalles de implementación del middleware de versioning automático, incluyendo el mecanismo de captura de estado y la integración con SQLAlchemy según ADR-006.
-- **Rol afectado**: Desarrollador Senior
-- **Referencia**: Línea 38 del documento actual, ADR-006
-- **Fecha de identificación**: 2026-05-27
-
-**GAP: Manejo de concurrencia para ediciones simultáneas** [PRIORIDAD: Alto] [ESTADO: PENDIENTE]
-
-- **Pregunta**: La tarea menciona "Manejo de concurrencia para ediciones simultáneas" como GAP. ¿Qué estrategia se usa? ¿Pessimistic locking con SELECT FOR UPDATE? ¿Optimistic locking con version numbers? ¿Cómo se manejan conflictos?
-- **Contexto faltante**: Detalles de la estrategia de manejo de concurrencia, incluyendo el tipo de locking y el manejo de conflictos según ADR-006.
-- **Rol afectado**: Desarrollador Senior
-- **Referencia**: Línea 39 del documento actual, ADR-006
-- **Fecha de identificación**: 2026-05-27
-
-**GESTIÓN DE PROYECTO**
-
-**GAP: Criterios para estimación de esfuerzo** [PRIORIDAD: Bajo] [ESTADO: PENDIENTE]
-
-- **Pregunta**: La tarea tiene una estimación de 6 horas. ¿Qué criterios se usaron para esta estimación? ¿Es basada en experiencia previa? ¿Referencias externas?
-- **Contexto faltante**: Justificación de la estimación de esfuerzo para esta tarea específica.
-- **Rol afectado**: Gerente de Proyecto
-- **Referencia**: Línea 22 del documento actual
-- **Fecha de identificación**: 2026-05-27

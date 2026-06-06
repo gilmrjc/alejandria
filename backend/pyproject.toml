@@ -43,19 +43,23 @@ dependencies = [
     # Security
     "python-jose[cryptography]>=3.4.0",
     "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=4.0.0,<5.0.0",
+
+    # Sanitization
+    "bleach>=6.2.0",
+    "bleach-allowlist>=1.0.3",
 
     # Utilities
     "structlog>=25.2.0",
     "orjson>=3.10.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     # Testing
     "pytest>=8.3.0",
     "pytest-asyncio>=0.26.0",
     "pytest-cov>=6.1.0",
-    "testcontainers>=4.10.0",
 
     # Linting and formatting
     "ruff>=0.11.0",
@@ -67,8 +71,10 @@ dev = [
 ]
 
 [tool.ruff]
-line-length = 100
+line-length = 88
 target-version = "py311"
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "F",   # Pyflakes
@@ -93,8 +99,9 @@ disallow_incomplete_defs = true
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["."]
+addopts = "--cov=api --cov=mcp_server --cov=shared --cov-report=term-missing --cov-report=html --cov-branch"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["api*", "mcp*", "jobs*", "shared*"]
+include = ["api*", "mcp_server*", "jobs*", "shared*"]
 exclude = ["tests*"]

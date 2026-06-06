@@ -26,21 +26,20 @@ El stack incluye componentes con características especiales: FastAPI (async web
 
 ## Decisiones
 
-**Decisión**: Usar estrategia de testing híbrida con pytest, testcontainers, y fixtures especializados para componentes asíncronos.
+**Decisión**: Usar estrategia de testing híbrida con pytest, bases de datos de pruebas separadas en docker-compose, y fixtures especializados para componentes asíncronos.
 
 **Stack de testing**:
 
 - **pytest**: Framework de testing principal
 - **pytest-asyncio**: Testing de código async
 - **pytest-cov**: Medición de cobertura de código
-- **testcontainers**: Contenedores Docker para integration tests (PostgreSQL, Redis)
 - **faker**: Generación de datos de prueba
 - **respx**: Mocking de HTTP requests para tests unitarios
 
 **Distribución de tests**:
 
 - **Unit tests (70-80%)**: Lógica de negocio, services, schemas sin dependencias externas
-- **Integration tests (15-20%)**: DB real (testcontainers PostgreSQL, Redis) y mocks hacia otras capas
+- **Integration tests (15-20%)**: DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL) y mocks hacia otras capas
 - **E2E tests (5-10%)**: Flujos completos del pipeline de 5 fases, solo happy paths
 
 **Cobertura objetivo**: >90%
@@ -76,12 +75,12 @@ addopts = [
 
 - pytest-asyncio permite testing natural de código async (FastAPI, Celery, FastMCP)
 - Fixtures async crean clientes in-memory para FastMCP sin overhead de red
-- Mocking de Redis broker para unit tests de Celery, Redis real (testcontainers) para integration tests
+- Mocking de Redis broker para unit tests de Celery, Redis real (bases de datos separadas en docker-compose) para integration tests
 
-**Testcontainers para integration tests**:
+**Bases de datos separadas para integration tests**:
 
-- PostgreSQL y Redis reales en contenedores Docker para tests realistas
-- Contenedores se levantan y destruyen automáticamente en cada test
+- PostgreSQL y Redis reales usando bases de datos separadas configuradas en docker-compose (POSTGRES_TEST_DB, REDIS_TEST_URL)
+- Transaction rollback para asegurar aislamiento entre tests
 - Consistencia con entorno de despliegue (Docker Compose según ADR-003)
 
 **Cobertura alta (>90%)**:
@@ -95,14 +94,14 @@ addopts = [
 **FastAPI (API Backend)**:
 
 - Unit tests: endpoints con mocks de servicios y DB
-- Integration tests: endpoints con DB real (testcontainers PostgreSQL)
+- Integration tests: endpoints con DB real (POSTGRES_TEST_DB)
 - Fixtures pytest para FastAPI TestClient
 - Testing de validación Pydantic en schemas
 
 **Celery (Jobs y Orquestación)**:
 
 - Unit tests: tasks con mocks de broker Redis y DB
-- Integration tests: tasks con Redis real (testcontainers) y DB real
+- Integration tests: tasks con Redis real (REDIS_TEST_URL) y DB real
 - Testing de retry policies y error handling
 - Testing de idempotencia con locks en DB
 
@@ -116,7 +115,7 @@ addopts = [
 **Servicios compartidos (shared/)**:
 
 - Unit tests: services con mocks de DB y dependencias externas
-- Integration tests: services con DB real (testcontainers)
+- Integration tests: services con DB real (POSTGRES_TEST_DB)
 - Testing de lógica de negocio aislada de API/MCP/jobs
 
 ### Alineación con ADR-002 y ADR-007
@@ -137,13 +136,11 @@ addopts = [
 
 ### Desventajas
 
-- **Complejidad de testcontainers**: Requiere Docker en entorno de CI/CD
-- **Tiempo de execution**: Integration tests con testcontainers son más lentos que unit tests
+- **Tiempo de execution**: Integration tests con DB real son más lentos que unit tests
 - **Curva de aprendizaje**: pytest-asyncio y fixtures async requieren aprendizaje
 
 ### Mitigación
 
-- **CI/CD con Docker**: Configurar CI/CD (GitHub Actions, GitLab CI) con Docker support
 - **Ejecución selectiva**: Permitir ejecutar solo unit tests en desarrollo rápido
 - **Documentación de fixtures**: Documentar fixtures pytest en `development-setup.md`
 
@@ -178,7 +175,7 @@ def test_create_document():
 
 **Características**:
 
-- DB real (testcontainers PostgreSQL, Redis)
+- DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL)
 - Mocks de servicios externos (LLM APIs, etc.)
 - Testing de interacciones con DB y cache
 - 15-20% del total de tests
@@ -188,16 +185,41 @@ def test_create_document():
 ```python
 # tests/integration/test_api.py
 import pytest
-from testcontainers.postgres import PostgresContainer
 from fastapi.testclient import TestClient
 from api.main import app
 
-@pytest.fixture(scope="module")
-def postgres():
-    with PostgresContainer("postgres:15") as postgres:
-        yield postgres
+@pytest.fixture(scope="function")
+def db_session():
+    """
+    Fixture to provide a database session using docker-compose test PostgreSQL.
+    Uses transaction rollback for test isolation.
+    """
+    from shared.config.settings import settings
+    from shared.db.session import get_engine, get_session_maker
+    from alembic.config import Config
+    from alembic import command
 
-def test_create_document_integration(postgres):
+    # Create engine with test database URL
+    test_db_url = settings.test_database_url or settings.database_url
+    test_db_url = test_db_url.replace("localhost", "postgresql")
+    engine = get_engine(test_db_url)
+
+    # Apply Alembic migrations to test database
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", test_db_url)
+    command.upgrade(alembic_cfg, "head")
+
+    # Create session with transaction rollback
+    session_local = get_session_maker(engine)
+    session = session_local()
+
+    yield session
+
+    # Cleanup: rollback transaction
+    session.rollback()
+    session.close()
+
+def test_create_document_integration(db_session):
     client = TestClient(app)
     response = client.post("/documents", json={"title": "Test", "content": "Content"})
     assert response.status_code == 201
@@ -218,16 +240,39 @@ def test_create_document_integration(postgres):
 ```python
 # tests/e2e/test_pipeline.py
 import pytest
-from testcontainers.postgres import PostgresContainer
-from testcontainers.redis import RedisContainer
 
-@pytest.fixture(scope="module")
-def infrastructure():
-    with PostgresContainer("postgres:15") as postgres, \
-         RedisContainer("redis:7") as redis:
-        yield {"postgres": postgres, "redis": redis}
+@pytest.fixture(scope="function")
+def db_session():
+    """
+    Fixture to provide a database session using docker-compose test PostgreSQL.
+    Uses transaction rollback for test isolation.
+    """
+    from shared.config.settings import settings
+    from shared.db.session import get_engine, get_session_maker
+    from alembic.config import Config
+    from alembic import command
 
-def test_five_phase_pipeline_happy_path(infrastructure):
+    # Create engine with test database URL
+    test_db_url = settings.test_database_url or settings.database_url
+    test_db_url = test_db_url.replace("localhost", "postgresql")
+    engine = get_engine(test_db_url)
+
+    # Apply Alembic migrations to test database
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", test_db_url)
+    command.upgrade(alembic_cfg, "head")
+
+    # Create session with transaction rollback
+    session_local = get_session_maker(engine)
+    session = session_local()
+
+    yield session
+
+    # Cleanup: rollback transaction
+    session.rollback()
+    session.close()
+
+def test_five_phase_pipeline_happy_path(db_session):
     # Test completo del pipeline de 5 fases
     # 1. Upload document
     # 2. Gap detection
@@ -253,20 +298,33 @@ def test_gap_detection_task_unit(celery_mock):
     assert result.status == "SUCCESS"
 ```
 
-**Integration tests** (Redis real con testcontainers):
+**Integration tests** (Redis real con base de datos separada en docker-compose):
 
 ```python
 # tests/integration/test_gap_detection_task.py
 import pytest
-from testcontainers.redis import RedisContainer
 from jobs.tasks.gap_detection import gap_detection_task
 
-@pytest.fixture(scope="module")
-def redis():
-    with RedisContainer("redis:7") as redis:
-        yield redis
+@pytest.fixture(scope="function")
+def redis_session():
+    """
+    Fixture to provide a Redis session using docker-compose test Redis.
+    Uses REDIS_TEST_URL (database 1) for test isolation.
+    """
+    from shared.config.settings import settings
+    import redis
 
-def test_gap_detection_task_integration(redis):
+    # Use test database (database 1 instead of 0)
+    test_redis_url = settings.redis_test_url or settings.redis_url
+    client = redis.from_url(test_redis_url)
+
+    yield client
+
+    # Cleanup: flush test database
+    client.flushdb()
+    client.close()
+
+def test_gap_detection_task_integration(redis_session):
     result = gap_detection_task.apply_async(args=[1])
     assert result.get(timeout=10) is not None
 ```
@@ -340,12 +398,12 @@ async def test_mcp_tool_integration(mcp_client):
 
 - **Cobertura alta**: >90% asegura calidad de código
 - **Feedback rápido**: Unit tests <1s permiten desarrollo iterativo
-- **Validación real**: Integration tests con testcontainers validan comportamiento real
+- **Validación real**: Integration tests con bases de datos separadas en docker-compose validan comportamiento real
 - **Testing asíncrono**: pytest-asyncio y fixtures async facilitan testing de componentes asíncronos
 
 ### Impacto Negativo
 
-- **Complejidad**: Requiere configuración de testcontainers y fixtures async
+- **Complejidad**: Requiere configuración de fixtures async
 - **Dependencia de Docker**: Integration tests requieren Docker en entorno de CI/CD
 - **Curva de aprendizaje**: pytest-asyncio y fixtures async requieren aprendizaje
 
@@ -354,7 +412,7 @@ async def test_mcp_tool_integration(mcp_client):
 - Configurar pytest en `pyproject.toml` con plugins (pytest-asyncio, pytest-cov)
 - Crear estructura de directorios de tests (tests/unit/, tests/integration/, tests/e2e/)
 - Implementar fixtures pytest reutilizables (DB, Redis, FastAPI TestClient, FastMCP Client)
-- Configurar testcontainers para PostgreSQL y Redis
+- Configurar bases de datos separadas en docker-compose (POSTGRES_TEST_DB, REDIS_TEST_URL)
 - Documentar patrones de testing en `development-setup.md`
 - Configurar CI/CD para ejecutar tests con Docker support
 - Asegurar que覆盖率 >90% se mantenga en cada commit
@@ -365,4 +423,3 @@ async def test_mcp_tool_integration(mcp_client):
 - ADR-007: Python Package Structure
 - pytest documentation: <https://docs.pytest.org/>
 - pytest-asyncio documentation: <https://pytest-asyncio.readthedocs.io/>
-- testcontainers-python: <https://testcontainers-python.readthedocs.io/>

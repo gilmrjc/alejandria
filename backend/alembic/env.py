@@ -2,19 +2,17 @@
 
 import os
 import sys
-from pathlib import Path
 from logging.config import fileConfig
+from pathlib import Path
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# Add backend directory to path for imports
-# alembic is at /backend/alembic, backend root is at /backend
+from alembic import context
+
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir.resolve()))
 
-# Import models for autogenerate support
-from shared.db.models import Base
+from shared.db.models import Base  # noqa: E402
 
 # Alembic Config object
 config = context.config
@@ -26,12 +24,12 @@ if config.config_file_name is not None:
 # Target metadata for autogenerate
 target_metadata = Base.metadata
 
+
 # Get database URL from environment or use default
 def get_url():
     """Get database URL from environment or config."""
     return os.getenv(
-        "DATABASE_URL",
-        "postgresql://alejandria:changeme@localhost:5432/alejandria"
+        "DATABASE_URL", "postgresql://alejandria:changeme@localhost:5432/alejandria"
     )
 
 
@@ -72,10 +70,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

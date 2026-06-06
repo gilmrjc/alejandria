@@ -14,7 +14,7 @@ related:
   - target: STR-005
     relationship_type: implements
     reason: Implementa la estrategia de frontend definiendo stack de frontend
-  - target: STR-004
+  - target: STR-006
     relationship_type: implements
     reason: Implementa la evaluación de LLM definiendo proveedores recomendados
   - target: ARC-004
@@ -208,7 +208,7 @@ El entorno de desarrollo MVP Bootstrapped prioriza simplicidad operacional y con
 La estrategia de testing utiliza un enfoque híbrido con capas autocontenidas. Cada capa tiene sus propios tests independientes, con mocks hacia otras capas que también están testeadas. Este enfoque permite testing rápido (unit) mientras valida integración real donde es crítico (integration), con E2E limitado a happy paths para evitar fragilidad.
 
 - **Unit tests**: 70-80% de tests, rápidos (<1s cada uno). Prueban lógica de negocio, services, schemas sin dependencias externas.
-- **Integration tests**: 15-20% de tests, con DB real (testcontainers). Prueban integración por capa con mocks hacia otras capas.
+- **Integration tests**: 15-20% de tests, con DB real (bases de datos separadas en docker-compose). Prueban integración por capa con mocks hacia otras capas.
 - **E2E tests**: 5-10% de tests, flujos completos (crear documento → ejecutar job → verificar resultado). Solo happy paths para verificar integración final entre capas.
 - **Mocks**: Requests HTTP entre capas, eventos de Redis, llamadas MCP.
 

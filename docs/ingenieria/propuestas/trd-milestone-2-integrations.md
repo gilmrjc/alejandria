@@ -148,9 +148,9 @@ Implementar integración con Redis para caché de sesiones y gestión de estado.
 
 - [ ] Cobertura objetivo: >90% con pytest (según ADR-002)
 - [ ] Unit tests (70-80%): lógica de negocio, services, schemas
-- [ ] Integration tests (15-20%): DB real (testcontainers PostgreSQL, Redis)
+- [ ] Integration tests (15-20%): DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL)
 - [ ] E2E tests (5-10%): flujos completos del pipeline
-- [ ] Estrategia de testing de integraciones específica (pytest, testcontainers)
+- [ ] Estrategia de testing de integraciones específica (pytest, bases de datos separadas en docker-compose)
 - [ ] Testing de integraciones con servicios externos (Qdrant, Redis)
 
 ---

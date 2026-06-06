@@ -1,5 +1,5 @@
 ---
-id: STR-004
+id: STR-006
 type: Strategy
 rating: 2
 rating-phase: document-critique

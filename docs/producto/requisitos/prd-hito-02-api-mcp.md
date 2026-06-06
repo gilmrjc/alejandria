@@ -218,7 +218,7 @@ El testing es crítico para asegurar calidad del código. Según ADR-002, el obj
 
 - Cobertura objetivo: >90% con pytest
 - Unit tests: lógica de negocio, services, schemas
-- Integration tests: DB real (testcontainers PostgreSQL, Redis)
+- Integration tests: DB real (bases de datos separadas en docker-compose: POSTGRES_TEST_DB, REDIS_TEST_URL)
 - E2E tests: flujos completos del pipeline
 - Estrategia de testing específica para API, jobs asíncronos y MCP servers (ver TRD-021, TRD-022, TRD-023 para detalles técnicos de implementación)
 

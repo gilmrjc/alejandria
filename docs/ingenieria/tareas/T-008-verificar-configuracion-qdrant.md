@@ -1,7 +1,7 @@
 ---
 id: T-008
 type: Task
-rating: 8
+rating: 9.0
 rating-phase: document-editing
 related:
   - target: T-002

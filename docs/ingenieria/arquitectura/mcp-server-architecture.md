@@ -61,7 +61,7 @@ El uso de MCP como capa de abstracción proporciona ventajas estratégicas y té
 El MCP Server de Alejandria se implementa con las siguientes tecnologías:
 
 - **Framework**: FastMCP (Python) - Framework simplificado para implementación de servidores MCP
-- **Transporte**: Stdio (para desarrollo local) y HTTP (para producción) - Dos modos de transporte según el entorno
+- **Transporte**: HTTP (exclusivo) - Transporte HTTP para todos los entornos (desarrollo y producción)
 - **LLM Provider**: Qwen 3.5 vía Ollama (MVP Bootstrapped) - Modelo LLM local para fase inicial
 - **Integración**: FastAPI para endpoints HTTP adicionales - API REST complementaria para integraciones externas
 
@@ -152,33 +152,28 @@ sequenceDiagram
 
 ## 3. Protocolo de Comunicación
 
-El MCP Server soporta dos modos de transporte según el entorno: stdio para desarrollo local y HTTP para producción. Cada modo tiene ventajas específicas y se elige según los requisitos de escalabilidad, autenticación y multi-tenancy.
+El MCP Server utiliza exclusivamente transporte HTTP para todos los entornos (desarrollo y producción). Esta decisión se tomó debido a problemas de compatibilidad entre FastMCP y los tipos de SQLAlchemy Session en pydantic-core cuando se usa transporte stdio.
 
-### Transporte Stdio (Desarrollo Local)
+### Transporte HTTP (Exclusivo)
 
-El transporte stdio es ideal para desarrollo local porque proporciona latencia mínima, aislamiento de proceso y simplicidad. El cliente lanza el servidor como subprocess y se comunica mediante stdin/stdout usando JSON-RPC delimitado por newlines.
+El transporte HTTP se utiliza para todos los entornos por las siguientes razones:
 
-**Características**:
+**Razones del cambio de stdio a HTTP**:
 
-- Latencia mínima (~10ms)
-- Sin overhead de red
-- Aislamiento de proceso
-- Simple para desarrollo local
-- Un proceso por usuario (no escala bien)
-- Sin auth en capa de transporte
-
-### Transporte HTTP (Producción)
-
-El transporte HTTP es necesario para producción porque soporta multi-tenancy, autenticación centralizada, escalabilidad horizontal y gateway. El servidor opera como proceso independiente manejando múltiples conexiones concurrentes.
+1. **Compatibilidad FastMCP-SQLAlchemy**: El transporte stdio tenía problemas fundamentales con los tipos `Session` de SQLAlchemy en pydantic-core, causando errores de schema generation que impedían el funcionamiento del servidor MCP. Se resolvió eliminando los parámetros `session` de las firmas de las funciones MCP
+2. **Autenticación API KEY nativa**: HTTP permite autenticación vía headers de forma estándar, ya implementada en el código para transporte HTTP
+3. **Mejor integración con IDEs**: Los IDEs modernos (Devin IDE, Windsurf, Claude Code) tienen mejor soporte para servidores MCP HTTP
+4. **Arquitectura más apropiada para producción**: HTTP es el estándar para servidores MCP en entornos de producción
+5. **Evita problemas de tipos complejos**: HTTP no tiene las mismas limitaciones de schema generation que stdio
 
 **Características**:
 
-- Escalable (multi-tenancy)
-- Auth vía Authorization header
-- Gateway centralizado
-- Mejor para múltiples usuarios
-- Más overhead de red
-- Requiere configuración de infraestructura
+- Autenticación API KEY vía headers HTTP
+- Soporte para CORS para integraciones web
+- Mejor escalabilidad y balanceo de carga
+- Compatible con clientes MCP HTTP estándar
+- Logs y monitoreo más claros
+- Servidor expuesto en `http://localhost:8000/mcp`
 
 **Autenticación y Autorización**:
 

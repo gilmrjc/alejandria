@@ -127,6 +127,7 @@ class Relationship:
     target: str
     relationship_type: str
     reason: str
+    rating: Optional[float] = None
 
 
 @dataclass
@@ -218,6 +219,10 @@ class DocumentValidator:
         """Valida el campo rating y rating_phase."""
         issues: List[ValidationErrorItem] = []
         
+        if doc.rating is None and doc.rating_phase:
+            self._add_error(issues, doc.path, 'Campo "rating-phase" presente pero "rating" faltante', 'warning')
+            return issues
+        
         if doc.rating is not None:
             if not isinstance(doc.rating, (int, float)):
                 self._add_error(issues, doc.path, 
@@ -231,9 +236,6 @@ class DocumentValidator:
             elif not self.validate_rating_phase(doc.rating_phase):
                 self._add_error(issues, doc.path, 
                     f'Campo "rating-phase" inválido "{doc.rating_phase}". Debe ser uno de: {self.config.valid_rating_phases}', 'warning')
-        
-        if doc.rating_phase and doc.rating is None:
-            self._add_error(issues, doc.path, 'Campo "rating-phase" presente pero "rating" faltante', 'warning')
         
         return issues
     
@@ -253,6 +255,10 @@ class DocumentValidator:
         
         if not rel.reason:
             self._add_error(issues, doc.path, f'Relación "{rel.target}" sin campo "reason"', 'warning', rel.target)
+        
+        if rel.rating is not None and not self.validate_rating_range(rel.rating):
+            self._add_error(issues, doc.path, 
+                f'Relación "{rel.target}" con rating inválido "{rel.rating}". Debe estar entre {self.config.min_rating} y {self.config.max_rating}', 'warning', rel.target)
         
         if rel.target not in repository.id_to_path:
             self._add_error(issues, doc.path, f'Relación "{rel.target}" (tipo: {rel.relationship_type}) no existe', 'warning', rel.target)
@@ -324,7 +330,8 @@ class DocumentParser:
             related.append(Relationship(
                 target=rel.get('target', ''),
                 relationship_type=rel.get('relationship_type', ''),
-                reason=rel.get('reason', '')
+                reason=rel.get('reason', ''),
+                rating=rel.get('rating')
             ))
         
         return related
@@ -509,17 +516,25 @@ class DocumentAnalyzer:
                         has_rating: Optional[bool] = None) -> List[Document]:
         """Filtra documentos por rating."""
         results: List[Document] = []
+        
         for doc in self.repository.documents.values():
+            # Filtro por presencia de rating
             if has_rating is not None and (doc.rating is None) != has_rating:
                 continue
+            
+            # Si no tiene rating y se pide rango, saltar
             if (min_rating is not None or max_rating is not None) and doc.rating is None:
                 continue
+            
+            # Si tiene rating, aplicar filtros de rango
             if doc.rating is not None:
                 if min_rating is not None and doc.rating < min_rating:
                     continue
                 if max_rating is not None and doc.rating > max_rating:
                     continue
+            
             results.append(doc)
+        
         return sorted(results, key=lambda d: d.rating or 0, reverse=True)
     
     def find_orphaned(self) -> List[Document]:
@@ -530,6 +545,13 @@ class DocumentAnalyzer:
         ]
         return sorted(orphaned, key=lambda d: d.path)
     
+    def _classify_issue(self, issue: ValidationErrorItem, issues: LintResults) -> None:
+        """Clasifica un issue en errors o warnings."""
+        if issue.severity == 'error':
+            issues['errors'].append(issue)
+        else:
+            issues['warnings'].append(issue)
+    
     def lint_documents(self) -> LintResults:
         """Valida los front matters de todos los documentos."""
         issues: LintResults = {'errors': [], 'warnings': []}
@@ -539,10 +561,7 @@ class DocumentAnalyzer:
             try:
                 doc_issues = self.validator.validate_document(doc, self.repository)
                 for issue in doc_issues:
-                    if issue.severity == 'error':
-                        issues['errors'].append(issue)
-                    else:
-                        issues['warnings'].append(issue)
+                    self._classify_issue(issue, issues)
             except Exception as e:
                 issues['errors'].append(ValidationErrorItem(
                     path=doc.path,
@@ -575,6 +594,18 @@ class OutputFormatter:
     def __init__(self):
         pass
     
+    def _format_relationship_line(self, rel: Relationship, repository: DocumentRepository) -> List[str]:
+        """Formatea una línea de relación individual."""
+        rel_doc = repository.get_by_id(rel.target)
+        rel_info = f" -> {rel_doc.path if rel_doc else 'NO ENCONTRADO'}"
+        lines = [
+            f"  - {rel.target} [{rel.relationship_type}]{rel_info}",
+            f"    Razón: {rel.reason}"
+        ]
+        if rel.rating is not None:
+            lines.append(f"    Rating de relación: {rel.rating}")
+        return lines
+    
     def format_document(self, doc: Document, repository: DocumentRepository) -> str:
         """Formatea información de un documento."""
         lines = [
@@ -584,19 +615,38 @@ class OutputFormatter:
             f"Path: {doc.path}",
             f"Rating: {doc.rating if doc.rating else 'Sin rating'}"
         ]
+        
         if doc.rating_phase:
             lines.append(f"Rating Phase: {doc.rating_phase}")
+        
         if doc.related:
             lines.append(f"Relaciones ({len(doc.related)}):")
             for rel in doc.related:
-                rel_doc = repository.get_by_id(rel.target)
-                rel_info = f" -> {rel_doc.path if rel_doc else 'NO ENCONTRADO'}"
-                lines.append(f"  - {rel.target} [{rel.relationship_type}]{rel_info}")
-                lines.append(f"    Razón: {rel.reason}")
+                lines.extend(self._format_relationship_line(rel, repository))
         else:
             lines.append("Relaciones: Ninguna (aislado)")
+        
         lines.append(f"{'='*60}")
         return "\n".join(lines)
+    
+    def _format_traversal_result(self, rel: TraversalResult, repository: DocumentRepository) -> List[str]:
+        """Formatea un resultado de traversación individual."""
+        rel_doc = repository.get_by_id(rel.target_id)
+        via_str = f" via {rel.via}" if rel.via else ""
+        
+        if not rel_doc:
+            return [f"    - {rel.target_id}{via_str} -> NO ENCONTRADO"]
+        
+        rating_str = f" (rating: {rel_doc.rating})" if rel_doc.rating else ""
+        lines = [
+            f"    - {rel.target_id}{via_str} -> {rel_doc.path}{rating_str}",
+            f"      Tipo: {rel.relationship_type}"
+        ]
+        
+        if rel.reason:
+            lines.append(f"      Razón: {rel.reason}")
+        
+        return lines
     
     def format_relationships(self, doc_id: str, rels: List[TraversalResult], depth: int, 
                               repository: DocumentRepository) -> str:
@@ -607,28 +657,20 @@ class OutputFormatter:
             f"{'='*60}"
         ]
         
-        if rels:
-            lines.append(f"\n📥 RELACIONES - {len(rels)} total:")
-            by_depth = defaultdict(list)
-            for rel in rels:
-                by_depth[rel.depth].append(rel)
-            
-            for d in sorted(by_depth.keys()):
-                lines.append(f"\n  Profundidad {d}:")
-                for rel in by_depth[d]:
-                    rel_doc = repository.get_by_id(rel.target_id)
-                    if rel_doc:
-                        rating_str = f" (rating: {rel_doc.rating})" if rel_doc.rating else ""
-                        via_str = f" via {rel.via}" if rel.via else ""
-                        lines.append(f"    - {rel.target_id}{via_str} -> {rel_doc.path}{rating_str}")
-                        lines.append(f"      Tipo: {rel.relationship_type}")
-                        if rel.reason:
-                            lines.append(f"      Razón: {rel.reason}")
-                    else:
-                        via_str = f" via {rel.via}" if rel.via else ""
-                        lines.append(f"    - {rel.target_id}{via_str} -> NO ENCONTRADO")
-        else:
+        if not rels:
             lines.append(f"\n📥 RELACIONES: Ninguna (aislado)")
+            lines.append(f"\n{'='*60}")
+            return "\n".join(lines)
+        
+        lines.append(f"\n📥 RELACIONES - {len(rels)} total:")
+        by_depth = defaultdict(list)
+        for rel in rels:
+            by_depth[rel.depth].append(rel)
+        
+        for d in sorted(by_depth.keys()):
+            lines.append(f"\n  Profundidad {d}:")
+            for rel in by_depth[d]:
+                lines.extend(self._format_traversal_result(rel, repository))
         
         lines.append(f"\n{'='*60}")
         return "\n".join(lines)
@@ -681,32 +723,34 @@ class GraphExporter:
         self.repository = repository
         self.config = config or Config()
     
+    def _match_pattern(self, path: str, patterns: dict[str, list[str]], default: str) -> str:
+        """Método genérico para buscar coincidencias de patrones en path."""
+        path_lower = path.lower()
+        for key, pattern_list in patterns.items():
+            if any(pattern in path_lower for pattern in pattern_list):
+                return key
+        return default
+    
     def get_group_from_path(self, path: str) -> str:
         """Determina el grupo basado en la estructura de carpetas."""
-        path_lower = path.lower()
-        for group, patterns in self.config.groups.items():
-            if any(pattern in path_lower for pattern in patterns):
-                return group
-        return 'IMPLEMENTACIÓN'
+        return self._match_pattern(path, self.config.groups, 'IMPLEMENTACIÓN')
     
     def get_milestone(self, path: str) -> str:
         """Determina el milestone basado en path."""
-        path_lower = path.lower()
-        for milestone, patterns in self.config.milestones.items():
-            if any(pattern in path_lower for pattern in patterns):
-                return milestone
-        return ''
+        return self._match_pattern(path, self.config.milestones, '')
     
     def get_status(self, doc: Document) -> str:
         """Determina el estado basado en rating."""
         if doc.rating is None:
             return 'pending'
-        elif doc.rating >= self.config.status_completed_threshold:
+        
+        if doc.rating >= self.config.status_completed_threshold:
             return 'completed'
-        elif doc.rating >= self.config.status_in_progress_threshold:
+        
+        if doc.rating >= self.config.status_in_progress_threshold:
             return 'in-progress'
-        else:
-            return 'pending'
+        
+        return 'pending'
     
     def export(self, output_path: str) -> None:
         """Exporta el grafo de dependencias a formato JSON."""
@@ -714,6 +758,7 @@ class GraphExporter:
         edges = []
         
         for doc in self.repository.documents.values():
+            # Agregar nodo
             nodes.append({
                 'id': doc.id,
                 'label': Path(doc.path).name,
@@ -722,8 +767,8 @@ class GraphExporter:
                 'group': self.get_group_from_path(doc.path),
                 'milestone': self.get_milestone(doc.path)
             })
-        
-        for doc in self.repository.documents.values():
+            
+            # Agregar edges para este documento
             for rel in doc.related:
                 if rel.target in self.repository.id_to_path:
                     edges.append({
@@ -746,6 +791,90 @@ class GraphExporter:
         print(f"  - Edges: {len(edges)}")
 
 
+# ==================== COMANDOS CLI ====================
+
+class Command:
+    """Base class para comandos CLI."""
+    
+    def __init__(self, cli: 'CLI'):
+        self.cli = cli
+    
+    def execute(self, args) -> None:
+        """Ejecuta el comando."""
+        raise NotImplementedError
+
+
+class FilterRatingCommand(Command):
+    """Comando para filtrar documentos por rating."""
+    
+    def execute(self, args) -> None:
+        has_rating = {'yes': True, 'no': False}.get(args.has_rating)
+        
+        docs = self.cli.analyzer.filter_by_rating(
+            min_rating=args.min,
+            max_rating=args.max,
+            has_rating=has_rating
+        )
+        print(self.cli.formatter.format_rating_list(docs))
+
+
+class RelationshipsCommand(Command):
+    """Comando para mostrar relaciones de un documento."""
+    
+    def execute(self, args) -> None:
+        if not args.id and not args.path:
+            print("Error: Debes especificar --id o --path")
+            return
+        
+        doc = self.cli._get_document(args.id, args.path)
+        if not doc:
+            identifier = args.path or args.id
+            print(f"Documento con '{identifier}' no encontrado")
+            return
+        
+        rels = self.cli.traverser.traverse(doc, args.depth)
+        print(self.cli.formatter.format_relationships(doc.id, rels, args.depth, self.cli.repository))
+
+
+class OrphansCommand(Command):
+    """Comando para encontrar archivos huérfanos."""
+    
+    def execute(self, args) -> None:
+        orphans = self.cli.analyzer.find_orphaned()
+        print(self.cli.formatter.format_simple_list(orphans, "archivos huérfanos (sin relaciones depends_on)"))
+
+
+class ShowCommand(Command):
+    """Comando para mostrar información de un documento."""
+    
+    def execute(self, args) -> None:
+        if not args.id and not args.path:
+            print("Error: Debes especificar --id o --path")
+            return
+        
+        doc = self.cli._get_document(args.id, args.path)
+        if doc:
+            print(self.cli.formatter.format_document(doc, self.cli.repository))
+        else:
+            identifier = args.path or args.id
+            print(f"Documento con '{identifier}' no encontrado")
+
+
+class LintCommand(Command):
+    """Comando para validar front matters."""
+    
+    def execute(self, args) -> None:
+        issues = self.cli.analyzer.lint_documents()
+        print(self.cli.formatter.format_lint_results(issues))
+
+
+class ExportGraphCommand(Command):
+    """Comando para exportar grafo de dependencias."""
+    
+    def execute(self, args) -> None:
+        self.cli.exporter.export(args.output)
+
+
 # ==================== CLI ====================
 
 class CLI:
@@ -761,6 +890,15 @@ class CLI:
         self.analyzer = DocumentAnalyzer(self.repository, self.validator)
         self.formatter = OutputFormatter()
         self.exporter = GraphExporter(self.repository, self.config)
+        
+        self._commands = {
+            'filter-rating': FilterRatingCommand(self),
+            'relationships': RelationshipsCommand(self),
+            'orphans': OrphansCommand(self),
+            'show': ShowCommand(self),
+            'lint': LintCommand(self),
+            'export-graph': ExportGraphCommand(self)
+        }
     
     def _get_document(self, doc_id: Optional[str] = None, path: Optional[str] = None) -> Optional[Document]:
         """Obtiene un documento por ID o path."""
@@ -773,58 +911,9 @@ class CLI:
     
     def run(self, args):
         """Ejecuta el comando especificado."""
-        if args.command == 'filter-rating':
-            has_rating = None
-            if args.has_rating == 'yes':
-                has_rating = True
-            elif args.has_rating == 'no':
-                has_rating = False
-            
-            docs = self.analyzer.filter_by_rating(
-                min_rating=args.min,
-                max_rating=args.max,
-                has_rating=has_rating
-            )
-            print(self.formatter.format_rating_list(docs))
-        
-        elif args.command == 'relationships':
-            if not args.id and not args.path:
-                print("Error: Debes especificar --id o --path")
-                return
-            
-            doc = self._get_document(args.id, args.path)
-            if not doc:
-                identifier = args.path if args.path else args.id
-                print(f"Documento con '{identifier}' no encontrado")
-                return
-            
-            rels = self.traverser.traverse(doc, args.depth)
-            
-            print(self.formatter.format_relationships(doc.id, rels, args.depth, self.repository))
-        
-        elif args.command == 'orphans':
-            orphans = self.analyzer.find_orphaned()
-            print(self.formatter.format_simple_list(orphans, "archivos huérfanos (sin relaciones depends_on)"))
-        
-        elif args.command == 'show':
-            if not args.id and not args.path:
-                print("Error: Debes especificar --id o --path")
-                return
-            
-            doc = self._get_document(args.id, args.path)
-            if doc:
-                print(self.formatter.format_document(doc, self.repository))
-            else:
-                identifier = args.path if args.path else args.id
-                print(f"Documento con '{identifier}' no encontrado")
-        
-        elif args.command == 'lint':
-            issues = self.analyzer.lint_documents()
-            print(self.formatter.format_lint_results(issues))
-        
-        elif args.command == 'export-graph':
-            self.exporter.export(args.output)
-        
+        command = self._commands.get(args.command)
+        if command:
+            command.execute(args)
         else:
             from argparse import ArgumentParser
             parser = ArgumentParser()

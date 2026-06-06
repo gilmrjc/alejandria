@@ -1,5 +1,7 @@
 """Database module for Alejandria."""
 
+# Import middleware to register event listeners
+from . import middleware  # noqa: F401, I001 - Import has side effects: registers SQLAlchemy event listeners
 from .models import (
     Base,
     Document,
@@ -24,30 +26,27 @@ from .models import (
 )
 from .session import get_db_session, init_db
 
-# Import middleware to register event listeners
-from . import middleware
-
 __all__ = [
-    'Base',
-    'Document',
-    'DocumentRelationship',
-    'DocumentSnapshot',
-    'Folder',
-    'Gap',
-    'GapTag',
-    'Job',
-    'Organization',
-    'Project',
-    'Proposal',
-    'ProposalDocument',
-    'ProposalGap',
-    'QdrantCollection',
-    'Question',
-    'QuestionDocumentReference',
-    'QuestionGapReference',
-    'Tag',
-    'User',
-    'VectorSyncLog',
-    'get_db_session',
-    'init_db',
+    "Base",
+    "Document",
+    "DocumentRelationship",
+    "DocumentSnapshot",
+    "Folder",
+    "Gap",
+    "GapTag",
+    "Job",
+    "Organization",
+    "Project",
+    "Proposal",
+    "ProposalDocument",
+    "ProposalGap",
+    "QdrantCollection",
+    "Question",
+    "QuestionDocumentReference",
+    "QuestionGapReference",
+    "Tag",
+    "User",
+    "VectorSyncLog",
+    "get_db_session",
+    "init_db",
 ]

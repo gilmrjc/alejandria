@@ -18,64 +18,29 @@ related:
 
 ## Descripción
 
-Configurar Ollama para descargar automáticamente el modelo Qwen 3.5. Ollama se ejecuta fuera de Docker (en el host o máquina remota), conectado vía Tailscale según ADR-003. La estrategia de descarga automática usa un script que espera a que Ollama esté corriendo y luego descarga el modelo. Qwen 3.5 fue seleccionado según benchmarks de tecnología (SWE-bench 77.2%, performance local 25-30 tokens/seg en Apple Silicon). El threshold de 5 segundos es razonable para prompts simples en desarrollo local.
+Configurar Ollama para conectar al servidor externo donde corre el modelo Qwen 3.5. Ollama se ejecuta en un servidor externo (no en el host local), conectado vía Tailscale según ADR-003. No se requiere descarga local del modelo ya que este está pre-instalado en el servidor externo. La configuración consiste en establecer la URL de Ollama (OLLAMA_URL) en las variables de entorno para apuntar al servidor externo. Qwen 3.5 fue seleccionado según benchmarks de tecnología (SWE-bench 77.2%, performance local 25-30 tokens/seg en Apple Silicon). El threshold de 5 segundos es razonable para prompts simples en desarrollo local.
 
 ## Criterios de Aceptación
 
-- [ ] Ollama está instalado y corriendo en el host o máquina remota
+- [ ] Ollama está corriendo en servidor externo accesible vía Tailscale
 - [ ] Ollama es accesible desde contenedores Docker mediante Tailscale
-- [ ] Modelo Qwen 3.5 descargado automáticamente en primer startup
-- [ ] Comando `ollama list` muestra Qwen 3.5 instalado
-- [ ] Comando `ollama run qwen:3.5` responde a prompts de prueba
+- [ ] Variable de entorno OLLAMA_URL configurada para apuntar al servidor externo
 - [ ] API de Ollama responde a requests HTTP vía Tailscale
 - [ ] Latencia de respuesta aceptable (<5 segundos para prompts simples)
 - [ ] Documentación de configuración de Tailscale incluida en README
 
-## Script de Inicialización
-
-```bash
-#!/bin/bash
-# scripts/download-ollama-model.sh
-
-# Esperar a que Ollama esté corriendo (vía Tailscale o localhost)
-OLLAMA_URL=${OLLAMA_URL:-http://localhost:11434}
-
-until curl -f $OLLAMA_URL/api/tags; do
-  echo "Esperando a que Ollama inicie en $OLLAMA_URL..."
-  sleep 5
-done
-
-# Descargar modelo Qwen 3.5
-echo "Descargando modelo Qwen 3.5..."
-curl $OLLAMA_URL/api/pull -d '{"name": "qwen:3.5"}'
-
-echo "Modelo Qwen 3.5 descargado exitosamente"
-```
-
-**Nota**: Ollama se ejecuta fuera de Docker según ADR-003. Este script debe ejecutarse manualmente o como parte del setup automatizado (T-011) en el host donde corre Ollama.
-
 ## Criterios de Éxito
 
-- Modelo Qwen 3.5 descargado automáticamente en primer startup
+- OLLAMA_URL configurada correctamente para apuntar al servidor externo
 - API de Ollama responde con latencia aceptable (<5 segundos para prompts simples)
 - Ollama accesible desde contenedores Docker mediante Tailscale
-- Script de inicialización funciona sin errores
+- Modelo Qwen 3.5 disponible en el servidor externo
 
 ### Actualización de Modelos
 
-Se usa actualización manual del modelo por el desarrollador.
+La actualización de modelos se realiza en el servidor externo por el administrador del servidor. No se requiere acción local para actualizar el modelo.
 
-**Proceso de actualización manual:**
-
-```bash
-# Actualizar a la última versión de Qwen 3.5
-ollama pull qwen:3.5
-
-# Verificar versión instalada
-ollama list
-```
-
-**Justificación:** Para desarrollo local, la actualización manual es suficiente. Evita actualizaciones inesperadas que pueden causar interrupciones. El desarrollador actualiza el modelo cuando lo necesite. Actualizaciones automáticas pueden considerarse más adelante si se requiere para producción.
+**Justificación:** El modelo corre en un servidor externo administrado centralmente. Los desarrolladores solo necesitan configurar la URL correcta en OLLAMA_URL. Esto simplifica el mantenimiento y asegura consistencia en el modelo usado por todos los desarrolladores.
 
 ### Validación de Conectividad Tailscale
 

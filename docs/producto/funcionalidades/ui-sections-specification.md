@@ -20,6 +20,8 @@ related:
 
 Especificación de las secciones principales de la interfaz de usuario de Alejandria.
 
+**Nota**: Para definiciones de conceptos técnicos clave (SPA, Diff Viewer, State Management, etc.), consulte [PRD-003](../requisitos/prd-hito-03-frontend-react.md) (sección 3, subsección Glosario de Términos Técnicos).
+
 ---
 
 ## Sección de Documentos
@@ -55,7 +57,10 @@ Los usuarios navegan carpetas y archivos en vista de árbol. Incluye búsqueda s
 
 ### Decisiones Relacionadas
 
-- [PENDIENTE]
+- Metadata a mostrar: Título, tipo, calificación, fecha última actualización, estado healthy/unhealthy, tags (según PRD-003)
+- Filtros: Por tipo (PRD/TRD/ADR), por calificación (>7/5-7/<5), por fecha (última semana/mes/año) (según PRD-003)
+- Acciones: Ver historial de versiones, ver gaps asociados, marcar como healthy, ver diff viewer (según PRD-003)
+- Paginación: 20 items por página para MVP (según PRD-003)
 
 ---
 
@@ -92,7 +97,9 @@ El sistema genera preguntas automáticamente al crear el primer documento. Las r
 
 ### Decisiones Relacionadas
 
-- [PENDIENTE]
+- Organización: Por tags (negocio/arquitectura/seguridad), por prioridad (crítico/alto/medio/bajo) (según PRD-003)
+- Filtros: Por prioridad, por estado (pendiente/respondido), por tipo de gap (según PRD-003)
+- Interfaz de respuesta: Campo de texto pre-rellenado, botones (aceptar/modificar/rechazar), feedback visual de estado (según PRD-003)
 
 ---
 
@@ -129,7 +136,9 @@ Los gaps se presentan como tarjetas con caja de respuesta pre-rellenada con suge
 
 ### Decisiones Relacionadas
 
-- [PENDIENTE]
+- Dashboard de gaps: Filtros por tema, prioridad, estado (pendiente/en progreso/resuelto) (según PRD-003)
+- Estados de gaps: Pendiente, en progreso, resuelto, no aplica, obsoleto (según PRD-003)
+- Interfaz de interacción asíncrona: Similar a sección de preguntas, campo de respuesta, acciones (según PRD-003)
 
 ---
 
@@ -166,7 +175,9 @@ Las propuestas se presentan como tarjetas con nombre descriptivo, archivos a edi
 
 ### Decisiones Relacionadas
 
-- [PENDIENTE]
+- Metadata a mostrar: Título, fecha creación, estado, documento asociado, impacto estimado (según PRD-003)
+- Estados de propuestas: Pendiente, aprobada, rechazada, aplicada (según PRD-003)
+- Integración con diff viewer: Modal con diff viewer lado a lado, botones (aprobar/rechazar/aplicar) (según PRD-003)
 
 ---
 
@@ -205,4 +216,6 @@ El grafo muestra conexiones entre elementos con capacidades de filtrado por tipo
 
 ### Decisiones Relacionadas
 
-- [PENDIENTE]
+- Librería de visualización: Evaluar opciones (react-flow, vis-network, d3.js) - decisión en fase de implementación (según PRD-003)
+- Tipos de relaciones: Referencia, implementa, depende, relacionado (según PRD-003)
+- Metadata de nodos: Tipo de documento, calificación, estado, tags (según PRD-003)

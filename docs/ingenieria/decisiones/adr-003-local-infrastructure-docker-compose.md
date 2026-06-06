@@ -16,6 +16,9 @@ related:
   - target: STR-003
     relationship_type: implements
     reason: Implementa el Hito 1 - Infraestructura Base del roadmap técnico
+  - target: FEAT-007
+    relationship_type: implements
+    reason: Esta decisión implementa la Feature Búsqueda Semántica con Qdrant como base de datos vectorial
 ---
 
 # ADR-003: Local Infrastructure with Docker Compose
@@ -229,7 +232,7 @@ Docker Compose crea una red bridge por defecto que aísla servicios del host. Lo
 
 ### Endurecimiento de Contenedores (MVP Bootstrapped)
 
-Usar imágenes Alpine (ya implementado: `postgres:18.3-alpine`, `redis:7.4.9-alpine`) para reducir la superficie de ataque.
+Se eligieron imágenes Debian (bookworm) sobre Alpine para PostgreSQL y Redis para evitar problemas de compatibilidad con dependencias Python (Alpine usa musl libc que puede causar incompatibilidades, mientras que Debian usa glibc estándar). Aunque Alpine reduce la superficie de ataque, la compatibilidad con el stack Python tiene prioridad para MVP Bootstrapped.
 
 ### Backup y Recuperación de Desastres (MVP Bootstrapped)
 

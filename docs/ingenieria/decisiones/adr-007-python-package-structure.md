@@ -127,7 +127,7 @@ alejandria/
 
 - Tests organizados por tipo (unit, integration, e2e) para ejecución selectiva
 - Mocking simplificado al tener módulos bien delimitados
-- Testcontainers se integran fácilmente con estructura de paquetes
+- Bases de datos separadas en docker-compose se integran fácilmente con estructura de paquetes
 
 **Escalabilidad**:
 

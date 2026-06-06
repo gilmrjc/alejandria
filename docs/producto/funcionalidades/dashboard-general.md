@@ -33,9 +33,12 @@ El dashboard muestra resumen de documentos (total, calificación promedio), gaps
 - Entender progreso de mejoras documentales
 
 ## Componentes y Referencias
-- Agregación de métricas → [PENDIENTE]
-- Navegación a secciones → [PENDIENTE]
-- Filtrado por módulo/estado → [PENDIENTE]
+- Agregación de métricas → NOTA: Definir métricas específicas (ej. % gaps resueltos, documentos healthy, tiempo promedio de resolución)
+- Navegación a secciones → NOTA: Definir navegación rápida (cards clickeables, breadcrumbs)
+- Filtrado por módulo/estado → NOTA: Definir filtros específicos (por módulo: documentos/gaps/propuestas, por estado: pendiente/en progreso/resuelto)
 
 ## Decisiones Relacionadas
-- [PENDIENTE]
+- Estrategia de actualización: Polling cada 5 min para MVP, websockets post-MVP (según PRD-003)
+- Widgets de métricas: Total documentos, calificación promedio, gaps por prioridad, propuestas pendientes (según PRD-003)
+- Layout: Sidebar izquierda (navegación) + header superior (breadcrumbs, user) + content area, grid system y breakpoints según TailwindCSS (según PRD-003)
+- Patrones de interacción: Hover y active states para MVP, loading/error states definidos ad-hoc (según PRD-003)

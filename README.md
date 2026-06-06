@@ -147,9 +147,16 @@ docker compose --profile dev run --rm dev uv run python run.py worker
 # Celery Scheduler
 docker compose --profile dev run --rm dev uv run python run.py scheduler
 
-# MCP Server
+# MCP Server (HTTP transport)
 docker compose --profile dev run --rm dev uv run python run.py mcp
 ```
+
+**Nota sobre el MCP Server:** El servidor MCP usa transporte HTTP. Para resolver problemas de compatibilidad entre FastMCP y los tipos de SQLAlchemy Session en pydantic-core, se eliminaron los parámetros `session` de las firmas de las funciones MCP. El transporte HTTP permite:
+- Autenticación API KEY nativa via headers
+- Mejor integración con IDEs y herramientas MCP
+- Arquitectura más apropiada para producción
+
+El servidor MCP se expone en `http://localhost:8000/mcp`.
 
 ### Tests
 

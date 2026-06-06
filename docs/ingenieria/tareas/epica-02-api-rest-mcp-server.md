@@ -2,7 +2,7 @@
 id: EPC-002
 type: Epic Implementation
 rating: 10
-rating-phase: document-editing-complete
+rating-phase: document-editing
 related:
   - target: TRD-021
     relationship_type: implements
@@ -35,7 +35,7 @@ related:
 
 # Epica 2: API REST y MCP Server Básico
 
-**Estado**: ⏳ EN PROGRESO
+**Estado**: ✅ COMPLETADO
 
 **Objetivo**: Implementar la API REST básica con FastAPI y el MCP Server usando FastMCP.
 
@@ -52,6 +52,7 @@ related:
 - **[../arquitectura/api-specification.md](../arquitectura/api-specification.md)**: Especificación de API REST
 - **[../arquitectura/mcp-server-architecture.md](../arquitectura/mcp-server-architecture.md)**: Arquitectura de MCP Server (ARC-030)
 - **[../arquitectura/mcp-tools-specification.md](../arquitectura/mcp-tools-specification.md)**: Tools de MCP (ARC-036)
+- **[../arquitectura/api-testing-logging.md](../arquitectura/api-testing-logging.md)**: Testing y Logging (ARC-040)
 - **[../arquitectura/mcp-server-data-consistency-concurrency.md](../arquitectura/mcp-server-data-consistency-concurrency.md)**: Consistencia y Concurrency (ARC-037)
 - **[../arquitectura/mcp-server-performance-scalability.md](../arquitectura/mcp-server-performance-scalability.md)**: Performance y Escalabilidad (ARC-038)
 - **[../arquitectura/mcp-server-observability-monitoring.md](../arquitectura/mcp-server-observability-monitoring.md)**: Observabilidad y Monitoreo (ARC-039)
@@ -85,7 +86,7 @@ Para detalles completos, consultar: ADR-001 (justificación de MCP), mcp-server-
 
 ### Estimación de Esfuerzo Total
 
-**Estimación total**: ~41 horas
+**Estimación total**: ~45 horas
 
 Desglose por tarea:
 
@@ -94,6 +95,7 @@ Desglose por tarea:
 - T-016: 4h
 - T-017: 6h
 - T-020: 5h
+- T-028: 4h
 - T-023: 10h
 - T-025: 5h
 - T-026: 2h
@@ -124,18 +126,19 @@ El orden de tareas se basa en dependencias secuenciales y valor crítico. Según
 **Dependencias Explícitas**:
 - T-014 (estructura base) es prerequisito para T-015, T-016, T-025 (requieren estructura de proyecto)
 - T-015 (migrations) es prerequisito para T-017 (requiere schema de base de datos)
-- T-016 (schemas) es prerequisito para T-017, T-020, T-027 (requieren validación de datos)
+- T-016 (schemas) es prerequisito para T-017, T-020, T-028, T-027 (requieren validación de datos)
 - T-017 (documents) es prerequisito para T-026 (requiere endpoints de documentos)
 - T-023 (MCP Server) es prerequisito para T-027 (requiere MCP Server para testing de integración)
 
 **Paralelización Posible**:
 - T-025 puede ejecutarse en paralelo después de T-014 (no depende de otras tareas)
 - T-020 puede ejecutarse en paralelo después de T-016 (no depende de T-017)
+- T-028 puede ejecutarse en paralelo después de T-016 (no depende de T-017)
 
 **Flujo Lógico**:
 1. Infraestructura base (T-014)
 2. Persistencia de datos (T-015, T-016)
-3. Core functionality (T-017, T-020)
+3. Core functionality (T-017, T-020, T-028)
 4. Integración MCP (T-023)
 5. Testing e integración (T-025, T-026, T-027)
 
@@ -144,17 +147,19 @@ graph TD
     T014[T-014: Estructura Base] --> T015[T-015: Migrations]
     T014 --> T016[T-016: Schemas]
     T014 --> T025[T-025: Qdrant Integration]
-    
+
     T015 --> T017[T-017: Documents API]
     T016 --> T017
     T016 --> T020[T-020: Users Auth]
-    
+    T016 --> T028[T-028: Organizations Projects]
+
     T017 --> T026[T-026: Context Entries]
     T020 --> T023[T-023: MCP Server]
-    
+
     T023 --> T027[T-027: Testing Integración]
-    
+
     T020 -. T017 .- T020
+    T028 -. T020 .- T028
 ```
 
 ### Estrategia de Rollback y Gestión de Riesgos
@@ -178,7 +183,7 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: Ninguna
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -194,7 +199,7 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: T-014
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -210,7 +215,7 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: T-014
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -226,7 +231,7 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: T-015, T-016
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -242,7 +247,24 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: T-016
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
+
+---
+
+### T-028: Implementar API Endpoints - Organizations y Projects
+
+**Descripción**: Implementar endpoints CRUD básicos para organizaciones y proyectos según api-specification.md. Ver detalles en T-028-implementar-api-endpoints-organizations-projects.md.
+
+**Criterios de Aceptación**:
+
+- [ ] Endpoints CRUD para organizaciones implementados (create, list, get)
+- [ ] Endpoints CRUD para proyectos implementados (create, list, get)
+- [ ] Validación de slug uniqueness implementada
+- [ ] Relación usuario-organización-proyecto implementada
+
+**Dependencias**: T-016
+
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -256,10 +278,12 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 - [ ] Tools implementados según especificación
 - [ ] Transporte stdio para desarrollo local
 - [ ] Integración con PostgreSQL, Qdrant, Redis
+- [ ] Autenticación via API KEY para identificar usuario que usa MCP (necesario incluso en transporte stdio)
+- [ ] Tabla api_keys implementada para gestión de API keys
 
 **Dependencias**: T-015
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -277,7 +301,7 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: T-014
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
@@ -294,23 +318,23 @@ Cada tarea tiene "Criterios de Aceptación" específicos que deben validarse man
 
 **Dependencias**: T-017
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
 ### T-027: Implementar Testing Básico
 
-**Descripción**: Implementar unit tests básicos para componentes principales. Integration tests usan bases de datos reales con testcontainers (PostgreSQL y Redis). Testing de MCP servers usa FastMCP Client in-memory. Ver detalles en T-027-implementar-testing-basico.md.
+**Descripción**: Implementar unit tests básicos para componentes principales. Integration tests usan bases de datos reales separadas en docker-compose (POSTGRES_TEST_DB y REDIS_TEST_URL). Testing de MCP servers usa FastMCP Client in-memory. Ver detalles en T-027-implementar-testing-basico.md.
 
 **Criterios de Aceptación**:
 
 - [ ] pytest configurado
 - [ ] Unit tests para Pydantic schemas
 - [ ] Unit tests para services de negocio
-- [ ] Integration tests con testcontainers (PostgreSQL y Redis reales)
+- [ ] Integration tests con bases de datos separadas en docker-compose (POSTGRES_TEST_DB y REDIS_TEST_URL)
 - [ ] Testing de MCP servers con FastMCP Client in-memory
 - [ ] Cobertura >70% objetivo inicial
 
 **Dependencias**: T-016, T-023
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
