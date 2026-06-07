@@ -17,7 +17,7 @@ from shared.schemas.proposal import (
     ProposalResponse,
     ProposalUpdate,
 )
-from shared.utils.pagination import apply_pagination, build_pagination_response
+from shared.utils.pagination import apply_pagination
 
 SessionDep = Annotated[Session, Depends(get_db_session)]
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
@@ -114,7 +114,13 @@ def list_proposals(
         for proposal in proposals
     ]
 
-    return build_pagination_response(items, page, per_page, total, total_pages)
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": total_pages,
+    }
 
 
 @router.put("/{proposal_id}", response_model=ProposalResponse)

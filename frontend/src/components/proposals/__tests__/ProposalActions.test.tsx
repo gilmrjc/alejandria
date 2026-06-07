@@ -111,7 +111,7 @@ describe('ProposalActions', () => {
     
     const { container } = render(
       <ProposalActions 
-        status={"rejected" as any}
+        status='rejected'
         onApprove={onApprove} 
         onReject={onReject} 
         onApply={onApply} 
@@ -121,14 +121,14 @@ describe('ProposalActions', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('debe no renderizar nada cuando status es applied', () => {
+  it('debe no renderizar nada cuando status es implemented', () => {
     const onApprove = vi.fn();
     const onReject = vi.fn();
     const onApply = vi.fn();
     
     const { container } = render(
       <ProposalActions 
-        status={"applied" as any}
+        status='implemented'
         onApprove={onApprove} 
         onReject={onReject} 
         onApply={onApply} 

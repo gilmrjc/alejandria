@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useDashboardStats } from '../useDashboardStats';
 import * as metricsService from '@/services/metrics';
 
@@ -25,26 +25,36 @@ describe('useDashboardStats', () => {
 
     vi.mocked(metricsService.getDashboardMetrics).mockResolvedValue(mockStats);
 
-    const { result } = renderHook(() => useDashboardStats());
+    const { result, unmount } = renderHook(() => useDashboardStats());
 
     expect(result.current.loading).toBe(true);
 
-    await vi.runAllTimersAsync();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
 
     expect(result.current.loading).toBe(false);
     expect(result.current.stats).toEqual(mockStats);
     expect(metricsService.getDashboardMetrics).toHaveBeenCalled();
+
+    unmount();
   });
 
   it('debe manejar errores en fetch', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(metricsService.getDashboardMetrics).mockRejectedValue(new Error('API Error'));
 
-    const { result } = renderHook(() => useDashboardStats());
+    const { result, unmount } = renderHook(() => useDashboardStats());
 
-    await vi.runAllTimersAsync();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
 
     expect(result.current.error).toBe('Error al cargar métricas');
     expect(result.current.stats).toBeNull();
+
+    consoleErrorSpy.mockRestore();
+    unmount();
   });
 
   it('debe tener función refresh', async () => {
@@ -57,15 +67,21 @@ describe('useDashboardStats', () => {
 
     vi.mocked(metricsService.getDashboardMetrics).mockResolvedValue(mockStats);
 
-    const { result } = renderHook(() => useDashboardStats());
+    const { result, unmount } = renderHook(() => useDashboardStats());
 
-    await vi.runAllTimersAsync();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
 
     expect(metricsService.getDashboardMetrics).toHaveBeenCalledTimes(1);
 
-    result.current.refresh();
+    act(() => {
+      result.current.refresh();
+    });
 
     expect(metricsService.getDashboardMetrics).toHaveBeenCalledTimes(2);
+
+    unmount();
   });
 });
 

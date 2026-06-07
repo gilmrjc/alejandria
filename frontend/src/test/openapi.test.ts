@@ -3,19 +3,20 @@
  * Ensures that the generated TypeScript types match the actual API schema
  */
 
+import { describe, it, expect } from 'vitest';
 import { paths, components } from '../types/api';
 
 describe('OpenAPI Schema Validation', () => {
   describe('Metrics Endpoint', () => {
     it('should have metrics endpoint defined in paths', () => {
       // Type check - if this compiles, the path exists
-      const metricsPath: paths['/api/v1/metrics'] = {} as any;
+      const metricsPath: paths['/api/v1/metrics'] = {} as unknown as paths['/api/v1/metrics'];
       expect(metricsPath).toBeDefined();
     });
 
     it('should have DashboardMetricsResponse type defined', () => {
       // Type check - if this compiles, the type exists
-      const dashboardMetrics: components['schemas']['DashboardMetricsResponse'] = {} as any;
+      const dashboardMetrics: components['schemas']['DashboardMetricsResponse'] = {} as unknown as components['schemas']['DashboardMetricsResponse'];
       expect(dashboardMetrics).toBeDefined();
     });
 
@@ -111,10 +112,10 @@ describe('OpenAPI Schema Validation', () => {
 
     it('should have DashboardMetricsResponse with all required sections', () => {
       const dashboardMetrics: components['schemas']['DashboardMetricsResponse'] = {
-        documents: {} as any,
-        gaps: {} as any,
-        proposals: {} as any,
-        progress: {} as any,
+        documents: {} as unknown as components['schemas']['DocumentStats'],
+        gaps: {} as unknown as components['schemas']['GapStats'],
+        proposals: {} as unknown as components['schemas']['ProposalStats'],
+        progress: {} as unknown as components['schemas']['ProgressMetrics'],
       };
       expect(dashboardMetrics.documents).toBeDefined();
       expect(dashboardMetrics.gaps).toBeDefined();

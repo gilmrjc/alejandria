@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Migrate local documentation files to Alejandria via API."""
 
-import os
 import re
 import sys
 from pathlib import Path
@@ -19,7 +18,7 @@ def extract_title_from_content(content: str, filename: str) -> str:
     heading_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
     if heading_match:
         return heading_match.group(1).strip()
-    
+
     # Fallback to filename without extension
     return filename.replace(".md", "").replace("-", " ").replace("_", " ").title()
 
@@ -80,7 +79,9 @@ def get_first_project(token: str) -> dict[str, Any]:
     return projects[0]
 
 
-def create_project(token: str, name: str, slug: str, organization_id: str) -> dict[str, Any]:
+def create_project(
+    token: str, name: str, slug: str, organization_id: str
+) -> dict[str, Any]:
     """Create a project."""
     response = requests.post(
         f"{API_BASE_URL}/projects",
@@ -129,12 +130,12 @@ def find_markdown_files(docs_dir: Path) -> list[Path]:
 def migrate_documents():
     """Main migration function."""
     print("Starting document migration...")
-    
+
     # Configuration
     email = "migrator@alejandria.dev"
     username = "doc_migrator"
     password = "MigrateDocs123!"
-    
+
     try:
         # Register user (ignore if already exists)
         print(f"Registering user: {email}")
@@ -146,17 +147,17 @@ def migrate_documents():
                 print("User already exists, proceeding with login")
             else:
                 raise
-        
+
         # Login
         print("Logging in...")
         token = login(email, password)
         print("Login successful")
-        
+
         # Get existing organization (created during registration)
         print("Getting organization...")
         org = get_first_organization(token)
         print(f"Using organization: {org['id']} - {org['name']}")
-        
+
         # Get existing project or create one
         print("Getting project...")
         try:
@@ -176,38 +177,40 @@ def migrate_documents():
                 if e.response.status_code == 409:
                     print("Project already exists, trying to get it...")
                     project = get_first_project(token)
-                    print(f"Using existing project: {project['id']} - {project['name']}")
+                    print(
+                        f"Using existing project: {project['id']} - {project['name']}"
+                    )
                 else:
                     raise
-        
+
         # Find all markdown files
         print(f"Scanning {DOCS_DIR} for markdown files...")
         markdown_files = find_markdown_files(DOCS_DIR)
         print(f"Found {len(markdown_files)} markdown files")
-        
+
         # Migrate each document
         success_count = 0
         error_count = 0
         skipped_count = 0
-        
+
         for file_path in markdown_files:
             try:
                 # Read file content
-                with open(file_path, "r", encoding="utf-8") as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read()
-                
+
                 # Extract title
                 relative_path = file_path.relative_to(DOCS_DIR)
                 filename = str(relative_path)
                 title = extract_title_from_content(content, file_path.name)
-                
+
                 print(f"Migrating: {filename}")
-                
+
                 # Create document
                 doc = create_document(token, title, content, filename)
                 print(f"  ✓ Created: {doc['id']}")
                 success_count += 1
-                
+
             except requests.HTTPError as e:
                 if e.response.status_code == 409:
                     print(f"  ⊘ Skipped (already exists): {filename}")
@@ -218,19 +221,19 @@ def migrate_documents():
             except Exception as e:
                 print(f"  ✗ Error migrating {file_path}: {e}")
                 error_count += 1
-        
+
         print("\n" + "=" * 50)
-        print(f"Migration complete!")
+        print("Migration complete!")
         print(f"  Success: {success_count}")
         print(f"  Skipped (already exists): {skipped_count}")
         print(f"  Errors: {error_count}")
         print(f"  Total: {len(markdown_files)}")
         print("=" * 50)
-        
+
     except Exception as e:
         print(f"Migration failed: {e}")
         import traceback
-        
+
         traceback.print_exc()
         sys.exit(1)
 

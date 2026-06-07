@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import api from '../api';
+import type { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
 describe('api client', () => {
   beforeEach(() => {
@@ -7,8 +8,7 @@ describe('api client', () => {
     // Reset localStorage
     localStorage.clear();
     // Reset window.location
-    delete (window as any).location;
-    (window as any).location = { href: '' };
+    (window as unknown as { location: { href: string } }).location = { href: '' };
   });
 
   it('debe tener baseURL configurada correctamente', () => {
@@ -24,7 +24,9 @@ describe('api client', () => {
       localStorage.setItem('access_token', 'test-token');
       
       // Test via actual API call behavior
-      const config = { headers: {} as any };
+      const config: InternalAxiosRequestConfig = {
+        headers: {},
+      } as InternalAxiosRequestConfig;
       api.interceptors.request.use((cfg) => {
         const token = localStorage.getItem('access_token');
         if (token) {
@@ -41,7 +43,9 @@ describe('api client', () => {
     });
 
     it('no debe agregar token cuando no existe', async () => {
-      const config = { headers: {} as any };
+      const config: InternalAxiosRequestConfig = {
+        headers: {},
+      } as InternalAxiosRequestConfig;
       api.interceptors.request.use((cfg) => {
         const token = localStorage.getItem('access_token');
         if (token) {
@@ -60,7 +64,13 @@ describe('api client', () => {
 
   describe('response interceptor', () => {
     it('debe pasar response exitosa', async () => {
-      const response = { data: { success: true } } as any;
+      const response: AxiosResponse = {
+        data: { success: true },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: { headers: {} } as InternalAxiosRequestConfig,
+      } as AxiosResponse;
       api.interceptors.response.use((res) => res);
       
       const handler = api.interceptors.response.handlers?.[0];
@@ -73,14 +83,14 @@ describe('api client', () => {
     it('debe redirigir a login en error 401', async () => {
       const error = {
         response: { status: 401 },
-      } as any;
+      } as { response?: { status: number } };
       
       api.interceptors.response.use(
         (res) => res,
         (err) => {
           if (err.response?.status === 401) {
             localStorage.removeItem('access_token');
-            (window as any).location.href = '/login';
+            (window as unknown as { location: { href: string } }).location.href = '/login';
           }
           return Promise.reject(err);
         }
@@ -90,26 +100,26 @@ describe('api client', () => {
       if (handler?.rejected) {
         try {
           await handler.rejected(error);
-        } catch (e) {
+        } catch {
           // Expected to reject
         }
       }
       
       expect(localStorage.getItem('access_token')).toBeNull();
-      expect((window as any).location.href).toBe('/login');
+      expect((window as unknown as { location: { href: string } }).location.href).toBe('/login');
     });
 
     it('debe rechazar error no 401', async () => {
       const error = {
         response: { status: 500 },
-      } as any;
+      } as { response?: { status: number } };
       
       api.interceptors.response.use(
         (res) => res,
         (err) => {
           if (err.response?.status === 401) {
             localStorage.removeItem('access_token');
-            (window as any).location.href = '/login';
+            (window as unknown as { location: { href: string } }).location.href = '/login';
           }
           return Promise.reject(err);
         }
@@ -122,14 +132,14 @@ describe('api client', () => {
     });
 
     it('debe rechazar error sin response', async () => {
-      const error = new Error('Network Error') as any;
+      const error = new Error('Network Error') as Error & { response?: { status: number } };
       
       api.interceptors.response.use(
         (res) => res,
         (err) => {
           if (err.response?.status === 401) {
             localStorage.removeItem('access_token');
-            (window as any).location.href = '/login';
+            (window as unknown as { location: { href: string } }).location.href = '/login';
           }
           return Promise.reject(err);
         }

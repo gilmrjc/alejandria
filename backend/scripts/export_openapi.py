@@ -28,16 +28,18 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from api.main import app
 
+
 def main():
     """Export OpenAPI schema to openapi.json."""
     output_path = Path(__file__).parent.parent / "openapi.json"
-    
+
     schema = app.openapi()
-    
+
     with open(output_path, "w") as f:
         json.dump(schema, f, indent=2)
-    
+
     print(f"OpenAPI schema exported to {output_path}")
+
 
 if __name__ == "__main__":
     main()

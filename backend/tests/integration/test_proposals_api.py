@@ -5,7 +5,6 @@ from httpx import AsyncClient
 from sqlalchemy import select
 
 from shared.db.models import Proposal, User
-from shared.db.session import get_db_session
 
 
 @pytest.mark.asyncio
@@ -73,7 +72,7 @@ async def test_update_proposal(
 
 @pytest.mark.asyncio
 async def test_delete_proposal(
-    async_client: AsyncClient, test_user: User, test_proposal: Proposal
+    async_client: AsyncClient, test_user: User, test_proposal: Proposal, db_session
 ):
     """Test deleting a proposal."""
     response = await async_client.delete(
@@ -83,11 +82,10 @@ async def test_delete_proposal(
     assert response.status_code == 204
 
     # Verify proposal is deleted
-    async with get_db_session() as session:
-        proposal = session.execute(
-            select(Proposal).where(Proposal.id == test_proposal.id)
-        ).scalar_one_or_none()
-        assert proposal is None
+    proposal = db_session.execute(
+        select(Proposal).where(Proposal.id == test_proposal.id)
+    ).scalar_one_or_none()
+    assert proposal is None
 
 
 @pytest.mark.asyncio

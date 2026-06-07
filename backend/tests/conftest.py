@@ -9,6 +9,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from api.main import app
+from shared.auth.jwt import create_access_token, get_password_hash
+from shared.db.models import Document, Gap, Organization, Project, Proposal, User
 from shared.db.session import get_db_session
 
 
@@ -231,3 +233,146 @@ def password_hash():
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.hash("testpass123")
+
+
+@pytest.fixture(scope="function")
+async def async_client(db_session: Session):
+    """
+    Fixture to provide an AsyncClient for async HTTP testing.
+
+    This creates an async test client with database session override.
+    """
+    import httpx
+
+    # Override database session
+    def override_get_db_session():
+        yield db_session
+
+    app.dependency_overrides[get_db_session] = override_get_db_session
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        yield ac
+
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def test_user(db_session: Session) -> User:
+    """
+    Fixture to create a test user with access token.
+
+    Returns a User instance with access_token attribute set.
+    """
+    user = User(
+        email="test@example.com",
+        username="testuser",
+        password_hash=get_password_hash("password123"),
+        is_active=True,
+    )
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+
+    # Add access_token attribute for authentication
+    user.access_token = create_access_token(user_id=str(user.id), email=user.email)
+
+    return user
+
+
+@pytest.fixture(scope="function")
+def test_organization(db_session: Session, test_user: User) -> Organization:
+    """
+    Fixture to create a test organization.
+    """
+    org = Organization(
+        name="Test Org",
+        slug="test-org",
+        is_personal=False,
+        created_by=test_user.id,
+    )
+    db_session.add(org)
+    db_session.commit()
+    db_session.refresh(org)
+    return org
+
+
+@pytest.fixture(scope="function")
+def test_project(
+    db_session: Session, test_organization: Organization, test_user: User
+) -> Project:
+    """
+    Fixture to create a test project.
+    """
+    project = Project(
+        name="Test Project",
+        slug="test-project",
+        organization_id=test_organization.id,
+        created_by=test_user.id,
+    )
+    db_session.add(project)
+    db_session.commit()
+    db_session.refresh(project)
+    return project
+
+
+@pytest.fixture(scope="function")
+def test_document(
+    db_session: Session,
+    test_project: Project,
+    test_organization: Organization,
+    test_user: User,
+) -> Document:
+    """
+    Fixture to create a test document.
+    """
+    document = Document(
+        project_id=test_project.id,
+        organization_id=test_organization.id,
+        title="Test Document",
+        slug="test-document",
+        content="This is a test document content.",
+        filename="test.md",
+        created_by=test_user.id,
+    )
+    db_session.add(document)
+    db_session.commit()
+    db_session.refresh(document)
+    return document
+
+
+@pytest.fixture(scope="function")
+def test_gap(db_session: Session, test_document: Document) -> Gap:
+    """
+    Fixture to create a test gap.
+    """
+    gap = Gap(
+        document_id=test_document.id,
+        slug="test-gap",
+        question="What is the purpose of this document?",
+        context_missing="Purpose statement",
+        priority="high",
+        status="pending",
+    )
+    db_session.add(gap)
+    db_session.commit()
+    db_session.refresh(gap)
+    return gap
+
+
+@pytest.fixture(scope="function")
+def test_proposal(db_session: Session) -> Proposal:
+    """
+    Fixture to create a test proposal.
+    """
+    proposal = Proposal(
+        slug="test-proposal",
+        name="Update documentation",
+        description="Add missing sections to the documentation",
+        status="pending",
+    )
+    db_session.add(proposal)
+    db_session.commit()
+    db_session.refresh(proposal)
+    return proposal

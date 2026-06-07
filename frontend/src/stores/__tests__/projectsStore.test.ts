@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useProjectsStore } from '../projectsStore';
 import { projectsService } from '@/services/projects';
+import type { Project, CreateProjectDto } from '@/types/organization';
 
 vi.mock('@/services/projects');
 
@@ -17,8 +18,8 @@ describe('projectsStore', () => {
   });
 
   it('debe actualizar projects al fetch exitoso', async () => {
-    const mockProjects = [{ id: '1', name: 'Test Project', slug: 'test-project' }];
-    vi.mocked(projectsService.list).mockResolvedValue(mockProjects as any);
+    const mockProjects: Project[] = [{ id: '1', name: 'Test Project', slug: 'test-project', description: null, organization_id: 'org1', created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' }];
+    vi.mocked(projectsService.list).mockResolvedValue(mockProjects);
 
     const store = useProjectsStore.getState();
     await store.fetchProjects();
@@ -41,14 +42,15 @@ describe('projectsStore', () => {
   });
 
   it('debe agregar proyecto al create exitoso', async () => {
-    const newProject = { id: '1', name: 'New Project', slug: 'new-project' };
-    vi.mocked(projectsService.create).mockResolvedValue(newProject as any);
+    const newProject: Project = { id: '1', name: 'New Project', slug: 'new-project', description: null, organization_id: 'org1', created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' };
+    vi.mocked(projectsService.create).mockResolvedValue(newProject);
 
     const store = useProjectsStore.getState();
-    await store.createProject({ name: 'New Project', slug: 'new-project' } as any);
+    const mockData: CreateProjectDto = { name: 'New Project', slug: 'new-project', organization_id: 'org1' };
+    await store.createProject(mockData);
     const updatedStore = useProjectsStore.getState();
 
-    expect(projectsService.create).toHaveBeenCalledWith({ name: 'New Project', slug: 'new-project' });
+    expect(projectsService.create).toHaveBeenCalledWith({ name: 'New Project', slug: 'new-project', organization_id: 'org1' });
     expect(updatedStore.projects).toContainEqual(newProject);
     expect(updatedStore.loading).toBe(false);
   });
@@ -57,7 +59,8 @@ describe('projectsStore', () => {
     vi.mocked(projectsService.create).mockRejectedValue(new Error('API Error'));
 
     const store = useProjectsStore.getState();
-    await expect(store.createProject({ name: 'Test' } as any)).rejects.toThrow('Error al crear proyecto');
+    const mockData: CreateProjectDto = { name: 'Test', slug: 'test', organization_id: 'org1' };
+    await expect(store.createProject(mockData)).rejects.toThrow('Error al crear proyecto');
     const updatedStore = useProjectsStore.getState();
 
     expect(updatedStore.error).toBe('Error al crear proyecto');

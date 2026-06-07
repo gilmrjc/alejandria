@@ -52,10 +52,10 @@ def get_dashboard_metrics(session: SessionDep) -> DashboardMetricsResponse:
 
     document_stats = DocumentStats(
         total=total_docs or 0,
-        avgRating=round(avg_rating, 1) if avg_rating else None,
+        avg_rating=round(avg_rating, 1) if avg_rating else None,
         healthy=healthy_docs or 0,
-        needsImprovement=needs_improvement_docs or 0,
-        noRating=no_rating_docs or 0,
+        needs_improvement=needs_improvement_docs or 0,
+        no_rating=no_rating_docs or 0,
     )
 
     # Gap stats by priority
@@ -87,13 +87,13 @@ def get_dashboard_metrics(session: SessionDep) -> DashboardMetricsResponse:
 
     gap_stats = GapStats(
         total=total_gaps or 0,
-        byPriority=GapByPriority(
+        by_priority=GapByPriority(
             critical=critical_gaps or 0,
             high=high_gaps or 0,
             medium=medium_gaps or 0,
             low=low_gaps or 0,
         ),
-        byStatus=GapByStatus(
+        by_status=GapByStatus(
             pending=pending_gaps or 0,
             responded=responded_gaps or 0,
             rejected=rejected_gaps or 0,
@@ -119,7 +119,7 @@ def get_dashboard_metrics(session: SessionDep) -> DashboardMetricsResponse:
 
     proposal_stats = ProposalStats(
         total=total_proposals or 0,
-        byStatus=ProposalByStatus(
+        by_status=ProposalByStatus(
             pending=pending_proposals or 0,
             accepted=accepted_proposals or 0,
             rejected=rejected_proposals or 0,
@@ -142,19 +142,17 @@ def get_dashboard_metrics(session: SessionDep) -> DashboardMetricsResponse:
     # Average resolution time for gaps
     avg_resolution_time = session.execute(
         select(
-            func.avg(
-                func.extract(
-                    "epoch", Gap.answered_at - Gap.created_at
-                ) / 3600
-            )
+            func.avg(func.extract("epoch", Gap.answered_at - Gap.created_at) / 3600)
         ).where(Gap.status == "responded", Gap.answered_at.isnot(None))
     ).scalar()
 
     progress_metrics = ProgressMetrics(
-        gapsResolvedPercentage=gaps_resolved_percentage,
-        documentsHealthyPercentage=documents_healthy_percentage,
-        avgResolutionTimeHours=round(avg_resolution_time, 1) if avg_resolution_time else None,
-        proposalAcceptanceRate=proposal_acceptance_rate,
+        gaps_resolved_percentage=gaps_resolved_percentage,
+        documents_healthy_percentage=documents_healthy_percentage,
+        avg_resolution_time_hours=round(avg_resolution_time, 1)
+        if avg_resolution_time
+        else None,
+        proposal_acceptance_rate=proposal_acceptance_rate,
     )
 
     return DashboardMetricsResponse(

@@ -5,7 +5,6 @@ from httpx import AsyncClient
 from sqlalchemy import select
 
 from shared.db.models import Document, Gap, User
-from shared.db.session import get_db_session
 
 
 @pytest.mark.asyncio
@@ -74,7 +73,9 @@ async def test_update_gap(async_client: AsyncClient, test_user: User, test_gap: 
 
 
 @pytest.mark.asyncio
-async def test_delete_gap(async_client: AsyncClient, test_user: User, test_gap: Gap):
+async def test_delete_gap(
+    async_client: AsyncClient, test_user: User, test_gap: Gap, db_session
+):
     """Test deleting a gap."""
     response = await async_client.delete(
         f"/api/v1/gaps/{test_gap.id}",
@@ -83,11 +84,10 @@ async def test_delete_gap(async_client: AsyncClient, test_user: User, test_gap: 
     assert response.status_code == 204
 
     # Verify gap is deleted
-    async with get_db_session() as session:
-        gap = session.execute(
-            select(Gap).where(Gap.id == test_gap.id)
-        ).scalar_one_or_none()
-        assert gap is None
+    gap = db_session.execute(
+        select(Gap).where(Gap.id == test_gap.id)
+    ).scalar_one_or_none()
+    assert gap is None
 
 
 @pytest.mark.asyncio

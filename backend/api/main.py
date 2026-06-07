@@ -9,7 +9,16 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import auth, documents, gaps, health, metrics, organizations, projects, proposals
+from api.routes import (
+    auth,
+    documents,
+    gaps,
+    health,
+    metrics,
+    organizations,
+    projects,
+    proposals,
+)
 from shared.db.session import get_engine
 
 

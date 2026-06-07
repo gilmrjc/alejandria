@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { GapList } from '../GapList';
+import type { Gap } from '@/types/gap';
 
 describe('GapList', () => {
   it('debe mostrar loading state', () => {
@@ -28,10 +29,10 @@ describe('GapList', () => {
   });
 
   it('debe renderizar lista de gaps', () => {
-    const mockGaps = [
-      { id: '1', slug: 'gap-1', question: 'Test Question 1', priority: 'high', status: 'pending' },
-      { id: '2', slug: 'gap-2', question: 'Test Question 2', priority: 'medium', status: 'pending' },
-    ] as any;
+    const mockGaps: Gap[] = [
+      { id: '1', document_id: '1', slug: 'gap-1', question: 'Test Question 1', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' },
+      { id: '2', document_id: '1', slug: 'gap-2', question: 'Test Question 2', priority: 'medium', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' },
+    ];
 
     const onGapClick = vi.fn();
     render(

@@ -87,7 +87,7 @@ describe('documentsService', () => {
   describe('create', () => {
     it('debe llamar API POST /documents con datos', async () => {
       const mockDocument = { id: '1', title: 'New Doc' };
-      const mockData = { title: 'New Doc', content: 'Content' };
+      const mockData = { title: 'New Doc', content: 'Content', filename: 'test.md' };
       
       server.use(
         http.post('http://localhost:8000/api/v1/documents', async ({ request }) => {
@@ -97,7 +97,7 @@ describe('documentsService', () => {
         })
       );
 
-      const result = await documentsService.create(mockData as any);
+      const result = await documentsService.create(mockData);
       expect(result).toEqual(mockDocument);
     });
   });
@@ -115,7 +115,7 @@ describe('documentsService', () => {
         })
       );
 
-      const result = await documentsService.update('1', mockData as any);
+      const result = await documentsService.update('1', mockData as { title: string });
       expect(result).toEqual(mockDocument);
     });
   });
@@ -133,7 +133,7 @@ describe('documentsService', () => {
         })
       );
 
-      const result = await documentsService.updateBySlug('test', mockData as any);
+      const result = await documentsService.updateBySlug('test', mockData as { title: string });
       expect(result).toEqual(mockDocument);
     });
   });

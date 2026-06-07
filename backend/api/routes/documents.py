@@ -99,9 +99,13 @@ def create_document(
 
     # Get user's default organization and project
     # For MVP, use the first organization/project the user has access to
-    organization = session.execute(
-        select(Organization).where(Organization.created_by == current_user.id)
-    ).scalars().first()
+    organization = (
+        session.execute(
+            select(Organization).where(Organization.created_by == current_user.id)
+        )
+        .scalars()
+        .first()
+    )
 
     if not organization:
         raise HTTPException(
@@ -109,12 +113,16 @@ def create_document(
             detail="User must belong to an organization to create documents",
         )
 
-    project = session.execute(
-        select(Project).where(
-            Project.organization_id == organization.id,
-            Project.created_by == current_user.id,
+    project = (
+        session.execute(
+            select(Project).where(
+                Project.organization_id == organization.id,
+                Project.created_by == current_user.id,
+            )
         )
-    ).scalars().first()
+        .scalars()
+        .first()
+    )
 
     if not project:
         raise HTTPException(

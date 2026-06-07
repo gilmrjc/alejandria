@@ -12,7 +12,7 @@ describe('authService', () => {
   describe('login', () => {
     it('debe llamar api.post con credenciales correctas', async () => {
       const mockTokens = { access_token: 'test-token' };
-      vi.mocked(api.post).mockResolvedValue({ data: mockTokens } as any);
+      vi.mocked(api.post).mockResolvedValue({ data: mockTokens } as { data: { access_token: string } });
 
       const credentials = { email: 'test@example.com', password: 'password' };
       const result = await authService.login(credentials);
@@ -32,7 +32,7 @@ describe('authService', () => {
   describe('me', () => {
     it('debe llamar api.get para obtener usuario', async () => {
       const mockUser = { id: '1', username: 'test', email: 'test@example.com' };
-      vi.mocked(api.get).mockResolvedValue({ data: mockUser } as any);
+      vi.mocked(api.get).mockResolvedValue({ data: mockUser } as { data: { id: string; username: string; email: string } });
 
       const result = await authService.me();
 
@@ -50,7 +50,7 @@ describe('authService', () => {
   describe('register', () => {
     it('debe llamar api.post con datos de registro', async () => {
       const mockUser = { id: '1', username: 'test', email: 'test@example.com' };
-      vi.mocked(api.post).mockResolvedValue({ data: mockUser } as any);
+      vi.mocked(api.post).mockResolvedValue({ data: mockUser } as { data: { id: string; username: string; email: string } });
 
       const data = { email: 'test@example.com', username: 'test', password: 'password' };
       const result = await authService.register(data);

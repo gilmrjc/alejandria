@@ -2,7 +2,6 @@
 """Create an API key for the doc migrator user."""
 
 import sys
-import uuid
 
 sys.path.insert(0, "/workspace")
 
@@ -29,9 +28,13 @@ def main():
         print(f"Found user: {user.username} (ID: {user.id})")
 
         # Get the user's organization
-        organization = session.execute(
-            select(Organization).where(Organization.created_by == user.id)
-        ).scalars().first()
+        organization = (
+            session.execute(
+                select(Organization).where(Organization.created_by == user.id)
+            )
+            .scalars()
+            .first()
+        )
 
         if not organization:
             print("Error: No organization found for user")

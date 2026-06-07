@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ProposalList } from '../ProposalList';
+import type { Proposal } from '@/types/proposal';
 
 describe('ProposalList', () => {
   it('debe mostrar loading state', () => {
@@ -28,10 +29,10 @@ describe('ProposalList', () => {
   });
 
   it('debe renderizar lista de propuestas', () => {
-    const mockProposals = [
-      { id: '1', name: 'Test Proposal 1', description: 'Description 1', status: 'pending' },
-      { id: '2', name: 'Test Proposal 2', description: 'Description 2', status: 'pending' },
-    ] as any;
+    const mockProposals: Proposal[] = [
+      { id: '1', slug: 'proposal-1', name: 'Test Proposal 1', description: 'Description 1', status: 'pending', created_at: '2024-01-01', updated_at: '2024-01-01' },
+      { id: '2', slug: 'proposal-2', name: 'Test Proposal 2', description: 'Description 2', status: 'pending', created_at: '2024-01-01', updated_at: '2024-01-01' },
+    ];
 
     const onProposalClick = vi.fn();
     render(

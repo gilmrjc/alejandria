@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useOrganizationsStore } from '../organizationsStore';
 import { organizationsService } from '@/services/organizations';
+import type { Organization, CreateOrganizationDto } from '@/types/organization';
 
 vi.mock('@/services/organizations');
 
@@ -17,8 +18,8 @@ describe('organizationsStore', () => {
   });
 
   it('debe actualizar organizations al fetch exitoso', async () => {
-    const mockOrganizations = [{ id: '1', name: 'Test Org', slug: 'test-org' }];
-    vi.mocked(organizationsService.list).mockResolvedValue(mockOrganizations as any);
+    const mockOrganizations: Organization[] = [{ id: '1', name: 'Test Org', slug: 'test-org', is_personal: false, created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' }];
+    vi.mocked(organizationsService.list).mockResolvedValue(mockOrganizations);
 
     const store = useOrganizationsStore.getState();
     await store.fetchOrganizations();
@@ -41,11 +42,12 @@ describe('organizationsStore', () => {
   });
 
   it('debe agregar organización al create exitoso', async () => {
-    const newOrg = { id: '1', name: 'New Org', slug: 'new-org' };
-    vi.mocked(organizationsService.create).mockResolvedValue(newOrg as any);
+    const newOrg: Organization = { id: '1', name: 'New Org', slug: 'new-org', is_personal: false, created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' };
+    vi.mocked(organizationsService.create).mockResolvedValue(newOrg);
 
     const store = useOrganizationsStore.getState();
-    await store.createOrganization({ name: 'New Org', slug: 'new-org' } as any);
+    const mockData: CreateOrganizationDto = { name: 'New Org', slug: 'new-org' };
+    await store.createOrganization(mockData);
     const updatedStore = useOrganizationsStore.getState();
 
     expect(organizationsService.create).toHaveBeenCalledWith({ name: 'New Org', slug: 'new-org' });
@@ -57,7 +59,8 @@ describe('organizationsStore', () => {
     vi.mocked(organizationsService.create).mockRejectedValue(new Error('API Error'));
 
     const store = useOrganizationsStore.getState();
-    await expect(store.createOrganization({ name: 'Test' } as any)).rejects.toThrow('Error al crear organización');
+    const mockData: CreateOrganizationDto = { name: 'Test', slug: 'test' };
+    await expect(store.createOrganization(mockData)).rejects.toThrow('Error al crear organización');
     const updatedStore = useOrganizationsStore.getState();
 
     expect(updatedStore.error).toBe('Error al crear organización');

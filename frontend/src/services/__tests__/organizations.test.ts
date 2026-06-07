@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { organizationsService } from '../organizations';
 import api from '../api';
+import type { Organization, CreateOrganizationDto } from '@/types/organization';
 
 vi.mock('../api');
 
@@ -11,8 +12,8 @@ describe('organizationsService', () => {
 
   describe('list', () => {
     it('debe llamar api.get para obtener organizaciones', async () => {
-      const mockOrganizations = [{ id: '1', name: 'Test Org' }];
-      vi.mocked(api.get).mockResolvedValue({ data: mockOrganizations } as any);
+      const mockOrganizations: Organization[] = [{ id: '1', name: 'Test Org', slug: 'test-org', is_personal: false, created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' }];
+      vi.mocked(api.get).mockResolvedValue({ data: mockOrganizations });
 
       const result = await organizationsService.list();
 
@@ -33,8 +34,8 @@ describe('organizationsService', () => {
 
   describe('get', () => {
     it('debe llamar api.get para obtener organización por id', async () => {
-      const mockOrganization = { id: '1', name: 'Test Org' };
-      vi.mocked(api.get).mockResolvedValue({ data: mockOrganization } as any);
+      const mockOrganization: Organization = { id: '1', name: 'Test Org', slug: 'test-org', is_personal: false, created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' };
+      vi.mocked(api.get).mockResolvedValue({ data: mockOrganization });
 
       const result = await organizationsService.get('1');
 
@@ -55,11 +56,11 @@ describe('organizationsService', () => {
 
   describe('create', () => {
     it('debe llamar api.post con datos de organización', async () => {
-      const mockOrganization = { id: '1', name: 'New Org' };
-      const mockData = { name: 'New Org', slug: 'new-org' };
-      vi.mocked(api.post).mockResolvedValue({ data: mockOrganization } as any);
+      const mockOrganization: Organization = { id: '1', name: 'New Org', slug: 'new-org', is_personal: false, created_by: 'user1', created_at: '2024-01-01', updated_at: '2024-01-01' };
+      const mockData: CreateOrganizationDto = { name: 'New Org', slug: 'new-org' };
+      vi.mocked(api.post).mockResolvedValue({ data: mockOrganization });
 
-      const result = await organizationsService.create(mockData as any);
+      const result = await organizationsService.create(mockData);
 
       expect(api.post).toHaveBeenCalledWith('/organizations', mockData);
       expect(result).toEqual(mockOrganization);
@@ -69,7 +70,8 @@ describe('organizationsService', () => {
       vi.mocked(api.post).mockRejectedValue(new Error('Validation Error'));
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      await expect(organizationsService.create({ name: 'Test' } as any)).rejects.toThrow('Validation Error');
+      const mockData: CreateOrganizationDto = { name: 'Test', slug: 'test' };
+      await expect(organizationsService.create(mockData)).rejects.toThrow('Validation Error');
       expect(consoleSpy).toHaveBeenCalledWith('Error al crear organización:', expect.any(Error));
 
       consoleSpy.mockRestore();
