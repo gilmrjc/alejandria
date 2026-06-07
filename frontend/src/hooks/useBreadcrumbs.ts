@@ -9,6 +9,9 @@ interface Breadcrumb {
 const routeLabels: Record<string, string> = {
   '/': 'Dashboard',
   '/login': 'Iniciar sesión',
+  '/documents': 'Documentos',
+  '/gaps': 'Gaps',
+  '/proposals': 'Propuestas',
 };
 
 export function useBreadcrumbs(): Breadcrumb[] {

@@ -7,7 +7,7 @@ Main application with document management, authentication, and health check endp
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import auth, documents, health, organizations, projects
+from api.routes import auth, documents, gaps, health, organizations, projects, proposals
 
 # FastAPI app
 app = FastAPI(
@@ -36,6 +36,8 @@ app.add_middleware(
 # Include routers
 app.include_router(documents.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(gaps.router, prefix="/api/v1")
+app.include_router(proposals.router, prefix="/api/v1")
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(organizations.router, prefix="/api/v1")
 app.include_router(projects.router, prefix="/api/v1")

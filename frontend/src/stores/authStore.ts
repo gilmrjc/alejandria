@@ -11,8 +11,20 @@ interface AuthState {
   fetchMe: () => Promise<void>;
 }
 
+const getUserFromStorage = (): User | null => {
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
+  user: getUserFromStorage(),
   loading: false,
   error: null,
 
@@ -22,6 +34,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const tokens = await authService.login({ email, password });
       localStorage.setItem('access_token', tokens.access_token);
       const user = await authService.me();
+      localStorage.setItem('user', JSON.stringify(user));
       set({ user, loading: false });
     } catch {
       set({ error: 'Credenciales incorrectas', loading: false });
@@ -31,6 +44,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
     set({ user: null });
   },
 
@@ -40,9 +54,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true });
     try {
       const user = await authService.me();
+      localStorage.setItem('user', JSON.stringify(user));
       set({ user, loading: false });
     } catch {
       localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
       set({ user: null, loading: false });
     }
   },

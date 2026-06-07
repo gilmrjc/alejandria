@@ -101,7 +101,7 @@ def create_document(
     # For MVP, use the first organization/project the user has access to
     organization = session.execute(
         select(Organization).where(Organization.created_by == current_user.id)
-    ).scalar_one_or_none()
+    ).scalars().first()
 
     if not organization:
         raise HTTPException(
@@ -114,7 +114,7 @@ def create_document(
             Project.organization_id == organization.id,
             Project.created_by == current_user.id,
         )
-    ).scalar_one_or_none()
+    ).scalars().first()
 
     if not project:
         raise HTTPException(
@@ -139,6 +139,24 @@ def create_document(
     session.add(document)
     session.commit()
     session.refresh(document)
+
+    return document
+
+
+@router.get("/slug/{slug}", response_model=DocumentResponse)
+def get_document_by_slug(
+    slug: str,
+    session: Annotated[Session, Depends(get_db_session)],
+) -> Document:
+    """Get a document by slug."""
+    document = session.execute(
+        select(Document).where(Document.slug == slug)
+    ).scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
 
     return document
 
@@ -211,6 +229,53 @@ def list_documents(
     return build_pagination_response(items, page, per_page, total, total_pages)
 
 
+@router.put("/slug/{slug}", response_model=DocumentResponse)
+def update_document_by_slug(
+    slug: str,
+    document_data: DocumentUpdate,
+    session: Annotated[Session, Depends(get_db_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> Document:
+    """
+    Update a document by slug with pessimistic locking.
+
+    Side effects:
+    - Creates automatic snapshot via middleware
+    - Re-enqueues gap_detection job (to be implemented in T-023)
+    """
+    # Get document by slug
+    document = session.execute(
+        select(Document).where(Document.slug == slug)
+    ).scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
+
+    # Acquire pessimistic lock
+    document = acquire_document_lock(session, document.id)
+
+    # Update fields if provided
+    if document_data.title is not None:
+        document.title = document_data.title
+        document.slug = generate_slug(document_data.title)
+
+    if document_data.content is not None:
+        document.content = document_data.content
+
+    if document_data.filename is not None:
+        document.filename = document_data.filename
+
+    # Update metadata
+    document.updated_by = current_user.id
+
+    session.commit()
+    session.refresh(document)
+
+    return document
+
+
 @router.put("/{document_id}", response_model=DocumentResponse)
 def update_document(
     document_id: uuid.UUID,
@@ -248,6 +313,32 @@ def update_document(
     return document
 
 
+@router.delete("/slug/{slug}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_document_by_slug(
+    slug: str,
+    session: Annotated[Session, Depends(get_db_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    """
+    Delete a document by slug.
+
+    Side effects:
+    - CASCADE DELETE of gaps, document_snapshots
+    - Cancels active related jobs (to be implemented in T-023)
+    """
+    document = session.execute(
+        select(Document).where(Document.slug == slug)
+    ).scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
+
+    session.delete(document)
+    session.commit()
+
+
 @router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_document(
     document_id: uuid.UUID,
@@ -272,6 +363,50 @@ def delete_document(
 
     session.delete(document)
     session.commit()
+
+
+@router.get("/slug/{slug}/snapshots", response_model=dict)
+def list_document_snapshots_by_slug(
+    slug: str,
+    session: Annotated[Session, Depends(get_db_session)],
+    page: int = Query(default=1, ge=1, description="Page number"),
+    per_page: int = Query(default=25, ge=1, le=100, description="Items per page"),
+) -> dict:
+    """Get snapshots for a document by slug."""
+    # Verify document exists
+    document = session.execute(
+        select(Document).where(Document.slug == slug)
+    ).scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
+
+    # Get snapshots
+    query = (
+        select(DocumentSnapshot)
+        .where(DocumentSnapshot.document_id == document.id)
+        .order_by(DocumentSnapshot.created_at.desc())
+    )
+
+    # Apply pagination
+    snapshots, total, total_pages = apply_pagination(
+        query, session, page=page, per_page=per_page
+    )
+
+    items = [
+        {
+            "id": snap.id,
+            "document_id": snap.document_id,
+            "content": snap.new_content,
+            "created_at": snap.created_at,
+            "created_by": snap.created_by,
+        }
+        for snap in snapshots
+    ]
+
+    return build_pagination_response(items, page, per_page, total, total_pages)
 
 
 @router.get("/{document_id}/snapshots", response_model=dict)
@@ -316,6 +451,62 @@ def list_document_snapshots(
     ]
 
     return build_pagination_response(items, page, per_page, total, total_pages)
+
+
+@router.post(
+    "/slug/{slug}/snapshots/{snapshot_id}/restore", response_model=DocumentResponse
+)
+def restore_snapshot_by_slug(
+    slug: str,
+    snapshot_id: uuid.UUID,
+    session: Annotated[Session, Depends(get_db_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> Document:
+    """
+    Restore a document snapshot by slug.
+
+    Side effects:
+    - Creates snapshot of current state before restoring
+    """
+    # Get document by slug
+    document = session.execute(
+        select(Document).where(Document.slug == slug)
+    ).scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
+        )
+
+    # Get snapshot
+    snapshot = session.execute(
+        select(DocumentSnapshot).where(
+            DocumentSnapshot.id == snapshot_id,
+            DocumentSnapshot.document_id == document.id,
+        )
+    ).scalar_one_or_none()
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Snapshot not found"
+        )
+
+    # Create snapshot of current state before restoring
+    current_snapshot = DocumentSnapshot(
+        document_id=document.id,
+        new_content=document.content,
+        created_by=current_user.id,
+    )
+    session.add(current_snapshot)
+
+    # Restore content
+    document.content = snapshot.new_content
+    document.updated_by = current_user.id
+
+    session.commit()
+    session.refresh(document)
+
+    return document
 
 
 @router.post(

@@ -437,7 +437,7 @@ La biblioteca de componentes UI seleccionada es shadcn/ui (componentes copiados 
 - Estado local: componentes específicos (filtros, modales, forms)
 - Patrones de state management: Zustand stores separados por dominio (authStore, documentsStore, sessionsStore)
 - Estándar de código: ESLint configurado, Prettier para formatting, convenciones de nombres consistentes
-- Testing de componentes: Cobertura objetivo >70% (similar a PRD-002), unit tests con Jest + React Testing Library
+- Testing de componentes: Cobertura objetivo >70% (similar a PRD-002), unit tests con Vitest + React Testing Library
 - **NOTA**: Testing básico para MVP, testing completo post-MVP.
 
 ---

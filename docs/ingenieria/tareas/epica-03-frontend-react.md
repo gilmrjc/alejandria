@@ -453,10 +453,10 @@ El flujo lógico sigue cinco fases: (1) Infraestructura base (T-030), (2) Config
 
 ### T-041: Implementar Testing de Componentes
 
-**Descripción**: Implementar unit tests e integration tests para componentes principales usando Jest y React Testing Library. Configurar coverage >70%. Implementar tests para servicios de API y state management.
+**Descripción**: Implementar unit tests e integration tests para componentes principales usando Vitest y React Testing Library. Configurar coverage >70%. Implementar tests para servicios de API y state management.
 
 **Criterios de Aceptación**:
-- [ ] Jest y React Testing Library configurados
+- [ ] Vitest y React Testing Library configurados
 - [ ] Unit tests para componentes principales implementados
 - [ ] Unit tests para servicios de API implementados
 - [ ] Unit tests para state management implementados

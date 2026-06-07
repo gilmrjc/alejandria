@@ -41,6 +41,7 @@ class GapResponse(BaseModel):
 
     id: UUID = Field(description="Gap ID")
     document_id: UUID = Field(description="Document ID")
+    slug: str = Field(description="Gap slug")
     question: str = Field(description="Gap question")
     priority: str = Field(description="Gap priority level")
     status: str = Field(description="Gap status")
@@ -61,6 +62,7 @@ class GapListItem(BaseModel):
 
     id: UUID = Field(description="Gap ID")
     document_id: UUID = Field(description="Document ID")
+    slug: str = Field(description="Gap slug")
     question: str = Field(description="Gap question")
     priority: str = Field(description="Gap priority level")
     status: str = Field(description="Gap status")
@@ -73,15 +75,4 @@ class GapListResponse(BaseModel):
     """Schema for paginated gap list response."""
 
     items: list[GapListItem] = Field(description="List of gaps")
-    total: int = Field(description="Total number of gaps")
-    page: int = Field(default=1, description="Current page number")
-    per_page: int = Field(default=25, description="Items per page")
-    total_pages: int = Field(description="Total number of pages")
-
-    @field_validator("total_pages")
-    @classmethod
-    def calculate_total_pages(cls, v: int, info) -> int:
-        """Calculate total pages from total and per_page."""
-        total = info.data.get("total", 0)
-        per_page = info.data.get("per_page", 25)
-        return (total + per_page - 1) // per_page if per_page > 0 else 0
+    pagination: dict = Field(description="Pagination metadata")

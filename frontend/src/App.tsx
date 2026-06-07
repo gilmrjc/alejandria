@@ -4,6 +4,12 @@ import { useAuthStore } from '@/stores/authStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { DocumentsPage } from '@/pages/DocumentsPage';
+import { DocumentDetailPage } from '@/pages/DocumentDetailPage';
+import { GapsPage } from '@/pages/GapsPage';
+import { GapDetailPage } from '@/pages/GapDetailPage';
+import { ProposalsPage } from '@/pages/ProposalsPage';
+import { ProposalDetailPage } from '@/pages/ProposalDetailPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 function RequireAuth() {
@@ -27,6 +33,12 @@ function App() {
         <Route element={<RequireAuth />}>
           <Route element={<AppLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="documents/:id" element={<DocumentDetailPage />} />
+            <Route path="gaps" element={<GapsPage />} />
+            <Route path="gaps/:slug" element={<GapDetailPage />} />
+            <Route path="proposals" element={<ProposalsPage />} />
+            <Route path="proposals/:id" element={<ProposalDetailPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />

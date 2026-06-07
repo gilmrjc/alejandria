@@ -58,7 +58,7 @@ related:
 - Routing (React Router)
 - UI Components (shadcn/ui)
 - Styling (TailwindCSS)
-- Testing (Jest + React Testing Library)
+- Testing (Vitest + React Testing Library)
 - Graph Visualization (librería específica)
 
 **Asignación de Equipo**:

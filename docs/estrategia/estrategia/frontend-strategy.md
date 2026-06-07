@@ -28,7 +28,7 @@ React facilita la implementación de diseño mediante: (1) Component-based archi
 
 React es una biblioteca JavaScript para construir interfaces de usuario basada en componentes. Es el framework más popular debido a su ecosistema maduro, adopción masiva por Facebook/Meta, y comunidad activa. Diferencias fundamentales: React usa JSX (JavaScript con sintaxis similar a HTML) y rendering en runtime, Vue usa templates HTML-based con reactividad integrada, Svelte compila componentes a JavaScript vanilla en build time (sin runtime). React enfatiza programación declarativa y unidirectional data flow.
 
-"Ecosistema amplio" de React significa que existe una vasta colección de librerías y herramientas mantenidas por la comunidad que aceleran el desarrollo. Incluye: Routing (React Router), State Management (Redux, Zustand, Context API), Data Fetching (React Query, Axios), UI Components (shadcn/ui, Material-UI, Chakra UI), Build Tools (Vite, Next.js), Testing (Jest, React Testing Library), y muchas más. Este ecosistema reduce la necesidad de construir funcionalidades desde cero.
+"Ecosistema amplio" de React significa que existe una vasta colección de librerías y herramientas mantenidas por la comunidad que aceleran el desarrollo. Incluye: Routing (React Router), State Management (Redux, Zustand, Context API), Data Fetching (React Query, Axios), UI Components (shadcn/ui, Material-UI, Chakra UI), Build Tools (Vite, Next.js), Testing (Vitest, React Testing Library), y muchas más. Este ecosistema reduce la necesidad de construir funcionalidades desde cero.
 
 ## Información Pendiente de Definir
 

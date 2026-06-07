@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogOut, BookOpen, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, LogOut, BookOpen, ChevronRight, FileText, AlertCircle, Lightbulb } from 'lucide-react';
 import { cn } from '@/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,9 @@ import { useBreadcrumbs } from '@/hooks/useBreadcrumbs';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/documents', label: 'Documentos', icon: FileText, end: false },
+  { to: '/gaps', label: 'Gaps', icon: AlertCircle, end: false },
+  { to: '/proposals', label: 'Propuestas', icon: Lightbulb, end: false },
 ];
 
 export function AppLayout() {
