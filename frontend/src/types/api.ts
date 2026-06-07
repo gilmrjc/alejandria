@@ -413,6 +413,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Dashboard Metrics
+         * @description Get dashboard metrics including document, gap, and proposal statistics.
+         *
+         *     Calculates aggregated statistics directly from the database for efficiency.
+         */
+        get: operations["get_dashboard_metrics_api_v1_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations": {
         parameters: {
             query?: never;
@@ -542,6 +564,20 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * DashboardMetricsResponse
+         * @description Dashboard metrics response.
+         */
+        DashboardMetricsResponse: {
+            /** @description Document statistics */
+            documents: components["schemas"]["DocumentStats"];
+            /** @description Gap statistics */
+            gaps: components["schemas"]["GapStats"];
+            /** @description Proposal statistics */
+            proposals: components["schemas"]["ProposalStats"];
+            /** @description Progress metrics */
+            progress: components["schemas"]["ProgressMetrics"];
+        };
         /**
          * DocumentCreate
          * @description Schema for creating a document.
@@ -685,6 +721,37 @@ export interface components {
             updated_by?: string | null;
         };
         /**
+         * DocumentStats
+         * @description Document statistics.
+         */
+        DocumentStats: {
+            /**
+             * Total
+             * @description Total number of documents
+             */
+            total: number;
+            /**
+             * Avgrating
+             * @description Average document rating
+             */
+            avgRating?: number | null;
+            /**
+             * Healthy
+             * @description Number of documents with rating >= 9
+             */
+            healthy: number;
+            /**
+             * Needsimprovement
+             * @description Number of documents with rating < 9
+             */
+            needsImprovement: number;
+            /**
+             * Norating
+             * @description Number of documents without rating
+             */
+            noRating: number;
+        };
+        /**
          * DocumentUpdate
          * @description Schema for updating a document.
          */
@@ -704,6 +771,53 @@ export interface components {
              * @description Document filename
              */
             filename?: string | null;
+        };
+        /**
+         * GapByPriority
+         * @description Gap counts by priority.
+         */
+        GapByPriority: {
+            /**
+             * Critical
+             * @description Number of critical gaps
+             */
+            critical: number;
+            /**
+             * High
+             * @description Number of high priority gaps
+             */
+            high: number;
+            /**
+             * Medium
+             * @description Number of medium priority gaps
+             */
+            medium: number;
+            /**
+             * Low
+             * @description Number of low priority gaps
+             */
+            low: number;
+        };
+        /**
+         * GapByStatus
+         * @description Gap counts by status.
+         */
+        GapByStatus: {
+            /**
+             * Pending
+             * @description Number of pending gaps
+             */
+            pending: number;
+            /**
+             * Responded
+             * @description Number of responded gaps
+             */
+            responded: number;
+            /**
+             * Rejected
+             * @description Number of rejected gaps
+             */
+            rejected: number;
         };
         /**
          * GapCreate
@@ -871,6 +985,26 @@ export interface components {
             updated_at: string;
         };
         /**
+         * GapStats
+         * @description Gap statistics.
+         */
+        GapStats: {
+            /**
+             * Total
+             * @description Total number of gaps
+             */
+            total: number;
+            /** @description Gap counts by priority */
+            byPriority: components["schemas"]["GapByPriority"];
+            /** @description Gap counts by status */
+            byStatus: components["schemas"]["GapByStatus"];
+            /**
+             * Pending
+             * @description Number of pending gaps
+             */
+            pending: number;
+        };
+        /**
          * GapUpdate
          * @description Schema for updating a gap.
          */
@@ -1016,6 +1150,32 @@ export interface components {
             updated_at: string;
         };
         /**
+         * ProgressMetrics
+         * @description Progress metrics.
+         */
+        ProgressMetrics: {
+            /**
+             * Gapsresolvedpercentage
+             * @description Percentage of gaps resolved
+             */
+            gapsResolvedPercentage: number;
+            /**
+             * Documentshealthypercentage
+             * @description Percentage of healthy documents
+             */
+            documentsHealthyPercentage: number;
+            /**
+             * Avgresolutiontimehours
+             * @description Average time to resolve gaps in hours
+             */
+            avgResolutionTimeHours?: number | null;
+            /**
+             * Proposalacceptancerate
+             * @description Percentage of proposals implemented
+             */
+            proposalAcceptanceRate: number;
+        };
+        /**
          * ProjectCreate
          * @description Schema for creating a project.
          */
@@ -1131,6 +1291,32 @@ export interface components {
              * @description Last update timestamp
              */
             updated_at: string;
+        };
+        /**
+         * ProposalByStatus
+         * @description Proposal counts by status.
+         */
+        ProposalByStatus: {
+            /**
+             * Pending
+             * @description Number of pending proposals
+             */
+            pending: number;
+            /**
+             * Accepted
+             * @description Number of accepted proposals
+             */
+            accepted: number;
+            /**
+             * Rejected
+             * @description Number of rejected proposals
+             */
+            rejected: number;
+            /**
+             * Implemented
+             * @description Number of implemented proposals
+             */
+            implemented: number;
         };
         /**
          * ProposalCreate
@@ -1257,6 +1443,24 @@ export interface components {
              * @description Last update timestamp
              */
             updated_at: string;
+        };
+        /**
+         * ProposalStats
+         * @description Proposal statistics.
+         */
+        ProposalStats: {
+            /**
+             * Total
+             * @description Total number of proposals
+             */
+            total: number;
+            /** @description Proposal counts by status */
+            byStatus: components["schemas"]["ProposalByStatus"];
+            /**
+             * Pending
+             * @description Number of pending proposals
+             */
+            pending: number;
         };
         /**
          * ProposalUpdate
@@ -2339,6 +2543,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthCheckResponse"];
+                };
+            };
+        };
+    };
+    get_dashboard_metrics_api_v1_metrics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardMetricsResponse"];
                 };
             };
         };

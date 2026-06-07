@@ -46,4 +46,13 @@ __all__ = [
     "PaginatedResponse",
     "HealthCheckResponse",
     "ServiceStatus",
+    # Metrics schemas
+    "DashboardMetricsResponse",
+    "DocumentStats",
+    "GapStats",
+    "GapByPriority",
+    "GapByStatus",
+    "ProposalStats",
+    "ProposalByStatus",
+    "ProgressMetrics",
 ]
