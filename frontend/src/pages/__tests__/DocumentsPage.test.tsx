@@ -95,4 +95,35 @@ describe('DocumentsPage', () => {
     searchInput.dispatchEvent(new Event('change', { bubbles: true }));
     Object.assign(searchInput, { value: 'Test' });
   });
+
+  it('debe mostrar estado de carga', () => {
+    vi.mocked(useDocumentsStore).mockReturnValue({
+      documents: [],
+      loading: true,
+      fetchDocuments: vi.fn(),
+      total: 0,
+      page: 1,
+      error: null,
+    });
+
+    render(<DocumentsPage />);
+
+    expect(screen.getByText('Cargando documentos...')).toBeInTheDocument();
+  });
+
+  it('debe mostrar error cuando hay error', () => {
+    vi.mocked(useDocumentsStore).mockReturnValue({
+      documents: [],
+      loading: false,
+      fetchDocuments: vi.fn(),
+      total: 0,
+      page: 1,
+      error: null,
+    });
+
+    render(<DocumentsPage />);
+
+    // DocumentsPage no maneja errores directamente, los delega al DocumentList
+    expect(screen.getByText('No se encontraron documentos')).toBeInTheDocument();
+  });
 });

@@ -95,4 +95,19 @@ describe('GapsPage', () => {
     searchInput.dispatchEvent(new Event('change', { bubbles: true }));
     Object.assign(searchInput, { value: 'Test' });
   });
+
+  it('debe mostrar estado de carga', () => {
+    vi.mocked(useGapsStore).mockReturnValue({
+      gaps: [],
+      loading: true,
+      fetchGaps: vi.fn(),
+      total: 0,
+      page: 1,
+      error: null,
+    });
+
+    render(<GapsPage />);
+
+    expect(screen.getByText('Cargando gaps...')).toBeInTheDocument();
+  });
 });

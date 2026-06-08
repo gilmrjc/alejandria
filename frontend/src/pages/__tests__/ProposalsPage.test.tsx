@@ -95,4 +95,19 @@ describe('ProposalsPage', () => {
     searchInput.dispatchEvent(new Event('change', { bubbles: true }));
     Object.assign(searchInput, { value: 'Test' });
   });
+
+  it('debe mostrar estado de carga', () => {
+    vi.mocked(useProposalsStore).mockReturnValue({
+      proposals: [],
+      loading: true,
+      fetchProposals: vi.fn(),
+      total: 0,
+      page: 1,
+      error: null,
+    });
+
+    render(<ProposalsPage />);
+
+    expect(screen.getByText('Cargando propuestas...')).toBeInTheDocument();
+  });
 });

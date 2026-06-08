@@ -52,7 +52,7 @@ related:
 
 ### Estimación de Esfuerzo Total
 
-**Estimación total**: ~40 horas
+**Estimación total**: ~46 horas
 
 Desglose por tarea:
 
@@ -63,6 +63,7 @@ Desglose por tarea:
 - T-044: Implementar Agente LLM para análisis de documentos - 8h
 - T-045: Implementar Sistema de metadata de gaps - 4h
 - T-046: Implementar Sistema de agrupación por tema - 4h
+- T-047: Implementar API Endpoints para Dashboard de Gaps - 6h
 
 Nota: Estimaciones detalladas están en tareas individuales.
 
@@ -193,7 +194,6 @@ Implementación usando celery_once con Redis distributed locks. Referencia: ADR-
 - [ ] Gaps agrupados por tema usando tags
 - [ ] Agrupación por similitud semántica usando Qdrant
 - [ ] Dashboard de gaps con filtros por tema
-- [ ] Metadata de sesiones (tema, subtema, prioridad)
 
 **Dependencias**: T-042, T-045
 
@@ -201,9 +201,30 @@ Implementación usando celery_once con Redis distributed locks. Referencia: ADR-
 
 ---
 
+### T-047: Implementar API Endpoints para Dashboard de Gaps
+
+**Descripción**: Implementar endpoints de API para datos del dashboard de gaps (backend-only).
+
+**Criterios de Aceptación**:
+
+- [ ] GET /api/v1/gaps/dashboard con métricas agregadas
+- [ ] Filtros por tema, prioridad, estado, tipo
+- [ ] Agrupación por tema implementada
+- [ ] Metadata de tags incluida en respuestas
+- [ ] Paginación implementada
+
+**Dependencias**: T-045, T-046
+
+**Estado**: PENDIENTE
+
+**Estimación**: 6h
+
+**Nota**: Frontend del dashboard (visualización) se implementará en Épica 3-B (T-036)
+
+---
+
 ## Información Pendiente de Definir
 
 Las siguientes secciones están marcadas como PENDIENTE y se definirán en fase de implementación:
 
-- Tareas técnicas individuales para metadata de sesiones
-- Tareas técnicas individuales para dashboard de gaps detectados con filtros
+- ~~Tareas técnicas individuales para dashboard de gaps detectados con filtros~~ ✅ DEFINIDO (T-047 - backend)

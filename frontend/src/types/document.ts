@@ -24,7 +24,10 @@ export interface DocumentListItem {
 export interface DocumentSnapshot {
   id: string;
   document_id: string;
-  content: string;
+  old_content: string | null;
+  new_content: string;
+  diff_type: 'full' | 'diff';
+  rating: number | null;
   created_at: string;
   created_by: string | null;
 }

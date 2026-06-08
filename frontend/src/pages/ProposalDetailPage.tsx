@@ -121,23 +121,6 @@ export function ProposalDetailPage() {
               <p className="text-sm whitespace-pre-wrap">{proposal.description}</p>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Cambios Propuestos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Visualización de cambios pendiente - Diff viewer se implementará en EPC-0033
-              </p>
-              <div className="mt-4 p-4 bg-muted rounded">
-                <p className="text-xs text-muted-foreground">
-                  Por ahora, los cambios se mostrarán en formato texto simple cuando el backend
-                  proporcione los detalles de old_content y new_content.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="space-y-6">

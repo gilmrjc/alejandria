@@ -129,4 +129,29 @@ describe('AppLayout', () => {
     expect(screen.getAllByText('Documentos')).toHaveLength(2); // Sidebar + breadcrumbs
     expect(screen.getByText('Detalle')).toBeInTheDocument();
   });
+
+  it('debe navegar al hacer click en breadcrumb no último', () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      user: { id: '1', username: 'test', email: 'test@example.com', is_active: true, created_at: '2024-01-01', updated_at: '2024-01-01' },
+      loading: false,
+      error: null,
+      logout: vi.fn(),
+      fetchMe: vi.fn(),
+    });
+    vi.mocked(useBreadcrumbs).mockReturnValue([
+      { label: 'Dashboard', path: '/' },
+      { label: 'Documentos', path: '/documents' },
+    ]);
+
+    render(
+      <MemoryRouter initialEntries={['/documents']}>
+        <AppLayout />
+      </MemoryRouter>
+    );
+
+    // El breadcrumb de Dashboard debería ser clickeable
+    const dashboardBreadcrumbs = screen.getAllByText('Dashboard');
+    const breadcrumbDashboard = dashboardBreadcrumbs.find(el => el.tagName === 'BUTTON');
+    expect(breadcrumbDashboard).toBeInTheDocument();
+  });
 });

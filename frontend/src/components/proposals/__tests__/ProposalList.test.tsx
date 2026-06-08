@@ -46,4 +46,22 @@ describe('ProposalList', () => {
     expect(screen.getByText('Test Proposal 1')).toBeInTheDocument();
     expect(screen.getByText('Test Proposal 2')).toBeInTheDocument();
   });
+
+  it('debe llamar onProposalClick cuando se hace click en una propuesta', () => {
+    const mockProposals: Proposal[] = [
+      { id: '1', slug: 'proposal-1', name: 'Test Proposal 1', description: 'Description 1', status: 'pending', created_at: '2024-01-01', updated_at: '2024-01-01' },
+    ];
+
+    const onProposalClick = vi.fn();
+    render(
+      <ProposalList 
+        proposals={mockProposals} 
+        loading={false} 
+        onProposalClick={onProposalClick} 
+      />
+    );
+
+    screen.getByText('Test Proposal 1').click();
+    expect(onProposalClick).toHaveBeenCalledWith('1');
+  });
 });

@@ -76,4 +76,25 @@ describe('useBreadcrumbs', () => {
       { label: '123', path: '/documents/123' },
     ]);
   });
+
+  it('debe manejar rutas con múltiples segmentos anidados', () => {
+    const { result } = renderHook(() => useBreadcrumbs(), {
+      wrapper: ({ children }) => React.createElement(MemoryRouter, { initialEntries: ['/documents/123/edit'] }, children),
+    });
+    
+    expect(result.current).toEqual([
+      { label: 'Dashboard', path: '/' },
+      { label: 'Documentos', path: '/documents' },
+      { label: '123', path: '/documents/123' },
+      { label: 'Edit', path: '/documents/123/edit' },
+    ]);
+  });
+
+  it('debe manejar segmentos vacíos en la ruta', () => {
+    const { result } = renderHook(() => useBreadcrumbs(), {
+      wrapper: ({ children }) => React.createElement(MemoryRouter, { initialEntries: ['//'] }, children),
+    });
+    
+    expect(result.current).toEqual([{ label: 'Dashboard', path: '/' }]);
+  });
 });

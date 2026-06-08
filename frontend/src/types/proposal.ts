@@ -8,6 +8,8 @@ export interface Proposal {
   status: ProposalStatus;
   created_at: string;
   updated_at: string;
+  old_content?: string;
+  new_content?: string;
 }
 
 export interface ProposalListItem {

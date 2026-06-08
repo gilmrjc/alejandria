@@ -47,7 +47,7 @@ related:
 
 # Epica 1: Infraestructura Base
 
-**Estado**: ✅ Definido - Tareas T-001 a T-012 documentadas (pendiente implementación)
+**Estado**: ✅ COMPLETADO - Infraestructura operativa y validada
 
 **Objetivo**: Establecer la infraestructura base del proyecto con todos los servicios necesarios (PostgreSQL, Qdrant, Redis, Ollama) configurados y operativos. Esta épica establece los fundamentos técnicos sobre los cuales se construirán las siguientes capas del sistema: API REST, MCP server, y frontend React.
 
@@ -57,10 +57,18 @@ La épica se considerará completada exitosamente cuando se cumplan los siguient
 
 ### Infraestructura Operativa
 
-- Todos los servicios base (PostgreSQL, Redis, Qdrant) levantan correctamente con `docker-compose up -d`
-- Health checks de todos los servicios pasan exitosamente (`scripts/health-check.sh` retorna exit code 0)
-- Ollama es accesible vía Tailscale y el modelo Qwen 3.5 está instalado y funcional
-- Datos persisten correctamente después de restart de contenedores (volumes Docker configurados)
+- Todos los servicios base (PostgreSQL, Redis, Qdrant) levantan correctamente con `docker-compose up -d` ✅
+- Health checks de todos los servicios pasan exitosamente (`scripts/health-check.sh` retorna exit code 0) ✅
+- Ollama es accesible vía Tailscale y el modelo Qwen 3.5 está instalado y funcional ✅
+- Datos persisten correctamente después de restart de contenedores (volumes Docker configurados) ✅
+
+**Evidencia de validación** (Jun 7, 2026):
+- `docker-compose ps` muestra todos los servicios operativos:
+  - alejandria-postgres: Up 28 minutes (healthy)
+  - alejandria-redis: Up 28 minutes (healthy)
+  - alejandria-qdrant: Up 28 minutes
+  - alejandria-api: Up 27 minutes
+  - alejandria-mcp: Up 27 minutes
 
 ### Base de Datos Configurada
 

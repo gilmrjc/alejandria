@@ -188,4 +188,20 @@ describe('DashboardPage', () => {
     refreshButton.click();
     expect(mockRefresh).toHaveBeenCalledTimes(1);
   });
+
+  it('debe mostrar "N/A" cuando avgRating es null', () => {
+    vi.mocked(useDashboardStats).mockReturnValue({
+      stats: {
+        documents: { total: 10, avgRating: null, healthy: 5, needsImprovement: 3, noRating: 2 },
+        gaps: { total: 5, byPriority: { critical: 1, high: 2, medium: 1, low: 1 }, byStatus: { pending: 3, responded: 2, rejected: 0 }, pending: 3 },
+        proposals: { total: 2, byStatus: { pending: 1, accepted: 0, rejected: 0, implemented: 1 }, pending: 1 },
+        progress: { gapsResolvedPercentage: 40, documentsHealthyPercentage: 50, avgResolutionTimeHours: null, proposalAcceptanceRate: 50 },
+      },
+      loading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+    render(<DashboardPage />);
+    expect(screen.getByText('N/A')).toBeInTheDocument();
+  });
 });

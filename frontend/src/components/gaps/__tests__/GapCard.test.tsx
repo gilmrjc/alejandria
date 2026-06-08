@@ -69,4 +69,11 @@ describe('GapCard', () => {
     
     expect(screen.queryByText(/Contexto faltante/)).not.toBeInTheDocument();
   });
+
+  it('falls back to pending status for unknown status', () => {
+    const unknownGap = { ...mockGap, status: 'unknown' as 'pending' | 'responded' | 'rejected' };
+    render(<GapCard gap={unknownGap} onClick={vi.fn()} />);
+    
+    expect(screen.getByText('Pendiente')).toBeInTheDocument();
+  });
 });

@@ -26,9 +26,21 @@ related:
 
 ## Epica 3-A: Infraestructura Frontend Base
 
-**Estado**: ⏳ PENDIENTE - Técnicas por definir
+**Estado**: ⏳ EN PROGRESO - Estructura base implementada, tareas por completar
 
 **Objetivo**: Configurar la base técnica del frontend React y validar que funciona visualmente con un dashboard base.
+
+**Evidencia de progreso** (Jun 7, 2026):
+- Estructura de proyecto React con Vite implementada ✅
+- Directorio `/frontend/src` con estructura completa:
+  - components: 40 items
+  - hooks: 4 items
+  - pages: 18 items
+  - services: 15 items
+  - stores: 12 items
+  - types: 7 items
+- Testing configurado con Vitest y React Testing Library ✅
+- Componentes base implementados (DocumentFilters, DiffViewer, etc.) ✅
 
 ---
 
@@ -152,13 +164,13 @@ T-033-base es el último componente de esta epica porque valida visualmente que 
 **Descripción**: Crear estructura base del proyecto React con Vite, configurar dependencias (React, React Router, Axios, shadcn/ui/Material-UI, TailwindCSS), y establecer convenciones de código. Configurar TypeScript y ESLint.
 
 **Criterios de Aceptación**:
-- [ ] Estructura de directorios configurada según frontend-specification.md (líneas 619-668)
-- [ ] package.json configurado con dependencias (React, React Router, Axios, UI library)
-- [ ] Vite configurado para desarrollo local (puerto 3000, proxy a API)
-- [ ] TypeScript configurado con strict mode
-- [ ] ESLint y Prettier configurados
-- [ ] TailwindCSS configurado (si se usa shadcn/ui)
-- [ ] README con instrucciones de setup
+- [x] Estructura de directorios configurada según frontend-specification.md (líneas 619-668)
+- [x] package.json configurado con dependencias (React, React Router, Axios, UI library)
+- [x] Vite configurado para desarrollo local (puerto 3000, proxy a API)
+- [x] TypeScript configurado con strict mode
+- [x] ESLint y Prettier configurados
+- [x] TailwindCSS configurado (si se usa shadcn/ui)
+- [x] README con instrucciones de setup
 
 **Dependencias**: Ninguna
 
@@ -166,7 +178,7 @@ T-033-base es el último componente de esta epica porque valida visualmente que 
 - [frontend-specification.md](../arquitectura/frontend-specification.md): Estructura de proyecto (líneas 619-668)
 - [technology-stack.md](../arquitectura/technology-stack.md): Stack de frontend (líneas 95-106)
 
-**Estado**: PENDIENTE
+**Estado**: ✅ COMPLETADO
 
 ---
 
