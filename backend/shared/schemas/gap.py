@@ -76,3 +76,27 @@ class GapListResponse(BaseModel):
 
     items: list[GapListItem] = Field(description="List of gaps")
     pagination: dict = Field(description="Pagination metadata")
+
+
+class GapDashboardMetrics(BaseModel):
+    """Schema for gap dashboard metrics."""
+
+    total_gaps: int = Field(description="Total number of gaps")
+    by_status: dict[str, int] = Field(description="Gaps grouped by status")
+    by_priority: dict[str, int] = Field(description="Gaps grouped by priority")
+    by_theme: dict[str, int] = Field(description="Gaps grouped by theme/tags")
+
+
+class GapThemeCluster(BaseModel):
+    """Schema for gap theme cluster."""
+
+    theme: str = Field(description="Theme name")
+    count: int = Field(description="Number of gaps in theme")
+    gaps: list[GapListItem] = Field(description="Gaps in this theme")
+
+
+class GapDashboardResponse(BaseModel):
+    """Schema for gap dashboard response."""
+
+    metrics: GapDashboardMetrics = Field(description="Dashboard metrics")
+    theme_clusters: list[GapThemeCluster] = Field(description="Gaps grouped by theme")

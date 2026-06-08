@@ -132,6 +132,35 @@ curl http://localhost:6333/
 curl http://localhost:6333/health
 ```
 
+### Ollama con Tailscale
+
+Para usar un servidor Ollama remoto vía Tailscale:
+
+1. **Configurar Tailscale en el servidor remoto:**
+```bash
+# En el servidor remoto con Ollama
+sudo tailscale up
+```
+
+2. **Obtener la IP Tailscale del servidor:**
+```bash
+# En el servidor remoto
+tailscale ip -4
+```
+
+3. **Configurar OLLAMA_URL en .env:**
+```bash
+# En tu máquina local
+OLLAMA_URL=http://<tailscale-ip>:11434
+```
+
+4. **Verificar conexión:**
+```bash
+curl http://<tailscale-ip>:11434/api/tags
+```
+
+**Nota:** Para desarrollo local con Ollama en tu máquina, usa `http://localhost:11434`.
+
 
 ## Desarrollo
 

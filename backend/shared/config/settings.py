@@ -52,6 +52,15 @@ class Settings(BaseSettings):
     # Ollama
     ollama_url: str = Field(description="Ollama API URL for LLM embeddings")
 
+    # Celery-Once configuration (required by celery_once library)
+    ONCE: dict = Field(
+        default={
+            "backend": "celery_once.backends.redis.Redis",
+            "settings": {"url": "redis://localhost:6379/0"},
+        },
+        description="Celery-Once configuration for distributed task locks",
+    )
+
     @field_validator("log_level")
     @classmethod
     def validate_log_level(cls, v: str) -> str:

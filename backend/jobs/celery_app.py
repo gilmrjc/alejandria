@@ -2,9 +2,13 @@
 Celery application configuration for background job processing.
 """
 
-from celery import Celery
+import logging
+
+from celery import Celery, signals
 
 from shared.config.settings import settings
+
+logger = logging.getLogger(__name__)
 
 # Create Celery app
 celery_app = Celery(
@@ -24,4 +28,34 @@ celery_app.conf.update(
     task_track_started=True,
     task_time_limit=30 * 60,  # 30 minutes
     task_soft_time_limit=25 * 60,  # 25 minutes
+    # Retry strategy with exponential backoff
+    task_default_retry_delay=60,  # 1 minute initial
+    task_max_retries=5,
+    task_acks_late=True,  # Ack only after successful completion
+    # Worker configuration
+    worker_prefetch_multiplier=1,  # Process one task at a time
+    worker_disable_rate_limits=True,
+    # celery_once configuration for distributed locks
+    once={
+        "backend": "celery_once.backends.redis.Redis",
+        "settings": {
+            "url": settings.redis_url,
+        },
+    },
 )
+
+
+# Celery signal handlers for structured logging
+@signals.task_prerun.connect
+def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
+    logger.info(f"Task started: {task.name}[{task_id}]")
+
+
+@signals.task_postrun.connect
+def task_postrun_handler(sender=None, task_id=None, task=None, retval=None, **kwargs):
+    logger.info(f"Task completed: {task.name}[{task_id}]")
+
+
+@signals.task_failure.connect
+def task_failure_handler(sender=None, task_id=None, exception=None, **kwargs):
+    logger.error(f"Task failed: {task.name}[{task_id}] - {exception}")

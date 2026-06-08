@@ -7,16 +7,21 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from jobs.tasks.gap_detection import gap_detection_task
 from shared.auth.jwt import get_current_user
 from shared.db.models import Document, Gap, User
 from shared.db.session import get_db_session
 from shared.schemas.gap import (
     GapCreate,
+    GapDashboardMetrics,
+    GapDashboardResponse,
     GapListItem,
     GapListResponse,
     GapResponse,
+    GapThemeCluster,
     GapUpdate,
 )
+from shared.services.gap_grouping_service import GapGroupingService
 from shared.utils.pagination import apply_pagination, build_pagination_response
 
 SessionDep = Annotated[Session, Depends(get_db_session)]
@@ -254,3 +259,132 @@ def delete_gap(
 
     session.delete(gap)
     session.commit()
+
+
+@router.get("/dashboard", response_model=GapDashboardResponse)
+def get_gap_dashboard(
+    session: SessionDep,
+    status: Annotated[str | None, Query(description="Filter by status")] = None,
+    priority: Annotated[str | None, Query(description="Filter by priority")] = None,
+    document_id: Annotated[
+        uuid.UUID | None, Query(description="Filter by document")
+    ] = None,
+) -> dict:
+    """Get gap dashboard metrics and theme clusters."""
+    # Build query
+    query = select(Gap)
+
+    # Apply filters
+    if status is not None:
+        query = query.where(Gap.status == status)
+
+    if priority is not None:
+        query = query.where(Gap.priority == priority)
+
+    if document_id is not None:
+        query = query.where(Gap.document_id == document_id)
+
+    # Execute query
+    gaps = session.execute(query).scalars().all()
+
+    # Calculate metrics
+    total_gaps = len(gaps)
+    by_status = {}
+    by_priority = {}
+
+    for gap in gaps:
+        by_status[gap.status] = by_status.get(gap.status, 0) + 1
+        by_priority[gap.priority] = by_priority.get(gap.priority, 0) + 1
+
+    # Get theme clusters using GapGroupingService
+    grouping_service = GapGroupingService(session)
+    tag_clusters = grouping_service.group_gaps_by_tags()
+
+    # Build theme clusters
+    theme_clusters = []
+    for theme, gap_dicts in tag_clusters.items():
+        # Convert gap dicts to GapListItem
+        gap_items = []
+        for g in gap_dicts:
+            # Get the actual gap to get created_at
+            actual_gap = session.execute(
+                select(Gap).where(Gap.id == uuid.UUID(g["id"]))
+            ).scalar_one_or_none()
+            created_at = actual_gap.created_at if actual_gap else None
+
+            gap_items.append(
+                GapListItem(
+                    id=uuid.UUID(g["id"]),
+                    document_id=uuid.UUID(g["document_id"]),
+                    slug="",  # Not available in dict
+                    question=g["question"],
+                    priority=g["priority"],
+                    status=g["status"],
+                    created_at=created_at,
+                )
+            )
+        theme_clusters.append(
+            GapThemeCluster(theme=theme, count=len(gap_items), gaps=gap_items)
+        )
+
+    # Build metrics
+    metrics = GapDashboardMetrics(
+        total_gaps=total_gaps,
+        by_status=by_status,
+        by_priority=by_priority,
+        by_theme={cluster.theme: cluster.count for cluster in theme_clusters},
+    )
+
+    return GapDashboardResponse(metrics=metrics, theme_clusters=theme_clusters)
+
+
+@router.post("/detect-all", status_code=status.HTTP_202_ACCEPTED)
+def detect_gaps_all_documents(
+    session: SessionDep,
+    current_user: CurrentUserDep,
+) -> dict:
+    """
+    Encola todos los documentos existentes para detección de gaps.
+
+    Returns:
+        Dict con información de las tareas encoladas
+    """
+    from shared.db.models import Document
+
+    # Obtener todos los documentos
+    documents = session.execute(select(Document)).scalars().all()
+
+    if not documents:
+        return {
+            "message": "No documents found",
+            "tasks_enqueued": 0,
+            "tasks": [],
+        }
+
+    # Encolar tareas
+    tasks = []
+    for doc in documents:
+        try:
+            result = gap_detection_task.delay(str(doc.id))
+            tasks.append(
+                {
+                    "document_id": str(doc.id),
+                    "document_title": doc.title,
+                    "task_id": result.id,
+                }
+            )
+        except Exception as e:
+            tasks.append(
+                {
+                    "document_id": str(doc.id),
+                    "document_title": doc.title,
+                    "error": str(e),
+                }
+            )
+
+    return {
+        "message": f"Enqueued {len([t for t in tasks if 'error' not in t])} documents for gap detection",
+        "tasks_enqueued": len([t for t in tasks if "error" not in t]),
+        "total_documents": len(documents),
+        "tasks": tasks,
+    }

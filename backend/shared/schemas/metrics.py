@@ -56,9 +56,7 @@ class GapStats(BaseModel):
     by_priority: GapByPriority = Field(
         alias="byPriority", description="Gap counts by priority"
     )
-    by_status: GapByStatus = Field(
-        alias="byStatus", description="Gap counts by status"
-    )
+    by_status: GapByStatus = Field(alias="byStatus", description="Gap counts by status")
     pending: int = Field(description="Number of pending gaps")
 
 

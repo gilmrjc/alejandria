@@ -267,6 +267,286 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]
     return chunks
 
 
+def chunk_document(
+    content: str, max_tokens: int = 512, overlap: int = 50
+) -> list[dict[str, Any]]:
+    """
+    Chunk document content for vector embedding with metadata.
+
+    Strategy:
+    - Split by paragraphs
+    - Group paragraphs until ~max_tokens
+    - Maintain overlap between chunks
+    - Preserve section structure in metadata
+
+    Args:
+        content: Document content (markdown or plain text)
+        max_tokens: Maximum tokens per chunk
+        overlap: Token overlap between chunks
+
+    Returns:
+        List of chunks with metadata
+    """
+    if not content:
+        return []
+
+    # Split into paragraphs
+    paragraphs = split_into_paragraphs(content)
+
+    # Group paragraphs into chunks
+    chunks = []
+    current_chunk = []
+    current_tokens = 0
+
+    for paragraph in paragraphs:
+        paragraph_tokens = estimate_tokens(paragraph)
+
+        # If paragraph is very long, split it
+        if paragraph_tokens > max_tokens:
+            if current_chunk:
+                chunks.append(create_chunk(current_chunk))
+                current_chunk = []
+                current_tokens = 0
+
+            # Split long paragraph
+            sub_chunks = split_long_paragraph(paragraph, max_tokens, overlap)
+            chunks.extend(sub_chunks)
+            continue
+
+        # If adding paragraph exceeds limit, create chunk
+        if current_tokens + paragraph_tokens > max_tokens and current_chunk:
+            chunks.append(create_chunk(current_chunk))
+            current_chunk = []
+            current_tokens = 0
+
+        # Add paragraph to current chunk
+        current_chunk.append(paragraph)
+        current_tokens += paragraph_tokens
+
+    # Add final chunk
+    if current_chunk:
+        chunks.append(create_chunk(current_chunk))
+
+    # Add overlap between chunks
+    chunks_with_overlap = add_overlap(chunks, overlap)
+
+    # Add section metadata
+    chunks_with_metadata = add_section_metadata(chunks_with_overlap, content)
+
+    return chunks_with_metadata
+
+
+def split_into_paragraphs(content: str) -> list[str]:
+    """
+    Split content into paragraphs based on markdown structure.
+
+    Args:
+        content: Document content
+
+    Returns:
+        List of paragraphs
+    """
+    lines = content.split("\n")
+    paragraphs = []
+    current_paragraph = []
+
+    for line in lines:
+        # Headers mark new sections
+        if line.startswith("#"):
+            if current_paragraph:
+                paragraphs.append("\n".join(current_paragraph))
+                current_paragraph = []
+            current_paragraph.append(line)
+        # Empty lines mark end of paragraph
+        elif line.strip() == "":
+            if current_paragraph:
+                paragraphs.append("\n".join(current_paragraph))
+                current_paragraph = []
+        # Lists stay together
+        elif line.strip().startswith(("-", "*", "+")):
+            current_paragraph.append(line)
+        # Normal text
+        else:
+            current_paragraph.append(line)
+
+    # Add last paragraph
+    if current_paragraph:
+        paragraphs.append("\n".join(current_paragraph))
+
+    return paragraphs
+
+
+def estimate_tokens(text: str) -> int:
+    """
+    Estimate token count (rough approximation: 1 token ≈ 4 characters).
+
+    Args:
+        text: Text to estimate
+
+    Returns:
+        Estimated token count
+    """
+    return len(text) // 4
+
+
+def create_chunk(paragraphs: list[str]) -> dict[str, Any]:
+    """
+    Create a chunk from paragraphs.
+
+    Args:
+        paragraphs: List of paragraphs
+
+    Returns:
+        Chunk dictionary
+    """
+    return {"text": "\n\n".join(paragraphs)}
+
+
+def split_long_paragraph(
+    paragraph: str, max_tokens: int, overlap: int
+) -> list[dict[str, Any]]:
+    """
+    Split a long paragraph into smaller chunks.
+
+    Args:
+        paragraph: Long paragraph to split
+        max_tokens: Maximum tokens per chunk
+        overlap: Token overlap
+
+    Returns:
+        List of chunks
+    """
+    words = paragraph.split()
+    chunks = []
+    current_words = []
+    current_tokens = 0
+
+    for word in words:
+        word_tokens = estimate_tokens(word)
+
+        if current_tokens + word_tokens > max_tokens and current_words:
+            chunks.append(create_chunk(current_words))
+            # Keep overlap
+            overlap_words = current_words[-overlap:] if overlap > 0 else []
+            current_words = overlap_words
+            current_tokens = sum(estimate_tokens(w) for w in current_words)
+
+        current_words.append(word)
+        current_tokens += word_tokens
+
+    if current_words:
+        chunks.append(create_chunk(current_words))
+
+    return chunks
+
+
+def add_overlap(
+    chunks: list[dict[str, Any]], overlap_tokens: int
+) -> list[dict[str, Any]]:
+    """
+    Add token overlap between adjacent chunks.
+
+    Args:
+        chunks: List of chunks
+        overlap_tokens: Number of tokens to overlap
+
+    Returns:
+        Chunks with overlap
+    """
+    if not chunks:
+        return []
+
+    chunks_with_overlap = [chunks[0]]
+
+    for i in range(1, len(chunks)):
+        prev_chunk = chunks[i - 1]["text"]
+        current_chunk = chunks[i]["text"]
+
+        # Get last N tokens from previous chunk
+        prev_words = prev_chunk.split()
+        overlap_text = (
+            " ".join(prev_words[-overlap_tokens:]) if overlap_tokens > 0 else ""
+        )
+
+        # Add overlap to current chunk
+        if overlap_text:
+            chunk_with_overlap = f"{overlap_text}\n\n{current_chunk}"
+        else:
+            chunk_with_overlap = current_chunk
+
+        chunks_with_overlap.append({"text": chunk_with_overlap})
+
+    return chunks_with_overlap
+
+
+def add_section_metadata(
+    chunks: list[dict[str, Any]], content: str
+) -> list[dict[str, Any]]:
+    """
+    Add section metadata to chunks.
+
+    Args:
+        chunks: List of chunks
+        content: Original document content
+
+    Returns:
+        Chunks with metadata
+    """
+    # Extract sections from content
+    sections = extract_sections(content)
+
+    chunks_with_metadata = []
+    current_section = None
+
+    for i, chunk in enumerate(chunks):
+        # Determine current section based on chunk content
+        for section in sections:
+            if section["title"] in chunk["text"]:
+                current_section = section
+                break
+
+        chunks_with_metadata.append(
+            {
+                "text": chunk["text"],
+                "metadata": {
+                    "section_title": current_section["title"]
+                    if current_section
+                    else None,
+                    "section_level": current_section["level"]
+                    if current_section
+                    else None,
+                    "chunk_index": i,
+                    "total_chunks": len(chunks),
+                    "token_count": estimate_tokens(chunk["text"]),
+                },
+            }
+        )
+
+    return chunks_with_metadata
+
+
+def extract_sections(content: str) -> list[dict[str, str]]:
+    """
+    Extract section headers from markdown content.
+
+    Args:
+        content: Document content
+
+    Returns:
+        List of sections with title and level
+    """
+    sections = []
+    lines = content.split("\n")
+
+    for line in lines:
+        if line.startswith("#"):
+            level = line.count("#")
+            title = line.lstrip("#").strip()
+            sections.append({"title": title, "level": f"h{level}"})
+
+    return sections
+
+
 async def generate_embedding(text: str, ollama_url: str = None) -> list[float]:
     """
     Generate embedding using BGE-M3 model via Ollama with retry logic.
