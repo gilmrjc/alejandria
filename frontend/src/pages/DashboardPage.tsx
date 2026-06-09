@@ -1,26 +1,39 @@
-import { FileText, AlertCircle, Star, CheckCircle, RefreshCw, TrendingUp } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { FileText, AlertCircle, Star, CheckCircle, RefreshCw, TrendingUp, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
-
-const INFRA_STATUS = [
-  { label: 'Vite + React + TypeScript', ok: true },
-  { label: 'TailwindCSS + shadcn/ui', ok: true },
-  { label: 'React Router', ok: true },
-  { label: 'Axios + JWT interceptors', ok: true },
-  { label: 'Zustand stores', ok: true },
-];
+import { useProjectContextStore } from '@/stores/projectContextStore';
 
 export function DashboardPage() {
-  const { stats, loading, error, refresh } = useDashboardStats();
+  const { orgSlug, projectSlug } = useParams<{ orgSlug?: string; projectSlug?: string }>();
+  // Pass project context to get project-specific metrics
+  const { stats, loading, error, refresh } = useDashboardStats({
+    orgSlug: orgSlug || undefined,
+    projectSlug: projectSlug || undefined,
+  });
+  const { currentOrganization, currentProject } = useProjectContextStore();
+
+  // Show project dashboard - requires project context
+  if (!orgSlug || !projectSlug) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Selecciona un proyecto para ver el dashboard</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+            <span>{currentOrganization?.name || orgSlug}</span>
+            <ChevronRight className="h-4 w-4" />
+            <span className="font-medium text-foreground">{currentProject?.name || projectSlug}</span>
+          </div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Estado general del sistema</p>
+          <p className="text-sm text-muted-foreground">Estado del proyecto</p>
         </div>
         <Button
           variant="outline"
@@ -44,7 +57,7 @@ export function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total documentos</CardTitle>
+            <CardTitle className="text-sm font-medium">Documentos</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -113,23 +126,6 @@ export function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Estado de infraestructura</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {INFRA_STATUS.map(({ label, ok }) => (
-              <li key={label} className="flex items-center gap-2 text-sm">
-                <CheckCircle className="h-4 w-4 shrink-0 text-emerald-500" />
-                <span>{label}</span>
-                {ok && <Badge variant="success" className="ml-auto">OK</Badge>}
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 }

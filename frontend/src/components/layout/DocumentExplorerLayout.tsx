@@ -3,11 +3,33 @@ import { DocumentSidebar } from '@/components/documents/DocumentSidebar';
 
 export function DocumentExplorerLayout() {
   const navigate = useNavigate();
-  const { slug } = useParams();
+  const { orgSlug, projectSlug, slug } = useParams<{
+    orgSlug: string;
+    projectSlug: string;
+    slug?: string;
+  }>();
 
   const handleDocumentClick = (docSlug: string) => {
-    navigate(`/documents/${docSlug}`);
+    if (orgSlug && projectSlug) {
+      navigate(`/${orgSlug}/${projectSlug}/documents/${docSlug}`);
+    }
   };
+
+  // Show message if no project context
+  if (!orgSlug || !projectSlug) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-muted-foreground">
+            Selecciona un proyecto
+          </h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            Usa el selector de proyectos en la barra superior
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -18,6 +40,8 @@ export function DocumentExplorerLayout() {
         <DocumentSidebar
           onDocumentClick={handleDocumentClick}
           selectedSlug={slug}
+          orgSlug={orgSlug}
+          projectSlug={projectSlug}
         />
       </aside>
       <main className="flex-1 overflow-y-auto">

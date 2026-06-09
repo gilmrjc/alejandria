@@ -2,26 +2,30 @@ import { File, ChevronRight, ChevronDown, Folder } from 'lucide-react';
 import type { FolderTreeItem } from '@/types/document';
 import { useState, useEffect } from 'react';
 import { cn } from '@/utils';
-import { documentsService } from '@/services/documents';
+import { projectDocumentsService } from '@/services/projectDocuments';
 
 interface DocumentSidebarProps {
   onDocumentClick: (slug: string) => void;
   selectedSlug?: string;
+  orgSlug: string;
+  projectSlug: string;
 }
 
-export function DocumentSidebar({ onDocumentClick, selectedSlug }: DocumentSidebarProps) {
+export function DocumentSidebar({ onDocumentClick, selectedSlug, orgSlug, projectSlug }: DocumentSidebarProps) {
   const [tree, setTree] = useState<FolderTreeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    loadTree();
-  }, []);
+    if (orgSlug && projectSlug) {
+      loadTree();
+    }
+  }, [orgSlug, projectSlug]);
 
   const loadTree = async () => {
     try {
       setLoading(true);
-      const data = await documentsService.getTree();
+      const data = await projectDocumentsService.getTree(orgSlug, projectSlug);
       setTree(data);
     } catch (error) {
       console.error('Error loading tree:', error);

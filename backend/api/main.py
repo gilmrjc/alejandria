@@ -16,6 +16,8 @@ from api.routes import (
     health,
     metrics,
     organizations,
+    project_documents,
+    project_gaps,
     projects,
     proposals,
 )
@@ -66,6 +68,9 @@ app.include_router(health.router, prefix="/api/v1")
 app.include_router(metrics.router, prefix="/api/v1")
 app.include_router(organizations.router, prefix="/api/v1")
 app.include_router(projects.router, prefix="/api/v1")
+# Project-scoped routes (include org/project slugs in path)
+app.include_router(project_documents.router, prefix="/api/v1")
+app.include_router(project_gaps.router, prefix="/api/v1")
 
 
 @app.get("/")

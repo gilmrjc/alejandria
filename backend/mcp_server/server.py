@@ -426,6 +426,103 @@ def get_project_by_slug(organization_slug: str, project_slug: str) -> dict:
 
 
 @mcp.tool()
+def list_organizations() -> dict:
+    """
+    List all organizations accessible to the current user.
+
+    Returns:
+        List of organizations with total count
+    """
+    session, should_close = get_authenticated_session()
+    try:
+        # Get current user info to filter by their organizations
+        from shared.db.models import ApiKey, User
+
+        # Get first active API key for current context
+        api_key = session.execute(
+            select(ApiKey).where(ApiKey.is_active).limit(1)
+        ).scalar_one_or_none()
+
+        if not api_key:
+            raise ValueError("No active API key found")
+
+        # Get organizations for this user
+        organizations = (
+            session.execute(
+                select(Organization).where(Organization.created_by == api_key.user_id)
+            )
+            .scalars()
+            .all()
+        )
+
+        return {
+            "organizations": [
+                {
+                    "id": str(org.id),
+                    "slug": org.slug,
+                    "name": org.name,
+                    "is_personal": org.is_personal,
+                    "created_at": org.created_at.isoformat(),
+                }
+                for org in organizations
+            ],
+            "total": len(organizations),
+        }
+
+    finally:
+        if should_close:
+            session.close()
+
+
+@mcp.tool()
+def list_projects(organization_slug: str | None = None) -> dict:
+    """
+    List projects, optionally filtered by organization.
+
+    Args:
+        organization_slug: Optional organization slug to filter projects by
+
+    Returns:
+        List of projects with total count
+    """
+    session, should_close = get_authenticated_session()
+    try:
+        query = select(Project)
+
+        if organization_slug:
+            # Get organization first
+            org = session.execute(
+                select(Organization).where(Organization.slug == organization_slug)
+            ).scalar_one_or_none()
+
+            if not org:
+                raise ValueError(f"Organization with slug '{organization_slug}' not found")
+
+            query = query.where(Project.organization_id == org.id)
+
+        projects = session.execute(query).scalars().all()
+
+        return {
+            "projects": [
+                {
+                    "id": str(project.id),
+                    "slug": project.slug,
+                    "name": project.name,
+                    "description": project.description,
+                    "organization_id": str(project.organization_id),
+                    "created_at": project.created_at.isoformat(),
+                }
+                for project in projects
+            ],
+            "total": len(projects),
+        }
+
+    finally:
+        if should_close:
+            session.close()
+
+
+@mcp.tool()
 def create_document(
     project_id: str,
     organization_id: str,
