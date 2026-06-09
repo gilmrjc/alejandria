@@ -168,6 +168,9 @@ class DocumentListItem(BaseModel):
     )
     created_at: datetime = Field(description="Creation timestamp")
     updated_at: datetime = Field(description="Last update timestamp")
+    folder_id: UUID | None = Field(None, description="Folder ID if document is in a folder")
+    folder_name: str | None = Field(None, description="Folder name if document is in a folder")
+    folder_path: str | None = Field(None, description="Full folder path for hierarchical display")
 
     model_config = {"from_attributes": True}
 
@@ -177,3 +180,20 @@ class DocumentListResponse(BaseModel):
 
     items: list[DocumentListItem] = Field(description="List of documents")
     pagination: dict = Field(description="Pagination metadata")
+
+
+class FolderTreeItem(BaseModel):
+    """Schema for a folder tree item (folder or document)."""
+
+    type: str = Field(description="Type: 'folder' or 'document'")
+    id: str = Field(description="ID of the folder or document (UUID for real items, path for virtual folders)")
+    name: str = Field(description="Name of the folder or document")
+    path: str = Field(description="Full path for hierarchical display")
+    slug: str | None = Field(None, description="Document slug (only for documents)")
+    children: list["FolderTreeItem"] = Field(default_factory=list, description="Child items (only for folders)")
+
+    model_config = {"from_attributes": True}
+
+
+# Update forward references for recursive model
+FolderTreeItem.model_rebuild()

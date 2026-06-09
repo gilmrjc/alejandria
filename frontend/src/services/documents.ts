@@ -5,6 +5,7 @@ import type {
   DocumentListItem,
   DocumentListParams,
   DocumentSnapshot,
+  FolderTreeItem,
   PaginatedResponse,
   UpdateDocumentDto,
 } from '@/types/document';
@@ -12,6 +13,11 @@ import type {
 export const documentsService = {
   async list(params?: DocumentListParams): Promise<PaginatedResponse<DocumentListItem>> {
     const response = await api.get<PaginatedResponse<DocumentListItem>>('/documents', { params });
+    return response.data;
+  },
+
+  async getTree(): Promise<FolderTreeItem[]> {
+    const response = await api.get<FolderTreeItem[]>('/documents/tree');
     return response.data;
   },
 

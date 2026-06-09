@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { DocumentExplorerLayout } from '@/components/layout/DocumentExplorerLayout';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { DocumentsPage } from '@/pages/DocumentsPage';
@@ -33,8 +34,10 @@ function App() {
         <Route element={<RequireAuth />}>
           <Route element={<AppLayout />}>
             <Route index element={<DashboardPage />} />
-            <Route path="documents" element={<DocumentsPage />} />
-            <Route path="documents/:slug" element={<DocumentDetailPage />} />
+            <Route path="documents" element={<DocumentExplorerLayout />}>
+              <Route index element={<DocumentsPage />} />
+              <Route path=":slug" element={<DocumentDetailPage />} />
+            </Route>
             <Route path="gaps" element={<GapsPage />} />
             <Route path="gaps/:slug" element={<GapDetailPage />} />
             <Route path="proposals" element={<ProposalsPage />} />

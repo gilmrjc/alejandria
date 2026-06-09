@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from shared.auth.jwt import get_current_user
-from shared.db.models import Document, DocumentSnapshot, Organization, Project, User
+from shared.db.models import Document, DocumentSnapshot, Folder, Organization, Project, User
 from shared.db.session import get_db_dependency
 from shared.schemas.document import (
     DocumentCreate,
@@ -19,6 +19,7 @@ from shared.schemas.document import (
     DocumentListResponse,
     DocumentResponse,
     DocumentUpdate,
+    FolderTreeItem,
     generate_slug,
 )
 from shared.utils.pagination import apply_pagination, build_pagination_response
@@ -169,6 +170,94 @@ def get_document_by_slug(
     return document
 
 
+@router.get("/tree", response_model=list[FolderTreeItem])
+def get_document_tree(
+    session: SessionDep,
+) -> list[FolderTreeItem]:
+    """Get hierarchical tree structure of folders and documents."""
+    # Get all documents with folder info
+    documents = session.execute(
+        select(Document).outerjoin(Folder, Document.folder_id == Folder.id)
+    ).scalars().all()
+    
+    # Build tree structure from folder_path or filename
+    class TreeNode:
+        def __init__(self, name: str, path: str):
+            self.name = name
+            self.path = path
+            self.documents: list[Document] = []
+            self.children: dict[str, "TreeNode"] = {}
+    
+    root = TreeNode("", "")
+    
+    for doc in documents:
+        folder_path = None
+        if doc.folder_id:
+            folder = session.execute(
+                select(Folder).where(Folder.id == doc.folder_id)
+            ).scalar_one_or_none()
+            if folder:
+                folder_path = folder.path
+        
+        # If no folder_id, try to infer from filename
+        if not folder_path and doc.filename:
+            # Extract path from filename (e.g., "docs/architecture/database.md" -> "docs/architecture")
+            filename_parts = doc.filename.split('/')
+            if len(filename_parts) > 1:
+                folder_path = '/'.join(filename_parts[:-1])
+        
+        if not folder_path:
+            # Document at root level
+            root.documents.append(doc)
+        else:
+            # Navigate/create path
+            parts = folder_path.split('/')
+            current = root
+            current_path = ""
+            
+            for part in parts:
+                if current_path:
+                    current_path += "/"
+                current_path += part
+                
+                if part not in current.children:
+                    current.children[part] = TreeNode(part, current_path)
+                
+                current = current.children[part]
+            
+            current.documents.append(doc)
+    
+    # Convert TreeNode to FolderTreeItem
+    def convert_node(node: TreeNode) -> list[FolderTreeItem]:
+        items: list[FolderTreeItem] = []
+        
+        # Add child folders first
+        for child_name, child_node in sorted(node.children.items()):
+            items.append(FolderTreeItem(
+                type="folder",
+                id=child_node.path,  # Use path as ID
+                name=child_name,
+                path=child_node.path,
+                slug=None,
+                children=convert_node(child_node)
+            ))
+        
+        # Add documents at this level after folders
+        for doc in node.documents:
+            items.append(FolderTreeItem(
+                type="document",
+                id=str(doc.id),
+                name=doc.title,
+                path=doc.filename,
+                slug=doc.slug,
+                children=[]
+            ))
+        
+        return items
+    
+    return convert_node(root)
+
+
 @router.get("/{document_id}", response_model=DocumentResponse)
 def get_document(
     document_id: uuid.UUID,
@@ -201,8 +290,8 @@ def list_documents(
     ),
 ) -> dict:
     """List documents with pagination and filtering."""
-    # Build query
-    query = select(Document)
+    # Build query with folder join
+    query = select(Document).outerjoin(Folder, Document.folder_id == Folder.id)
 
     # Apply filters
     if updated_after is not None:
@@ -220,19 +309,33 @@ def list_documents(
         query, session, page=page, per_page=per_page
     )
 
-    # Convert to response format
-    items = [
-        DocumentListItem(
-            id=doc.id,
-            title=doc.title,
-            slug=doc.slug,
-            filename=doc.filename,
-            rating=doc.rating,
-            created_at=doc.created_at,
-            updated_at=doc.updated_at,
+    # Convert to response format with folder info
+    items = []
+    for doc in documents:
+        folder_name = None
+        folder_path = None
+        if doc.folder_id:
+            folder = session.execute(
+                select(Folder).where(Folder.id == doc.folder_id)
+            ).scalar_one_or_none()
+            if folder:
+                folder_name = folder.name
+                folder_path = folder.path
+
+        items.append(
+            DocumentListItem(
+                id=doc.id,
+                title=doc.title,
+                slug=doc.slug,
+                filename=doc.filename,
+                rating=doc.rating,
+                created_at=doc.created_at,
+                updated_at=doc.updated_at,
+                folder_id=doc.folder_id,
+                folder_name=folder_name,
+                folder_path=folder_path,
+            )
         )
-        for doc in documents
-    ]
 
     return build_pagination_response(items, page, per_page, total, total_pages)
 

@@ -19,6 +19,18 @@ export interface DocumentListItem {
   rating: number | null;
   created_at: string;
   updated_at: string;
+  folder_id: string | null;
+  folder_name: string | null;
+  folder_path: string | null;
+}
+
+export interface FolderTreeItem {
+  type: 'folder' | 'document';
+  id: string; // UUID for real items, path for virtual folders
+  name: string;
+  path: string;
+  slug: string | null;
+  children: FolderTreeItem[];
 }
 
 export interface DocumentSnapshot {
