@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, X, FileText, Code } from 'lucide-react';
 import { DocumentMetadata } from '@/components/documents/DocumentMetadata';
 import { SnapshotHistory } from '@/components/documents/SnapshotHistory';
 import { GapList } from '@/components/gaps/GapList';
 import { DiffViewer } from '@/components/diff/DiffViewer';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { documentsService } from '@/services/documents';
 import { gapsService } from '@/services/gaps';
 import type { Document, DocumentSnapshot } from '@/types/document';
@@ -21,6 +22,7 @@ export function DocumentDetailPage() {
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
   const [gapsLoading, setGapsLoading] = useState(false);
   const [comparingSnapshot, setComparingSnapshot] = useState<DocumentSnapshot | null>(null);
+  const [showRaw, setShowRaw] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -141,10 +143,35 @@ export function DocumentDetailPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <div className="border rounded-lg p-6 bg-background">
-            <h2 className="text-lg font-semibold mb-4">Contenido</h2>
-            <pre className="whitespace-pre-wrap text-sm font-mono bg-muted/50 p-4 rounded overflow-auto max-h-[600px]">
-              {document.content}
-            </pre>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Contenido</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowRaw(!showRaw)}
+              >
+                {showRaw ? (
+                  <>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Ver renderizado
+                  </>
+                ) : (
+                  <>
+                    <Code className="h-4 w-4 mr-2" />
+                    Ver código
+                  </>
+                )}
+              </Button>
+            </div>
+            {showRaw ? (
+              <pre className="whitespace-pre-wrap text-sm font-mono bg-muted/50 p-4 rounded overflow-auto max-h-[600px]">
+                {document.content}
+              </pre>
+            ) : (
+              <div className="max-w-none">
+                <MarkdownRenderer content={document.content} />
+              </div>
+            )}
           </div>
         </div>
 
