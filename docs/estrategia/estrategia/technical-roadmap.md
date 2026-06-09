@@ -187,11 +187,12 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 - Sistema de jobs asíncronos con Celery
 - Agentes LLM para análisis de documentos
 - Sistema de metadata de gaps (tipo, severidad, rol afectado, contexto)
-- Sistema de agrupación por tema y similitud semántica
-- Metadata de sesiones (tema, subtema, prioridad)
+- Sistema de agrupación por tema (tags deterministas)
 - Dashboard de gaps detectados con filtros
 
 **Nota**: El sistema de jobs asíncronos (Celery) se implementa en este hito porque las fases de detección y agrupación requieren ejecución de tareas pesadas de LLM (gap_detection, vector_sync) que no pueden bloquear el servidor principal. Según ADR-004, se usa Celery con Redis como broker para jobs efímeros con retry strategy y backoff exponencial.
+
+**Nota**: El workflow usa proceso asíncrono sin sesiones según decisión de diseño (ver 5-phase-workflow.md). La agrupación por similitud semántica se pospone a POST-MVP.
 
 **Features Asociados**:
 
@@ -206,7 +207,7 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 - Agentes LLM detectan gaps en documentos de prueba
 - Gaps detectados tienen metadata completa
 - Sistema agrupa gaps por tema correctamente
-- Dashboard muestra gaps y sesiones pendientes
+- Dashboard muestra gaps pendientes
 
 **Dependencias**: Hito 2 (API REST y MCP Server)
 
@@ -216,15 +217,18 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 
 ### Hito 5: Implementación de Fases Resolución y Verificación
 
-**Objetivo**: Implementar resolución interactiva y verificación automática
+**Objetivo**: Implementar resolución asíncrona de gaps y verificación automática
 
 **Componentes**:
 
-- Interfaz de sesión interactiva con agentes LLM
+- Job asíncrono para verificación de respuestas
 - Metadata de respuestas (quién, cuándo, calidad, fuentes)
 - Sistema de verificación automática de consistencia
 - Metadata de verificación (confianza, gaps nuevos, contradicciones)
 - Detección de contradicciones entre respuestas
+- API endpoints para responder gaps individualmente
+
+**Nota**: El workflow usa proceso asíncrono sin sesiones según decisión de diseño (ver 5-phase-workflow.md). Los usuarios responden gaps individualmente vía API, y las respuestas se verifican automáticamente mediante jobs.
 
 **Features Asociados**:
 
@@ -233,10 +237,11 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 
 **Criterios de Completitud**:
 
-- Sesiones interactivas permiten responder gaps
+- API endpoints permiten responder gaps individualmente
 - Respuestas tienen metadata completa
-- Sistema verifica consistencia de respuestas
+- Job asíncrono verifica consistencia de respuestas
 - Contradicciones se detectan correctamente
+- Sistema encola verificación automáticamente al responder gaps
 
 **Dependencias**: Hito 4 (Detección y Agrupación)
 
@@ -250,10 +255,14 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 
 **Componentes**:
 
-- Sistema de aplicación automática con aprobación
-- Diff viewer para revisar cambios antes de aplicar
+- Job asíncrono para generación de propuestas
+- Job asíncrono para aplicación de propuestas
+- Sistema de aprobación de propuestas
+- Diff viewer para revisión de cambios antes de aplicar
 - Versioning automático de documentos
 - Rollback automático si se detectan errores
+
+**Nota**: El workflow usa proceso asíncrono sin sesiones según decisión de diseño (ver 5-phase-workflow.md). Las propuestas se generan automáticamente cuando gaps son verificados con alta confianza, y se aplican automáticamente tras aprobación humana. Este flujo se alinea con los skills actions-proposal-mcp (generación) y document-editing-mcp (aplicación).
 
 **Features Asociados**:
 
@@ -263,10 +272,12 @@ Estos hitos secuenciales implementan el ciclo de 5 fases con recursos MVP Bootst
 
 **Criterios de Completitud**:
 
-- Sistema genera diff de cambios correctamente
+- Job proposal_generation genera propuestas automáticamente al verificar gaps
+- Job proposal_application aplica propuestas aprobadas
+- Sistema de aprobación permite revisar y aprobar/rechazar propuestas
 - Diff viewer permite revisar cambios antes de aplicar
 - Versioning crea snapshots antes de cada UPDATE
-- Rollback restaura snapshots correctamente
+- Rollback restaura snapshots correctamente si hay errores
 
 **Dependencias**: Hito 5 (Resolución y Verificación)
 

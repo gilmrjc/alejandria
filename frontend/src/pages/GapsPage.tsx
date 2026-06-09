@@ -25,6 +25,10 @@ export function GapsPage() {
     navigate(`/gaps/${slug}`);
   };
 
+  const handleDocumentClick = (documentSlug: string) => {
+    navigate(`/documents/${documentSlug}`);
+  };
+
   const filteredGaps = gaps.filter((gap) =>
     gap.question.toLowerCase().includes(search.toLowerCase())
   );
@@ -46,6 +50,7 @@ export function GapsPage() {
         gaps={filteredGaps}
         loading={loading}
         onGapClick={handleGapClick}
+        onDocumentClick={handleDocumentClick}
       />
     </div>
   );

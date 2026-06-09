@@ -7,7 +7,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from shared.db.models import Gap
+from shared.db.models import Gap, GapDocumentReference
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class GapService:
 
         Args:
             document_id: Document ID
-            gap_data: Gap data dictionary with question, context_missing, priority, role_affected
+            gap_data: Gap data dictionary with question, context_missing, priority, role_affected, document_ids
 
         Returns:
             Created Gap instance
@@ -71,12 +71,47 @@ class GapService:
             priority=priority,
             context_missing=gap_data.get("context_missing"),
             role_affected=gap_data.get("role_affected"),
+            answer=gap_data.get("answer"),
             status="pending",
         )
 
         self.session.add(gap)
         self.session.commit()
         self.session.refresh(gap)
+
+        # Create gap-document references if document_ids provided
+        document_ids = gap_data.get("document_ids", [])
+        if document_ids:
+            from shared.db.models import Document
+
+            # Verify all documents exist
+            docs = (
+                self.session.execute(
+                    select(Document).where(
+                        Document.id.in_([uuid.UUID(did) for did in document_ids])
+                    )
+                )
+                .scalars()
+                .all()
+            )
+
+            if len(docs) != len(document_ids):
+                logger.warning(
+                    f"Some document_ids not found for gap {gap.id}, skipping references"
+                )
+            else:
+                # Create gap-document references
+                for ref_doc in docs:
+                    gdr = GapDocumentReference(
+                        gap_id=gap.id,
+                        document_id=ref_doc.id,
+                    )
+                    self.session.add(gdr)
+
+                self.session.commit()
+                logger.info(
+                    f"Created {len(docs)} document references for gap {gap.id}"
+                )
 
         logger.info(f"Created gap {gap.id} for document {document_id}")
         return gap

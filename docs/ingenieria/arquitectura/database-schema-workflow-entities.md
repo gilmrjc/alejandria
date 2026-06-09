@@ -57,17 +57,19 @@ Preguntas identificadas durante la fase de detección que requieren resolución.
 - `question`: Texto de la pregunta detectada
 - `priority`: Prioridad del gap (critical, high, medium, low)
 - `status`: Estado del gap (pending, responded, rejected)
-- `answer`: Respuesta proporcionada por usuario (NULL si pendiente)
-- `answered_at`: Timestamp de respuesta (NULL si pendiente)
+- `answer`: Respuesta pre-llenada por el LLM al detectar el gap (sugerencia), o respuesta confirmada por el usuario. NULL si el LLM no pudo generar sugerencia.
+- `answered_at`: Timestamp de confirmación por usuario (NULL si pendiente o solo sugerencia)
+- `answered_by`: FK UUID al usuario que confirmó la respuesta (NULL = solo sugerencia del LLM, UUID = usuario confirmó)
 
 **Relaciones**:
 
 - FK a `documents` (CASCADE DELETE)
+- FK a `users` en `answered_by` (SET NULL on delete)
 
 **Estados de gap**:
 
-- `pending`: Pendiente de respuesta
-- `responded`: Respondido por usuario
+- `pending`: Gap detectado, puede tener `answer` pre-llenado por el LLM como sugerencia
+- `responded`: Usuario confirmó o modificó la respuesta (`answered_by` y `answered_at` quedan seteados)
 - `rejected`: Rechazado por usuario (no es un gap real)
 
 ### tags

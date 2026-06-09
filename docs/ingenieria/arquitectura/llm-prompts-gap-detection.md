@@ -82,6 +82,7 @@ Analyze the following document for gaps, inconsistencies, and missing informatio
 For each gap identified, provide:
 - Question: A clear, specific question about the missing information
 - Context missing: Description of what information is missing
+- Answer: A suggested answer based on the document content and related documents found via `search_similar_documents`. If insufficient context is available, provide a partial answer or indicate where to look.
 - Type: Type of gap (implementation, clarification, consistency, prerequisite)
 - Severity: Impact level (low, medium, high, critical)
 - Role affected: Who needs this information (developer, architect, product, etc.)
@@ -92,6 +93,7 @@ Return a JSON array of gaps with the following structure:
   {
     "question": "string",
     "context_missing": "string",
+    "answer": "string (suggested answer pre-filled by LLM using document context and related documents)",
     "type": "implementation|clarification|consistency|prerequisite",
     "severity": "low|medium|high|critical",
     "role_affected": "developer|architect|product|stakeholder|other"
@@ -119,6 +121,7 @@ Content: "The system uses JWT tokens for authentication. Tokens expire after 8 h
   {
     "question": "How are JWT tokens generated and validated?",
     "context_missing": "Missing information about token generation algorithm, secret key management, and validation process",
+    "answer": "Based on the document, the system uses JWT with HS256 signing. Token generation happens at /auth/login and validation uses the shared secret from environment variables.",
     "type": "implementation",
     "severity": "high",
     "role_affected": "developer"
@@ -126,6 +129,7 @@ Content: "The system uses JWT tokens for authentication. Tokens expire after 8 h
   {
     "question": "What happens when a token expires? Is there a refresh mechanism?",
     "context_missing": "Missing information about token refresh flow and user experience on expiration",
+    "answer": "The document does not specify a refresh mechanism. Recommend checking related auth documentation or implementing a /auth/refresh endpoint following OAuth2 patterns.",
     "type": "implementation",
     "severity": "medium",
     "role_affected": "developer"
@@ -147,6 +151,7 @@ Content: "Services communicate via REST APIs. Database is PostgreSQL."
   {
     "question": "How is service discovery implemented?",
     "context_missing": "Missing information about how services find and communicate with each other",
+    "answer": "No service discovery mechanism is documented. Common approaches include Consul, Kubernetes DNS, or a service registry. See related infrastructure documentation for the chosen approach.",
     "type": "implementation",
     "severity": "high",
     "role_affected": "architect"
@@ -154,6 +159,7 @@ Content: "Services communicate via REST APIs. Database is PostgreSQL."
   {
     "question": "What is the data consistency strategy across services?",
     "context_missing": "Missing information about transaction management and data synchronization",
+    "answer": "With PostgreSQL as the single database, consistency can be maintained via database transactions. If moving to separate databases per service, Saga pattern or two-phase commit would be needed.",
     "type": "consistency",
     "severity": "high",
     "role_affected": "architect"

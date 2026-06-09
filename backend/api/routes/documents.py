@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from shared.auth.jwt import get_current_user
 from shared.db.models import Document, DocumentSnapshot, Organization, Project, User
-from shared.db.session import get_db_session
+from shared.db.session import get_db_dependency
 from shared.schemas.document import (
     DocumentCreate,
     DocumentListItem,
@@ -23,7 +23,7 @@ from shared.schemas.document import (
 )
 from shared.utils.pagination import apply_pagination, build_pagination_response
 
-SessionDep = Annotated[Session, Depends(get_db_session)]
+SessionDep = Annotated[Session, Depends(get_db_dependency)]
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -74,7 +74,7 @@ def acquire_document_lock(
 @router.post("", response_model=DocumentResponse, status_code=status.HTTP_201_CREATED)
 def create_document(
     document_data: DocumentCreate,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> Document:
     """
@@ -154,7 +154,7 @@ def create_document(
 @router.get("/slug/{slug}", response_model=DocumentResponse)
 def get_document_by_slug(
     slug: str,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
 ) -> Document:
     """Get a document by slug."""
     document = session.execute(
@@ -172,7 +172,7 @@ def get_document_by_slug(
 @router.get("/{document_id}", response_model=DocumentResponse)
 def get_document(
     document_id: uuid.UUID,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
 ) -> Document:
     """Get a document by ID."""
     document = session.execute(
@@ -189,7 +189,7 @@ def get_document(
 
 @router.get("", response_model=DocumentListResponse)
 def list_documents(
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     page: int = Query(default=1, ge=1, description="Page number"),
     per_page: int = Query(default=25, ge=1, le=100, description="Items per page"),
     updated_after: datetime | None = Query(  # noqa: B008 - FastAPI pattern for optional query params with defaults
@@ -241,7 +241,7 @@ def list_documents(
 def update_document_by_slug(
     slug: str,
     document_data: DocumentUpdate,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> Document:
     """
@@ -288,7 +288,7 @@ def update_document_by_slug(
 def update_document(
     document_id: uuid.UUID,
     document_data: DocumentUpdate,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> Document:
     """
@@ -324,7 +324,7 @@ def update_document(
 @router.delete("/slug/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_document_by_slug(
     slug: str,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> None:
     """
@@ -350,7 +350,7 @@ def delete_document_by_slug(
 @router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_document(
     document_id: uuid.UUID,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> None:
     """
@@ -376,7 +376,7 @@ def delete_document(
 @router.get("/slug/{slug}/snapshots", response_model=dict)
 def list_document_snapshots_by_slug(
     slug: str,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     page: int = Query(default=1, ge=1, description="Page number"),
     per_page: int = Query(default=25, ge=1, le=100, description="Items per page"),
 ) -> dict:
@@ -407,7 +407,9 @@ def list_document_snapshots_by_slug(
         {
             "id": snap.id,
             "document_id": snap.document_id,
-            "content": snap.new_content,
+            "old_content": snap.old_content,
+            "new_content": snap.new_content,
+            "diff_type": snap.diff_type,
             "created_at": snap.created_at,
             "created_by": snap.created_by,
         }
@@ -420,7 +422,7 @@ def list_document_snapshots_by_slug(
 @router.get("/{document_id}/snapshots", response_model=dict)
 def list_document_snapshots(
     document_id: uuid.UUID,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     page: int = Query(default=1, ge=1, description="Page number"),
     per_page: int = Query(default=25, ge=1, le=100, description="Items per page"),
 ) -> dict:
@@ -451,7 +453,9 @@ def list_document_snapshots(
         {
             "id": snap.id,
             "document_id": snap.document_id,
-            "content": snap.new_content,
+            "old_content": snap.old_content,
+            "new_content": snap.new_content,
+            "diff_type": snap.diff_type,
             "created_at": snap.created_at,
             "created_by": snap.created_by,
         }
@@ -467,7 +471,7 @@ def list_document_snapshots(
 def restore_snapshot_by_slug(
     slug: str,
     snapshot_id: uuid.UUID,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> Document:
     """
@@ -523,7 +527,7 @@ def restore_snapshot_by_slug(
 def restore_snapshot(
     document_id: uuid.UUID,
     snapshot_id: uuid.UUID,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> Document:
     """
@@ -562,6 +566,36 @@ def restore_snapshot(
     document.updated_by = current_user.id
 
     # Commit (middleware will create snapshot of current state)
+    session.commit()
+    session.refresh(document)
+
+    return document
+
+
+@router.post("/{document_id}/rollback", response_model=DocumentResponse)
+def rollback_document(
+    document_id: uuid.UUID,
+    session: SessionDep,
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> Document:
+    """
+    Rollback document to the latest snapshot.
+
+    Side effects:
+    - Creates snapshot of current state before rollback
+    """
+    from shared.services.rollback_service import RollbackService
+
+    # Acquire pessimistic lock
+    document = acquire_document_lock(session, document_id)
+
+    # Use RollbackService
+    rollback_service = RollbackService(session=session)
+    document = rollback_service.rollback_to_latest(document_id)
+
+    # Update metadata
+    document.updated_by = current_user.id
+
     session.commit()
     session.refresh(document)
 

@@ -66,8 +66,7 @@ Este skill utiliza las siguientes herramientas MCP de Alejandria:
 
 - **`read_document`**: Leer el contenido del documento desde la base de datos (usa document_slug)
 - **`list_gaps`**: Obtener gaps existentes para un documento (usa document_slug)
-- **`create_gap`**: Crear nuevos gaps identificados (usa document_slug, genera gap_slug automáticamente)
-- **`create_tag`**: Crear tags para agrupación temática (genera tag_slug automáticamente)
+- **`create_gap`**: Crear nuevos gaps identificados (usa document_slug, genera gap_slug automáticamente). Acepta opcionalmente `document_ids` (JSON string list) para guardar referencias a documentos usados en la generación del gap
 - **`assign_tag_to_gap`**: Asignar tags a gaps para agrupación (usa gap_slug y tag_slug)
 - **`list_gaps_by_tag`**: Listar gaps por tag para verificación (usa tag_slug)
 - **`search_similar_documents`**: Buscar documentos similares para investigación de referencias
@@ -85,7 +84,7 @@ El proceso termina cuando:
 - Se ha clasificado el documento y determinado roles funcionales y perspectivas
 - Se han evaluado todos los gaps previos actualizando sus estados según corresponda
 - Se han validado respuestas y consistencia cruzada para cada rol funcional (mínimo 2-3 roles)
-- Se han investigado documentos similares usando `search_similar_documents` para cada rol funcional
+- Se han investigado documentos similares usando `search_similar_documents` para cada rol funcional (guardando los document_ids usados para pasarlos a create_gap)
 - Se han identificado nuevos gaps con deduplicación contra existentes aplicando preguntas clave usando `create_gap`
 - Se han agrupado gaps temáticamente usando `create_tag` y `assign_tag_to_gap`
 - Se ha calificado el documento (1-10) con desglose por criterios
@@ -98,8 +97,8 @@ El proceso termina cuando:
 2. **Preparación y Clasificación**: Usar `read_document` para leer el documento, determinar tipo, rol funcional principal, y perspectivas (ver `reference/classification.md`)
 3. **Evaluación de Gaps Previos**: Si existen gaps previos, validar su estado, buscar respuestas, y actualizar según corresponda
 4. **Validación de Respuestas y Consistencia**: Para cada rol funcional (mínimo 2-3), validar respuestas existentes y consistencia cruzada entre fuentes
-5. **Investigación de Referencias**: Para cada rol funcional, usar `search_similar_documents` para revisar documentos similares y documentar hallazgos
-6. **Identificación de Contexto Faltante**: Para cada rol funcional, identificar contexto faltante aplicando preguntas clave (cómo/por qué/qué/cuándo/quién/dónde) y crear gaps usando `create_gap`
+5. **Investigación de Referencias**: Para cada rol funcional, usar `search_similar_documents` para revisar documentos similares, documentar hallazgos y guardar los document_ids para usarlos al crear gaps
+6. **Identificación de Contexto Faltante**: Para cada rol funcional, identificar contexto faltante aplicando preguntas clave (cómo/por qué/qué/cuándo/quién/dónde) y crear gaps usando `create_gap` (pasando `document_ids` si se usaron documentos de referencia)
 7. **Agrupación de Gaps**: Crear tags usando `create_tag` y asignarlos a gaps usando `assign_tag_to_gap` para agrupación temática
 8. **Evaluación de Calidad y Decisión de Adición de Gaps**: Calificar el documento (1-10) y decidir si los gaps deben agregarse
 9. **Revisión Final**: Verificar cobertura multi-rol, consistencia de perspectiva dual, contradicciones, y criterios de terminación
@@ -140,7 +139,7 @@ Invoca este skill al revisar documentos almacenados en Alejandria para generar p
 3. Evaluación de Gaps Previos - Validar estado de gaps existentes y actualizar según corresponda
 4. Validación de Respuestas y Consistencia - Para cada rol funcional, validar respuestas y consistencia cruzada
 5. Investigación de Referencias - Para cada rol funcional, usar search_similar_documents para revisar documentos similares
-6. Identificación de Contexto Faltante - Para cada rol funcional, identificar contexto faltante con preguntas clave y crear gaps usando create_gap
+6. Identificación de Contexto Faltante - Para cada rol funcional, identificar contexto faltante con preguntas clave y crear gaps usando create_gap (pasando document_ids si se usaron documentos de referencia)
 7. Agrupación de Gaps - Crear tags y asignarlos a gaps para agrupación temática
 8. Evaluación de Calidad y Decisión - Calificar documento y decidir adición de gaps
 9. Revisión Final - Verificar cobertura multi-rol, consistencia y criterios de terminación

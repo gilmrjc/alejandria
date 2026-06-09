@@ -10,10 +10,10 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from shared.config.settings import settings
-from shared.db.session import get_db_session
+from shared.db.session import get_db_dependency
 from shared.schemas.common import HealthCheckResponse, ServiceStatus
 
-SessionDep = Annotated[Session, Depends(get_db_session)]
+SessionDep = Annotated[Session, Depends(get_db_dependency)]
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -89,7 +89,7 @@ async def check_ollama() -> ServiceStatus:
 
 
 @router.get("", response_model=HealthCheckResponse)
-async def health_check(session: Annotated[Session, Depends(get_db_session)]) -> dict:
+async def health_check(session: SessionDep) -> dict:
     """
     Comprehensive health check for all services.
 

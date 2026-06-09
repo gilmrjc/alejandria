@@ -339,6 +339,9 @@ class Gap(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
     answer: Mapped[str | None] = mapped_column(Text, nullable=True)
     answered_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    answered_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     role_affected: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     __table_args__ = (
@@ -353,6 +356,9 @@ class Gap(Base, TimestampMixin):
 
     # Relationships
     document: Mapped["Document"] = relationship("Document", back_populates="gaps")
+    answered_by_user: Mapped[Optional["User"]] = relationship(
+        "User", foreign_keys=[answered_by]
+    )
 
 
 class Tag(Base, TimestampMixin):
@@ -387,6 +393,23 @@ class GapTag(Base, TimestampMixin):
     )
     tag_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True
+    )
+
+
+class GapDocumentReference(Base, TimestampMixin):
+    """Many-to-many: Gaps and documents used as references for gap generation."""
+
+    __tablename__ = "gap_document_references"
+
+    gap_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("gaps.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("documents.id", ondelete="CASCADE"),
+        primary_key=True,
     )
 
 

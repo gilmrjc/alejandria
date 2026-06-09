@@ -39,8 +39,11 @@ def question_generation_task(self, gap_id: str, answer: str):
         gap_uuid = uuid.UUID(gap_id)
 
         # 1. Read gap using GapService
-        gap_service = GapService()
-        gap = gap_service.get_gap(gap_uuid)
+        from shared.db.session import get_db_session, get_db_session_context
+
+        with get_db_session_context() as session:
+            gap_service = GapService(session=session)
+            gap = gap_service.get_gap(gap_uuid)
 
         if not gap:
             logger.error(f"Gap {gap_id} not found")

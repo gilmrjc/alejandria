@@ -218,7 +218,8 @@ Esta tool crea un registro de gap detectado por el Agente 1 durante la fase de d
   "question": "¿Por qué se eligió esta arquitectura?",
   "context_missing": "No se justifica la elección de arquitectura de 5 fases",
   "priority": "high",
-  "role_affected": "Senior Developer"
+  "role_affected": "Senior Developer",
+  "answer": "Según el ADR-002, la arquitectura de 5 fases fue elegida para..." 
 }
 ```
 
@@ -232,6 +233,7 @@ Esta tool crea un registro de gap detectado por el Agente 1 durante la fase de d
   "context_missing": "No se justifica la elección de arquitectura de 5 fases",
   "priority": "high",
   "role_affected": "Senior Developer",
+  "answer": "Según el ADR-002...",
   "status": "pending",
   "created_at": "2026-05-22T12:00:00Z"
 }
@@ -239,7 +241,7 @@ Esta tool crea un registro de gap detectado por el Agente 1 durante la fase de d
 
 **Entidades Manipuladas**: Gap (creación)
 
-**Uso**: El Agente 1 (detección) crea gaps cuando detecta información faltante en el documento.
+**Uso**: El Agente 1 (detección) crea gaps cuando detecta información faltante en el documento. El campo `answer` es opcional y contiene una sugerencia de respuesta generada por el LLM usando contexto de documentos relacionados (vía `search_similar_documents`). El gap siempre se crea con `status=pending` independientemente de si hay sugerencia.
 
 **Errores Específicos**: DocumentNotFoundError, ValidationError
 
@@ -247,13 +249,13 @@ Esta tool crea un registro de gap detectado por el Agente 1 durante la fase de d
 
 ### answer_gap
 
-Esta tool registra una respuesta proporcionada por el usuario para un gap específico. Es usada durante sesiones interactivas de resolución.
+Esta tool registra una respuesta confirmada por el usuario para un gap específico. Cambia el estado a `responded`.
 
 **Parámetros**:
 
 ```json
 {
-  "gap_id": "uuid",
+  "gap_slug": "gap-abc123",
   "answer": "ADR-002 justifica cada fase del pipeline..."
 }
 ```
@@ -266,15 +268,16 @@ Esta tool registra una respuesta proporcionada por el usuario para un gap espec�
   "question": "¿Por qué se eligió esta arquitectura?",
   "answer": "ADR-002 justifica cada fase...",
   "status": "responded",
-  "answered_at": "2026-05-22T14:00:00Z"
+  "answered_at": "2026-05-22T14:00:00Z",
+  "answered_by": null
 }
 ```
 
-**Side Effects**: Inicia verificación de respuestas cuando todos los gaps de un grupo han sido respondidos.
+**Side Effects**: Al responder via API REST (PUT /gaps/{id}), se encola `question_generation_task` para vectorizar la respuesta en Qdrant y hacerla disponible para búsqueda semántica y generación de propuestas.
 
-**Entidades Manipuladas**: Gap (actualización)
+**Entidades Manipuladas**: Gap (actualización: answer, status, answered_at, answered_by)
 
-**Uso**: El Agente 3 (resolución) registra respuestas proporcionadas por el usuario durante sesiones interactivas.
+**Uso**: El usuario (via API REST o skill gap-resolution-mcp) confirma o modifica la sugerencia pre-llenada. El campo `answered_by` queda con el UUID del usuario autenticado cuando se usa la API REST.
 
 **Errores Específicos**: GapNotFoundError, GapAlreadyAnsweredError
 

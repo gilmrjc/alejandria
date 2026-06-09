@@ -1,15 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { History, RotateCcw } from 'lucide-react';
+import { History, RotateCcw, GitCompare } from 'lucide-react';
 import type { DocumentSnapshot } from '@/types/document';
 
 interface SnapshotHistoryProps {
   snapshots: DocumentSnapshot[];
   loading: boolean;
   onRestore: (snapshotId: string) => void;
+  onCompare?: (snapshotId: string) => void;
 }
 
-export function SnapshotHistory({ snapshots, loading, onRestore }: SnapshotHistoryProps) {
+export function SnapshotHistory({ snapshots, loading, onRestore, onCompare }: SnapshotHistoryProps) {
   if (loading) {
     return (
       <Card>
@@ -54,14 +55,26 @@ export function SnapshotHistory({ snapshots, loading, onRestore }: SnapshotHisto
                     </p>
                   )}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onRestore(snapshot.id)}
-                  className="ml-2"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-1 ml-2">
+                  {onCompare && snapshot.old_content && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onCompare(snapshot.id)}
+                      title="Comparar con versión anterior"
+                    >
+                      <GitCompare className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onRestore(snapshot.id)}
+                    title="Restaurar esta versión"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

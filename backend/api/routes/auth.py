@@ -14,13 +14,13 @@ from shared.auth.jwt import (
 )
 from shared.config.settings import settings
 from shared.db.models import Organization, User
-from shared.db.session import get_db_session
+from shared.db.session import get_db_dependency
 from shared.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
 from shared.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-SessionDep = Annotated[Session, Depends(get_db_session)]
+SessionDep = Annotated[Session, Depends(get_db_dependency)]
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -29,7 +29,7 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 @router.post("/login", response_model=TokenResponse)
 def login(
     login_data: UserLogin,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
 ) -> dict:
     """
     Authenticate user and return JWT access token.
@@ -90,7 +90,7 @@ def get_current_user_info(
 )
 def register(
     user_data: UserCreate,
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
 ) -> User:
     """
     Register a new user and create personal organization.

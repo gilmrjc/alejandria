@@ -35,8 +35,9 @@ Flujo completo del sistema desde la creación de un documento hasta su actualiza
    → Sistema revisa campo de calificación del documento
    → Si rating >= 9: no se procesa (documento suficientemente completo)
    → Si rating < 9: Agente LLM analiza documento buscando gaps contextuales
-   → Genera gaps específicos y accionables con estado: pending
-   → Gaps se almacenan en base de datos
+   → Para cada gap, LLM llama search_similar_documents para buscar contexto relacionado
+   → Genera gaps específicos y accionables con estado: pending y answer pre-llenado (sugerencia)
+   → Gaps se almacenan en base de datos (answer=sugerencia del LLM, answered_by=NULL)
    → API encola job gap_grouping (Fase 2: Agrupación)
 
 3. gap_grouping corre en background (Fase 2: Agrupación)
@@ -48,11 +49,12 @@ Flujo completo del sistema desde la creación de un documento hasta su actualiza
 
 4. Usuario revisa gaps en su propio tiempo (Fase 3: Resolución)
    → Usuario navega a sección de Gaps en interfaz
-   → Cada gap presentado con caja de respuesta pre-rellenada (sugerencia de agente)
+   → Cada gap presentado con caja de respuesta pre-rellenada desde campo answer (sugerencia generada en paso 2)
    → Usuario tiene 3 opciones:
-     * Aceptar sugerencia tal como está → gap estado: responded
-     * Modificar sugerencia → gap estado: responded
+     * Aceptar sugerencia tal como está → gap estado: responded, answered_by=user.id
+     * Modificar sugerencia → gap estado: responded, answered_by=user.id
      * Rechazar con motivo (obsoleto, no aplica, no es gap) → gap estado: rejected
+   → Al responder via API REST: se encola question_generation_task para vectorizar la respuesta en Qdrant
    → Interacción completamente asíncrona, mediada por plataforma
    → No hay sesión interactiva en tiempo real con agente
 

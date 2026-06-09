@@ -36,11 +36,22 @@ class GapUpdate(BaseModel):
     )
 
 
+class ReferenceDocument(BaseModel):
+    """Schema for reference document."""
+
+    id: UUID = Field(description="Document ID")
+    slug: str = Field(description="Document slug")
+    title: str = Field(description="Document title")
+    filename: str = Field(description="Document filename")
+
+
 class GapResponse(BaseModel):
     """Schema for gap response."""
 
     id: UUID = Field(description="Gap ID")
     document_id: UUID = Field(description="Document ID")
+    document_slug: str | None = Field(None, description="Document slug")
+    document_title: str | None = Field(None, description="Document title")
     slug: str = Field(description="Gap slug")
     question: str = Field(description="Gap question")
     priority: str = Field(description="Gap priority level")
@@ -51,8 +62,14 @@ class GapResponse(BaseModel):
     answered_at: datetime | None = Field(
         None, description="Timestamp when gap was answered"
     )
+    answered_by: UUID | None = Field(
+        None, description="UUID of user who confirmed the answer (NULL = LLM suggestion)"
+    )
     created_at: datetime = Field(description="Creation timestamp")
     updated_at: datetime = Field(description="Last update timestamp")
+    reference_documents: list[ReferenceDocument] = Field(
+        default=[], description="Reference documents used for this gap"
+    )
 
     model_config = {"from_attributes": True}
 
@@ -62,6 +79,8 @@ class GapListItem(BaseModel):
 
     id: UUID = Field(description="Gap ID")
     document_id: UUID = Field(description="Document ID")
+    document_slug: str | None = Field(None, description="Document slug")
+    document_title: str | None = Field(None, description="Document title")
     slug: str = Field(description="Gap slug")
     question: str = Field(description="Gap question")
     priority: str = Field(description="Gap priority level")

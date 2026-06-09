@@ -35,14 +35,22 @@ celery_app.conf.update(
     # Worker configuration
     worker_prefetch_multiplier=1,  # Process one task at a time
     worker_disable_rate_limits=True,
-    # celery_once configuration for distributed locks
-    once={
-        "backend": "celery_once.backends.redis.Redis",
-        "settings": {
-            "url": settings.redis_url,
+    # Celery Beat schedule for periodic tasks
+    beat_schedule={
+        "proposal-generation-every-30-minutes": {
+            "task": "proposal_generation",
+            "schedule": 30.0 * 60,  # 30 minutes
         },
     },
 )
+
+# celery_once configuration for distributed locks (must be set separately)
+celery_app.conf.ONCE = {
+    "backend": "celery_once.backends.redis.Redis",
+    "settings": {
+        "url": settings.redis_url,
+    },
+}
 
 
 # Celery signal handlers for structured logging

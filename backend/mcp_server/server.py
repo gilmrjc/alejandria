@@ -6,6 +6,7 @@ according to mcp-tools-specification.md (ARC-036).
 """
 
 import contextlib
+import logging
 import os
 import uuid
 
@@ -13,10 +14,13 @@ from fastmcp import FastMCP
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
+logger = logging.getLogger(__name__)
+
 from shared.auth.api_key import validate_api_key
 from shared.db.models import (
     Document,
     Gap,
+    GapDocumentReference,
     GapTag,
     Organization,
     Project,
@@ -608,6 +612,8 @@ def create_gap(
     context_missing: str,
     priority: str = "medium",
     role_affected: str | None = None,
+    answer: str | None = None,
+    document_ids: str | None = None,
 ) -> dict:
     """
     Create a new gap for a document.
@@ -618,11 +624,15 @@ def create_gap(
         context_missing: Description of missing context
         priority: Gap priority (critical, high, medium, low)
         role_affected: Role affected by this gap
+        answer: Optional suggested answer pre-filled by LLM (status stays pending)
+        document_ids: Optional JSON string list of document UUIDs used as references for gap generation
 
 
     Returns:
         Created gap data
     """
+    import json
+
     session, should_close = get_authenticated_session()
     try:
         # Verify document exists by slug
@@ -654,12 +664,44 @@ def create_gap(
             context_missing=context_missing,
             priority=priority,
             role_affected=role_affected,
+            answer=answer,
             status="pending",
         )
 
         session.add(gap)
         session.commit()
         session.refresh(gap)
+
+        # Link gap to documents if provided
+        if document_ids:
+            # Parse JSON string to list
+            try:
+                doc_ids_list = json.loads(document_ids)
+            except json.JSONDecodeError:
+                # If not valid JSON, try comma-separated string
+                doc_ids_list = [s.strip() for s in document_ids.split(",")]
+
+            # Verify all documents exist
+            docs = (
+                session.execute(
+                    select(Document).where(Document.id.in_([uuid.UUID(did) for did in doc_ids_list]))
+                )
+                .scalars()
+                .all()
+            )
+
+            if len(docs) != len(doc_ids_list):
+                raise ValueError("One or more documents not found")
+
+            # Create gap-document references
+            for ref_doc in docs:
+                gdr = GapDocumentReference(
+                    gap_id=gap.id,
+                    document_id=ref_doc.id,
+                )
+                session.add(gdr)
+
+            session.commit()
 
         return {
             "id": str(gap.id),
@@ -670,8 +712,10 @@ def create_gap(
             "context_missing": gap.context_missing,
             "priority": gap.priority,
             "role_affected": gap.role_affected,
+            "answer": gap.answer,
             "status": gap.status,
             "created_at": gap.created_at.isoformat(),
+            "reference_document_count": len(doc_ids_list) if document_ids else 0,
         }
 
     finally:
@@ -720,6 +764,7 @@ def answer_gap(gap_slug: str, answer: str) -> dict:
             "answer": gap.answer,
             "status": gap.status,
             "answered_at": gap.answered_at.isoformat() if gap.answered_at else None,
+            "answered_by": str(gap.answered_by) if gap.answered_by else None,
         }
 
     finally:
@@ -1059,23 +1104,26 @@ def search_similar_documents(
     query: str,
     project_id: str,
     limit: int = 5,
+    use_hybrid: bool = True,
 ) -> dict:
     """
-    Search for similar documents using BM25 text search via Qdrant.
+    Search for similar documents using hybrid search (BM25 + semantic) or BM25 only.
 
-    Note: Semantic search (vector embeddings) is planned for future implementation.
-    Currently only BM25 full-text search is available.
+    When use_hybrid=True, combines BM25 keyword search with semantic vector search
+    using Reciprocal Rank Fusion (RRF) for better results.
 
     Args:
         query: Search query text
         project_id: UUID of the project to search within
         limit: Maximum number of results (default: 5)
+        use_hybrid: Whether to use hybrid search (default: True)
 
 
     Returns:
         List of similar documents with similarity scores
     """
-    from shared.vector.qdrant import QdrantClient
+    import asyncio
+    from shared.vector.qdrant import QdrantClient, generate_embedding
 
     session, should_close = get_authenticated_session()
     try:
@@ -1089,21 +1137,77 @@ def search_similar_documents(
         if not project:
             raise ValueError(f"Project {project_id} not found")
 
-        # Search in Qdrant using BM25 (text search)
-        # TODO: Add hybrid search with BM25 + semantic vectors when semantic
-        # search is implemented
         qdrant_client = QdrantClient()
-        collection_name = f"project_{project_id}"
+        collection_name = f"project_{project_id}_hybrid"
 
-        results = qdrant_client.search_similar(
-            collection_name=collection_name,
-            query_text=query,
-            limit=limit,
-            score_threshold=0.0,  # BM25 scores can be negative
-        )
+        results = []
+        search_type = "bm25"
+
+        # Check if we can use hybrid search (requires async context for embeddings)
+        can_use_hybrid = False
+        if use_hybrid:
+            try:
+                # Check if there's already a running event loop
+                asyncio.get_running_loop()
+                # If we're in an async context, we can't use asyncio.run()
+                logger.warning("Running in async context, falling back to BM25-only search")
+            except RuntimeError:
+                # No running loop, we can use asyncio.run
+                can_use_hybrid = True
+                logger.info("No running event loop, can use hybrid search")
+
+        if can_use_hybrid:
+            try:
+                # Try hybrid search (BM25 + semantic)
+                # Generate embedding for query
+                logger.info(f"Attempting hybrid search on collection: {collection_name}")
+                query_vector = asyncio.run(generate_embedding(query))
+                logger.info(f"Generated query embedding successfully")
+
+                # Attempt hybrid search
+                results = qdrant_client.search_hybrid(
+                    collection_name=collection_name,
+                    query_vector=query_vector,
+                    query_text=query,
+                    limit=limit,
+                )
+                search_type = "hybrid"
+                logger.info(f"Hybrid search returned {len(results)} results")
+            except Exception as e:
+                # Hybrid search failed, fallback to BM25 on hybrid collection
+                logger.warning(f"Hybrid search failed, falling back to BM25: {e}")
+                collection_name_hybrid = f"project_{project_id}_hybrid"
+                logger.info(f"Using BM25 fallback on collection: {collection_name_hybrid}")
+                results = qdrant_client.search_similar(
+                    collection_name=collection_name_hybrid,
+                    query_text=query,
+                    limit=limit,
+                    score_threshold=0.0,
+                )
+                search_type = "bm25"
+                logger.info(f"BM25 fallback returned {len(results)} results")
+        else:
+            # Use BM25 only on hybrid collection (documents are stored in hybrid collections)
+            collection_name_hybrid = f"project_{project_id}_hybrid"
+            logger.info(f"Using BM25 search on collection: {collection_name_hybrid}")
+            results = qdrant_client.search_similar(
+                collection_name=collection_name_hybrid,
+                query_text=query,
+                limit=limit,
+                score_threshold=0.0,
+            )
+            logger.info(f"BM25 search returned {len(results)} results")
+            search_type = "bm25"
 
         # Get document details for each result
-        document_ids = [r["id"] for r in results]
+        # Extract document_id from payload instead of parsing point ID
+        document_ids = []
+        for r in results:
+            payload = r.get("payload", {})
+            doc_id = payload.get("document_id")
+            if doc_id:
+                document_ids.append(doc_id)
+        
         documents = {}
         if document_ids:
             from shared.db.models import Document
@@ -1112,7 +1216,7 @@ def search_similar_documents(
                 session.execute(
                     select(Document).where(
                         Document.id.in_(
-                            [uuid.UUID(did.split("_")[0]) for did in document_ids]
+                            [uuid.UUID(did) for did in document_ids]
                         )
                     )
                 )
@@ -1124,24 +1228,29 @@ def search_similar_documents(
         # Format results
         formatted_results = []
         for result in results:
-            doc_id = result["id"].split("_")[0]  # Extract document ID from point ID
-            doc = documents.get(doc_id)
+            # Extract document_id from payload
+            payload = result.get("payload", {})
+            doc_id = payload.get("document_id")
+            doc = documents.get(doc_id) if doc_id else None
             if doc:
-                formatted_results.append(
-                    {
-                        "id": str(doc.id),
-                        "title": doc.title,
-                        "slug": doc.slug,
-                        "score": result["score"],
-                        "chunk_content": result["payload"].get("content", ""),
-                    }
-                )
+                result_data = {
+                    "id": str(doc.id),
+                    "title": doc.title,
+                    "slug": doc.slug,
+                    "score": result["score"],
+                    "chunk_content": result["payload"].get("content", ""),
+                }
+                # Add individual scores if hybrid search
+                if search_type == "hybrid":
+                    result_data["dense_score"] = result.get("dense_score", 0)
+                    result_data["sparse_score"] = result.get("sparse_score", 0)
+                formatted_results.append(result_data)
 
         return {
             "query": query,
             "results": formatted_results,
             "total": len(formatted_results),
-            "search_type": "bm25",  # Current implementation
+            "search_type": search_type,
         }
 
     finally:

@@ -8,7 +8,7 @@ export const proposalsService = {
   },
 
   async get(id: string): Promise<Proposal> {
-    const response = await api.get<Proposal>(`/proposals/${id}`);
+    const response = await api.get<Proposal>(`/proposals/${id}/view`);
     return response.data;
   },
 

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText } from 'lucide-react';
 import { ProposalActions } from '@/components/proposals/ProposalActions';
 import { proposalsService } from '@/services/proposals';
 import type { Proposal } from '@/types/proposal';
@@ -166,6 +166,53 @@ export function ProposalDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          {proposal.gaps && proposal.gaps.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Gaps relacionados ({proposal.gaps.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Pregunta</th>
+                        <th className="px-3 py-2 text-left font-medium">Estado</th>
+                        <th className="px-3 py-2 text-left font-medium">Prioridad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {proposal.gaps.map((gap) => (
+                        <tr
+                          key={gap.id}
+                          className="border-t hover:bg-accent/50 cursor-pointer transition-colors"
+                          onClick={() => navigate(`/gaps/${gap.slug}`)}
+                        >
+                          <td className="px-3 py-2 max-w-[200px] truncate" title={gap.question}>
+                            {gap.question}
+                          </td>
+                          <td className="px-3 py-2">
+                            <Badge variant="outline" className="text-xs">
+                              {gap.status}
+                            </Badge>
+                          </td>
+                          <td className="px-3 py-2">
+                            <Badge variant="outline" className="text-xs">
+                              {gap.priority}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

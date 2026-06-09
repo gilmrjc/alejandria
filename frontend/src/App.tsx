@@ -34,7 +34,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="documents" element={<DocumentsPage />} />
-            <Route path="documents/:id" element={<DocumentDetailPage />} />
+            <Route path="documents/:slug" element={<DocumentDetailPage />} />
             <Route path="gaps" element={<GapsPage />} />
             <Route path="gaps/:slug" element={<GapDetailPage />} />
             <Route path="proposals" element={<ProposalsPage />} />

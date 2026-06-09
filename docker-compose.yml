@@ -203,6 +203,33 @@ services:
     # Usa la red del sidecar de Tailscale
     network_mode: service:ts-celery-worker
 
+  # Celery beat for scheduled tasks
+  celery-beat:
+    image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+    container_name: alejandria-celery-beat
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_GRPC_URL=http://qdrant:6334
+    depends_on:
+      ts-celery-worker:
+        condition: service_started
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: ["uv", "run", "celery", "-A", "jobs.celery_app", "beat", "--loglevel=info"]
+    # Usa la red del sidecar de Tailscale
+    network_mode: service:ts-celery-worker
+
 volumes:
   postgres_data:
     driver: local

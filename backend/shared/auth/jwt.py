@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from shared.config.settings import settings
 from shared.db.models import User
-from shared.db.session import get_db_session
+from shared.db.session import get_db_dependency
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -22,7 +22,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # Type aliases for dependencies
-SessionDep = Annotated[Session, Depends(get_db_session)]
+SessionDep = Annotated[Session, Depends(get_db_dependency)]
 CredentialsDep = Annotated[HTTPAuthorizationCredentials, Depends(security)]
 OptionalCredentialsDep = Annotated[
     HTTPAuthorizationCredentials | None, Depends(HTTPBearer(auto_error=False))
@@ -118,7 +118,7 @@ def verify_token(token: str) -> TokenData:
 
 async def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
 ) -> User:
     """
     Get the current authenticated user from JWT token.
@@ -160,7 +160,7 @@ async def get_current_user_optional(
     credentials: Annotated[
         HTTPAuthorizationCredentials | None, Depends(HTTPBearer(auto_error=False))
     ],
-    session: Annotated[Session, Depends(get_db_session)],
+    session: SessionDep,
 ) -> User | None:
     """
     Get the current authenticated user if token is provided.

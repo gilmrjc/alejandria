@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from shared.db.models import Document
-from shared.db.session import get_db_session
+from shared.db.session import get_db_session, get_db_session_context
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,20 @@ class DocumentService:
         Args:
             session: Optional database session (creates new if not provided)
         """
-        self.session = session or next(get_db_session())
+        self.session = session
+        self._owns_session = session is None
+
+    def __enter__(self):
+        """Context manager entry."""
+        if self._owns_session:
+            self._context = get_db_session_context()
+            self.session = self._context.__enter__()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        if self._owns_session:
+            self._context.__exit__(exc_type, exc_val, exc_tb)
 
     def get_document(self, document_id: uuid.UUID) -> Document | None:
         """

@@ -1,31 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import { DocumentMetadata } from '@/components/documents/DocumentMetadata';
 import { SnapshotHistory } from '@/components/documents/SnapshotHistory';
+import { GapList } from '@/components/gaps/GapList';
+import { DiffViewer } from '@/components/diff/DiffViewer';
 import { documentsService } from '@/services/documents';
+import { gapsService } from '@/services/gaps';
 import type { Document, DocumentSnapshot } from '@/types/document';
+import type { Gap } from '@/types/gap';
 
 export function DocumentDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [document, setDocument] = useState<Document | null>(null);
   const [snapshots, setSnapshots] = useState<DocumentSnapshot[]>([]);
+  const [gaps, setGaps] = useState<Gap[]>([]);
   const [loading, setLoading] = useState(true);
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
+  const [gapsLoading, setGapsLoading] = useState(false);
+  const [comparingSnapshot, setComparingSnapshot] = useState<DocumentSnapshot | null>(null);
 
   useEffect(() => {
-    if (id) {
-      loadDocument(id);
-      loadSnapshots(id);
+    if (slug) {
+      loadDocument(slug);
+      loadSnapshots(slug);
+      loadGaps(slug);
     }
-  }, [id]);
+  }, [slug]);
 
-  const loadDocument = async (docId: string) => {
+  const loadDocument = async (docSlug: string) => {
     setLoading(true);
     try {
-      const data = await documentsService.get(docId);
+      const data = await documentsService.getBySlug(docSlug);
       setDocument(data);
     } catch (error) {
       console.error('Error loading document:', error);
@@ -34,10 +42,10 @@ export function DocumentDetailPage() {
     }
   };
 
-  const loadSnapshots = async (docId: string) => {
+  const loadSnapshots = async (docSlug: string) => {
     setSnapshotsLoading(true);
     try {
-      const data = await documentsService.getSnapshots(docId);
+      const data = await documentsService.getSnapshotsBySlug(docSlug);
       setSnapshots(data.items);
     } catch (error) {
       console.error('Error loading snapshots:', error);
@@ -46,15 +54,41 @@ export function DocumentDetailPage() {
     }
   };
 
-  const handleRestoreSnapshot = async (snapshotId: string) => {
-    if (!id) return;
+  const loadGaps = async (docSlug: string) => {
+    setGapsLoading(true);
     try {
-      await documentsService.restoreSnapshot(id, snapshotId);
-      // Reload document and snapshots
-      loadDocument(id);
-      loadSnapshots(id);
+      // Get document ID first to filter gaps by document_id
+      const doc = await documentsService.getBySlug(docSlug);
+      const data = await gapsService.list({ document_id: doc.id });
+      setGaps(data.items);
+    } catch (error) {
+      console.error('Error loading gaps:', error);
+    } finally {
+      setGapsLoading(false);
+    }
+  };
+
+  const handleRestoreSnapshot = async (snapshotId: string) => {
+    if (!slug) return;
+    try {
+      await documentsService.restoreSnapshotBySlug(slug, snapshotId);
+      // Reload document, snapshots, and gaps
+      loadDocument(slug);
+      loadSnapshots(slug);
+      loadGaps(slug);
     } catch (error) {
       console.error('Error restoring snapshot:', error);
+    }
+  };
+
+  const handleGapClick = (gapSlug: string) => {
+    navigate(`/gaps/${gapSlug}`);
+  };
+
+  const handleCompareSnapshot = (snapshotId: string) => {
+    const snapshot = snapshots.find(s => s.id === snapshotId);
+    if (snapshot && snapshot.old_content) {
+      setComparingSnapshot(snapshot);
     }
   };
 
@@ -87,6 +121,23 @@ export function DocumentDetailPage() {
         </div>
       </div>
 
+      {comparingSnapshot && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Comparando con snapshot del {new Date(comparingSnapshot.created_at).toLocaleString()}</h2>
+            <Button variant="ghost" size="sm" onClick={() => setComparingSnapshot(null)}>
+              <X className="h-4 w-4 mr-2" />
+              Cerrar comparación
+            </Button>
+          </div>
+          <DiffViewer
+            oldContent={comparingSnapshot.old_content}
+            newContent={comparingSnapshot.new_content}
+            filename={document.filename}
+          />
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <div className="border rounded-lg p-6 bg-background">
@@ -103,7 +154,12 @@ export function DocumentDetailPage() {
             snapshots={snapshots}
             loading={snapshotsLoading}
             onRestore={handleRestoreSnapshot}
+            onCompare={handleCompareSnapshot}
           />
+          <div className="border rounded-lg p-6 bg-background">
+            <h2 className="text-lg font-semibold mb-4">Gaps</h2>
+            <GapList gaps={gaps} loading={gapsLoading} onGapClick={handleGapClick} compact />
+          </div>
         </div>
       </div>
     </div>

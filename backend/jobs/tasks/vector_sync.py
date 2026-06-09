@@ -40,8 +40,8 @@ def vector_sync_task(self, document_id: str):
         doc_uuid = uuid.UUID(document_id)
 
         # 1. Read document using DocumentService
-        document_service = DocumentService()
-        document = document_service.get_document(doc_uuid)
+        with DocumentService() as document_service:
+            document = document_service.get_document(doc_uuid)
 
         if not document:
             logger.error(f"Document {document_id} not found")

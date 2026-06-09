@@ -109,14 +109,19 @@ Tu análisis debe enfocarse en:
 Para cada brecha identificada, proporciona:
 - Question: Una pregunta clara y específica sobre la información faltante
 - Context missing: Descripción de qué información está faltando
+- Answer: Una respuesta sugerida basada en el contenido del documento y documentos relacionados encontrados con las herramientas disponibles. Si no tienes suficiente información, déjala como una respuesta parcial o indicación de dónde buscar.
 - Type: Tipo de brecha (implementation, clarification, consistency, prerequisite)
 - Severity: Nivel de impacto (low, medium, high, critical)
 - Role affected: Quién necesita esta información (developer, architect, product, stakeholder, other)
+- Document IDs: Lista de IDs de documentos que usaste como referencia para generar la respuesta sugerida (obtenidos de search_similar_documents). Si no usaste documentos de referencia, usa una lista vacía [].
 
 IMPORTANTE: Devuelve SOLAMENTE un array JSON puro, sin código fences, sin markdown, sin texto adicional. El JSON debe ser válido y parseable directamente."""
 
         # Build user prompt
         user_prompt = f"""Analiza el siguiente documento para identificar brechas, inconsistencias e información faltante.
+
+=== INFORMACIÓN DEL PROYECTO ===
+- Project ID: {project_id}
 
 === INFORMACIÓN DEL DOCUMENTO ===
 - Título: {document_title}
@@ -142,27 +147,89 @@ Devuelve SOLAMENTE un array JSON puro de brechas con la siguiente estructura:
   {{
     "question": "string",
     "context_missing": "string",
+    "answer": "string (respuesta sugerida basada en el documento y contexto encontrado con herramientas)",
     "type": "implementation|clarification|consistency|prerequisite",
     "severity": "low|medium|high|critical",
-    "role_affected": "developer|architect|product|stakeholder|other"
+    "role_affected": "developer|architect|product|stakeholder|other",
+    "document_ids": ["uuid1", "uuid2"] (lista de IDs de documentos usados como referencia, o [] si no se usaron)
   }}
 ]
 
 IMPORTANTE: No uses código fences (```json), no agregues texto adicional, no uses markdown. Devuelve únicamente el JSON válido y parseable."""
 
-        logger.info("Sending prompt to LLM...")
+        # Search for relevant documents programmatically if tools are enabled
+        relevant_documents_context = ""
+        relevant_document_ids = []
+        
+        if use_tools and project_id:
+            logger.info("Searching for relevant documents programmatically...")
+            try:
+                from mcp_server.server import search_similar_documents
+                
+                # Search for documents related to the document title and key topics
+                # Extract key terms from document title for better search
+                import re
+                key_terms = re.findall(r'\b[A-Z]{2,}-\d{3}\b', document_content)  # Find document IDs like ARC-003
+                if not key_terms:
+                    # Fallback to words from title (remove common words)
+                    key_terms = [word for word in document_title.split() if len(word) > 3 and word.lower() not in ['the', 'and', 'for', 'with', 'alejandria']]
+                
+                search_queries = [document_title] + key_terms[:5]  # Use title + up to 5 key terms
+                
+                all_results = {}
+                for query in search_queries:
+                    try:
+                        logger.info(f"Searching for query: '{query}'")
+                        result = search_similar_documents(
+                            query=query,
+                            project_id=project_id,
+                            limit=3,
+                            use_hybrid=True
+                        )
+                        logger.info(f"Search result for '{query}': total={result.get('total', 0)}, results_count={len(result.get('results', []))}")
+                        for doc in result.get("results", []):
+                            doc_id = doc.get("id")
+                            if doc_id and doc_id not in all_results:
+                                all_results[doc_id] = doc
+                                logger.info(f"Added document {doc_id}: {doc.get('title', 'Unknown')}")
+                    except Exception as e:
+                        logger.warning(f"Search failed for query '{query}': {e}", exc_info=True)
+                
+                # Build context from relevant documents
+                if all_results:
+                    relevant_document_ids = list(all_results.keys())
+                    relevant_documents_context = "\n\n=== DOCUMENTOS RELACIONADOS DISPONIBLES ===\n"
+                    for doc_id, doc in all_results.items():
+                        relevant_documents_context += f"\nDocumento ID: {doc_id}\n"
+                        relevant_documents_context += f"Título: {doc.get('title', 'Unknown')}\n"
+                        relevant_documents_context += f"Slug: {doc.get('slug', 'unknown')}\n"
+                        relevant_documents_context += f"Contenido (snippet): {doc.get('chunk_content', '')[:500]}...\n"
+                        relevant_documents_context += "-" * 50 + "\n"
+                    
+                    logger.info(f"Found {len(relevant_document_ids)} relevant documents to include in context")
+                else:
+                    logger.info("No relevant documents found in search")
+            except Exception as e:
+                logger.warning(f"Failed to search for relevant documents: {e}", exc_info=True)
+        
+        # Build enhanced user prompt with document context
+        enhanced_user_prompt = user_prompt
+        if relevant_documents_context:
+            enhanced_user_prompt = user_prompt + relevant_documents_context + "\n\n=== INSTRUCCIONES PARA USAR DOCUMENTOS ===\nCuando formules la respuesta sugerida (answer) para un gap, puedes usar la información de los documentos relacionados listados arriba. Si usas información de alguno de estos documentos, DEBES incluir su ID en el campo document_ids. Los IDs disponibles son:\n" + str(relevant_document_ids) + "\n"
+        
+        logger.info(f"Sending prompt to LLM...")
         logger.info(f"System prompt length: {len(system_prompt)} chars")
-        logger.info(f"User prompt length: {len(user_prompt)} chars")
+        logger.info(f"User prompt length: {len(enhanced_user_prompt)} chars")
 
         # Save complete prompts to files for debugging
         doc_id = document_title.replace(" ", "_")[:20]  # Use document title as ID
         save_prompt_to_file("system", system_prompt, doc_id)
-        save_prompt_to_file("user", user_prompt, doc_id)
+        save_prompt_to_file("user", enhanced_user_prompt, doc_id)
 
         try:
             # Calculate adaptive timeout based on document size
             # Estimate tokens: ~4 characters per token (rough approximation)
-            estimated_tokens = len(user_prompt) // 4
+            estimated_tokens = len(enhanced_user_prompt) // 4
 
             # Exploration phase: conservative timeout calculation
             # Assumption: 2 tokens/second generation speed (conservative estimate)
@@ -183,41 +250,14 @@ IMPORTANTE: No uses código fences (```json), no agregues texto adicional, no us
             logger.info(f"  - Safety margin: {safety_margin}x ({safety_margin*100:.0f}%)")
             logger.info(f"  - Max timeout cap: {max_timeout}s")
 
-            # Use tools if enabled and project_id is provided
-            if use_tools and project_id:
-                logger.info("Using chat_with_tools for enhanced gap detection")
-                tool_handlers = self.ollama_client._create_mcp_tool_handlers(project_id)
-                
-                # Enhance system prompt to encourage tool use
-                enhanced_system_prompt = system_prompt + """
-
-Tienes acceso a herramientas que te permiten:
-- search_similar_documents: Buscar documentos relacionados en el proyecto
-- list_gaps: Consultar gaps existentes en otros documentos
-- read_document: Leer contenido de documentos relacionados
-
-Usa estas herramientas cuando sea útil para:
-- Encontrar contexto en documentos relacionados
-- Verificar si información ya existe en otros documentos
-- Identificar patrones de gaps similares en otros documentos
-"""
-                
-                response = await self.ollama_client.chat_with_tools(
-                    prompt=user_prompt,
-                    system_prompt=enhanced_system_prompt,
-                    temperature=0.3,
-                    timeout=timeout,
-                    tool_handlers=tool_handlers,
-                    max_tool_calls=3,
-                )
-            else:
-                logger.info("Using standard chat without tools")
-                response = await self.ollama_client.chat(
-                    prompt=user_prompt,
-                    system_prompt=system_prompt,
-                    temperature=0.3,  # Lower temperature for more consistent output
-                    timeout=timeout,
-                )
+            # Use standard chat without tools (context is injected directly)
+            logger.info("Using standard chat with injected document context")
+            response = await self.ollama_client.chat(
+                prompt=enhanced_user_prompt,
+                system_prompt=system_prompt,
+                temperature=0.3,  # Lower temperature for more consistent output
+                timeout=timeout,
+            )
 
             logger.info(f"Received response from LLM (length: {len(response)})")
 

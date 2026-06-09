@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { AlertCircle, Clock, CheckCircle, XCircle, FileText } from 'lucide-react';
 import type { Gap } from '@/types/gap';
 import { GapPriorityBadge } from './GapPriorityBadge';
 
 interface GapCardProps {
   gap: Gap;
   onClick: () => void;
+  onDocumentClick?: (documentSlug: string) => void;
 }
 
 const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; variant: 'default' | 'success' | 'destructive' }> = {
@@ -14,9 +15,16 @@ const statusConfig: Record<string, { icon: typeof AlertCircle; label: string; va
   rejected: { icon: XCircle, label: 'Rechazado', variant: 'destructive' },
 };
 
-export function GapCard({ gap, onClick }: GapCardProps) {
+export function GapCard({ gap, onClick, onDocumentClick }: GapCardProps) {
   const status = statusConfig[gap.status] || statusConfig.pending;
   const StatusIcon = status.icon;
+
+  const handleDocumentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDocumentClick && gap.document_slug) {
+      onDocumentClick(gap.document_slug);
+    }
+  };
 
   return (
     <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={onClick}>
@@ -38,6 +46,17 @@ export function GapCard({ gap, onClick }: GapCardProps) {
             </span>
           )}
         </div>
+        {gap.document_title && onDocumentClick && (
+          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+            <FileText className="h-4 w-4" />
+            <button
+              onClick={handleDocumentClick}
+              className="hover:text-foreground transition-colors underline"
+            >
+              {gap.document_title}
+            </button>
+          </div>
+        )}
         {gap.context_missing && (
           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
             Contexto faltante: {gap.context_missing}

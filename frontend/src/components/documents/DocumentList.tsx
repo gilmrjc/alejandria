@@ -6,7 +6,7 @@ import type { DocumentListItem } from '@/types/document';
 interface DocumentListProps {
   documents: DocumentListItem[];
   loading: boolean;
-  onDocumentClick: (id: string) => void;
+  onDocumentClick: (slug: string) => void;
 }
 
 export function DocumentList({ documents, loading, onDocumentClick }: DocumentListProps) {
@@ -35,7 +35,7 @@ export function DocumentList({ documents, loading, onDocumentClick }: DocumentLi
         <Card
           key={doc.id}
           className="cursor-pointer hover:bg-accent/50 transition-colors"
-          onClick={() => onDocumentClick(doc.id)}
+          onClick={() => onDocumentClick(doc.slug)}
         >
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-4">

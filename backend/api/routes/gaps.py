@@ -1,5 +1,6 @@
 """Gap API endpoints with CRUD operations."""
 
+import logging
 import uuid
 from typing import Annotated
 
@@ -8,9 +9,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from jobs.tasks.gap_detection import gap_detection_task
+from jobs.tasks.question_generation import question_generation_task
 from shared.auth.jwt import get_current_user
-from shared.db.models import Document, Gap, User
-from shared.db.session import get_db_session
+
+from shared.db.models import Document, Gap, GapDocumentReference, User
+from shared.db.session import get_db_dependency
+
 from shared.schemas.gap import (
     GapCreate,
     GapDashboardMetrics,
@@ -21,10 +25,13 @@ from shared.schemas.gap import (
     GapThemeCluster,
     GapUpdate,
 )
+
 from shared.services.gap_grouping_service import GapGroupingService
 from shared.utils.pagination import apply_pagination, build_pagination_response
 
-SessionDep = Annotated[Session, Depends(get_db_session)]
+logger = logging.getLogger(__name__)
+
+SessionDep = Annotated[Session, Depends(get_db_dependency)]
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter(prefix="/gaps", tags=["gaps"])
@@ -81,23 +88,71 @@ def create_gap(
 def get_gap_by_slug(
     slug: str,
     session: SessionDep,
-) -> Gap:
+) -> dict:
     """Get a gap by slug."""
-    gap = session.execute(select(Gap).where(Gap.slug == slug)).scalar_one_or_none()
+    gap = session.execute(
+        select(Gap).where(Gap.slug == slug)
+    ).scalar_one_or_none()
 
     if not gap:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Gap not found"
         )
 
-    return gap
+    # Get document information
+    document = session.execute(
+        select(Document).where(Document.id == gap.document_id)
+    ).scalar_one_or_none()
+
+    # Get reference documents
+    gap_document_refs = session.execute(
+        select(GapDocumentReference).where(GapDocumentReference.gap_id == gap.id)
+    ).scalars().all()
+
+    reference_document_ids = [gdr.document_id for gdr in gap_document_refs]
+    reference_documents = []
+    if reference_document_ids:
+        ref_docs = session.execute(
+            select(Document).where(Document.id.in_(reference_document_ids))
+        ).scalars().all()
+        reference_documents = [
+            {
+                "id": doc.id,
+                "slug": doc.slug,
+                "title": doc.title,
+                "filename": doc.filename,
+            }
+            for doc in ref_docs
+        ]
+
+    # Build response with document info
+    response = {
+        "id": gap.id,
+        "document_id": gap.document_id,
+        "document_slug": document.slug if document else None,
+        "document_title": document.title if document else None,
+        "slug": gap.slug,
+        "question": gap.question,
+        "priority": gap.priority,
+        "status": gap.status,
+        "context_missing": gap.context_missing,
+        "role_affected": gap.role_affected,
+        "answer": gap.answer,
+        "answered_at": gap.answered_at,
+        "answered_by": gap.answered_by,
+        "created_at": gap.created_at,
+        "updated_at": gap.updated_at,
+        "reference_documents": reference_documents,
+    }
+
+    return response
 
 
 @router.get("/{gap_id}", response_model=GapResponse)
 def get_gap(
     gap_id: uuid.UUID,
     session: SessionDep,
-) -> Gap:
+) -> dict:
     """Get a gap by ID."""
     gap = session.execute(select(Gap).where(Gap.id == gap_id)).scalar_one_or_none()
 
@@ -106,7 +161,31 @@ def get_gap(
             status_code=status.HTTP_404_NOT_FOUND, detail="Gap not found"
         )
 
-    return gap
+    # Get document information
+    document = session.execute(
+        select(Document).where(Document.id == gap.document_id)
+    ).scalar_one_or_none()
+
+    # Build response with document info
+    response = {
+        "id": gap.id,
+        "document_id": gap.document_id,
+        "document_slug": document.slug if document else None,
+        "document_title": document.title if document else None,
+        "slug": gap.slug,
+        "question": gap.question,
+        "priority": gap.priority,
+        "status": gap.status,
+        "context_missing": gap.context_missing,
+        "role_affected": gap.role_affected,
+        "answer": gap.answer,
+        "answered_at": gap.answered_at,
+        "answered_by": gap.answered_by,
+        "created_at": gap.created_at,
+        "updated_at": gap.updated_at,
+    }
+
+    return response
 
 
 @router.get("", response_model=GapListResponse)
@@ -142,11 +221,22 @@ def list_gaps(
         query, session, page=page, per_page=per_page
     )
 
+    # Get all document IDs
+    document_ids = [gap.document_id for gap in gaps]
+    documents = {}
+    if document_ids:
+        docs = session.execute(
+            select(Document).where(Document.id.in_(document_ids))
+        ).scalars().all()
+        documents = {doc.id: doc for doc in docs}
+
     # Convert to response format
     items = [
         GapListItem(
             id=gap.id,
             document_id=gap.document_id,
+            document_slug=documents[gap.document_id].slug if gap.document_id in documents else None,
+            document_title=documents[gap.document_id].title if gap.document_id in documents else None,
             slug=gap.slug,
             question=gap.question,
             priority=gap.priority,
@@ -177,7 +267,6 @@ def update_gap_by_slug(
     # Update fields if provided
     if gap_data.answer is not None:
         gap.answer = gap_data.answer
-        gap.answered_at = None  # Will be set by database trigger or manually
 
     if gap_data.status is not None:
         gap.status = gap_data.status
@@ -185,6 +274,12 @@ def update_gap_by_slug(
             from datetime import UTC, datetime
 
             gap.answered_at = datetime.now(UTC)
+            gap.answered_by = current_user.id
+
+            try:
+                question_generation_task.delay(str(gap.id), gap.answer)
+            except Exception:
+                logger.warning(f"Could not enqueue question_generation for gap {gap.id}")
 
     session.commit()
     session.refresh(gap)
@@ -210,7 +305,6 @@ def update_gap(
     # Update fields if provided
     if gap_data.answer is not None:
         gap.answer = gap_data.answer
-        gap.answered_at = None  # Will be set by database trigger or manually
 
     if gap_data.status is not None:
         gap.status = gap_data.status
@@ -218,6 +312,12 @@ def update_gap(
             from datetime import UTC, datetime
 
             gap.answered_at = datetime.now(UTC)
+            gap.answered_by = current_user.id
+
+            try:
+                question_generation_task.delay(str(gap.id), gap.answer)
+            except Exception:
+                logger.warning(f"Could not enqueue question_generation for gap {gap.id}")
 
     session.commit()
     session.refresh(gap)

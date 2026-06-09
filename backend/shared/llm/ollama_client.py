@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import httpx
+from sqlalchemy import select
 
 from shared.config.settings import settings
 from shared.utils.retry import retry_with_backoff
@@ -466,7 +467,7 @@ class OllamaClient:
         Note: MCP functions are synchronous, so we wrap them to be async-compatible.
         
         Args:
-            project_id: Project ID for context
+            project_id: Project ID for context (used as fallback if LLM doesn't provide it)
             
         Returns:
             Dict of tool handler functions that wrap MCP server calls
@@ -478,25 +479,65 @@ class OllamaClient:
         )
         import asyncio
         
-        async def wrapped_search_similar_documents(query: str, limit: int = 5):
+        # Capture project_id in closure for fallback
+        context_project_id = project_id
+        
+        async def wrapped_search_similar_documents(query: str, project_id: str = None, limit: int = 5, use_hybrid: bool = True):
             """Call MCP search_similar_documents with project_id."""
             logger.info(f"[Tool] search_similar_documents: {query[:50]}...")
             try:
+                # Use provided project_id or fall back to context project_id
+                effective_project_id = project_id or context_project_id
+                if not effective_project_id:
+                    return {"error": "project_id is required for search_similar_documents"}
+                
+                # Validate project_id is a valid UUID (LLM might pass slugs or other strings)
+                import uuid
+                try:
+                    uuid.UUID(effective_project_id)
+                except ValueError:
+                    logger.warning(f"Invalid project_id format: {effective_project_id}, using context project_id: {context_project_id}")
+                    effective_project_id = context_project_id
+                    if not effective_project_id:
+                        return {"error": f"Invalid project_id format: {project_id}. Must be a valid UUID."}
+                
+                # If LLM provided a different project_id than context, verify it exists
+                if project_id and project_id != context_project_id:
+                    try:
+                        from shared.db.session import get_db_session
+                        from shared.db.models import Project
+                        session = get_db_session()
+                        project_exists = session.execute(
+                            select(Project).where(Project.id == uuid.UUID(effective_project_id))
+                        ).scalar_one_or_none()
+                        session.close()
+                        
+                        if not project_exists:
+                            logger.warning(f"Project {effective_project_id} does not exist, using context project_id: {context_project_id}")
+                            effective_project_id = context_project_id
+                            if not effective_project_id:
+                                return {"error": f"Project {project_id} not found."}
+                    except Exception as e:
+                        logger.warning(f"Error verifying project existence: {e}, using context project_id: {context_project_id}")
+                        effective_project_id = context_project_id
+                
                 # Run synchronous MCP function in thread pool
                 loop = asyncio.get_event_loop()
                 result = await loop.run_in_executor(
                     None,  # Default executor
                     lambda: search_similar_documents(
                         query=query,
-                        project_id=project_id,
-                        limit=limit
+                        project_id=effective_project_id,
+                        limit=limit,
+                        use_hybrid=use_hybrid
                     )
                 )
-                # Simplify result for LLM
+                # Simplify result for LLM - include document IDs for reference tracking
                 return {
                     "total": result.get("total", 0),
                     "results": [
                         {
+                            "id": r.get("id", "Unknown"),
                             "title": r.get("title", "Unknown"),
                             "slug": r.get("slug", "unknown"),
                             "score": r.get("score", 0),
@@ -627,3 +668,111 @@ class OllamaClient:
         union = words1.union(words2)
 
         return len(intersection) / len(union) if union else 0.0
+
+    async def generate_proposal_prompt(
+        self,
+        document_title: str,
+        document_content: str,
+        gaps: list[dict[str, Any]],
+    ) -> str:
+        """
+        Generate a proposal prompt for integrating resolved gaps into a document.
+
+        Args:
+            document_title: Title of the document
+            document_content: Content of the document
+            gaps: List of resolved gaps with question, answer, and metadata
+
+        Returns:
+            Generated prompt string with integration instructions
+        """
+        # Build gap context
+        gaps_context = "\n\n".join(
+            [
+                f"Gap {i+1}:\n"
+                f"Question: {gap.get('question', '')}\n"
+                f"Answer: {gap.get('answer', '')}\n"
+                f"Priority: {gap.get('priority', 'medium')}\n"
+                f"Context Missing: {gap.get('context_missing', 'N/A')}\n"
+                f"Role Affected: {gap.get('role_affected', 'N/A')}"
+                for i, gap in enumerate(gaps)
+            ]
+        )
+
+        system_prompt = """You are an expert technical documentation editor. Your task is to integrate resolved gaps into document content by providing specific, actionable edit instructions."""
+
+        user_prompt = f"""Document Title: {document_title}
+
+Document Content:
+{document_content}
+
+Resolved Gaps to Integrate:
+{gaps_context}
+
+Instructions:
+1. Review the document content and the resolved gaps
+2. Determine the best way to integrate each gap's answer into the document
+3. Provide specific, actionable edit instructions for each gap
+4. Group related edits together for efficiency
+5. Specify the exact location (section/paragraph) for each edit
+6. Maintain the document's existing style and structure
+7. Ensure the integration improves the document's clarity and completeness
+
+Output Format:
+For each gap, provide:
+- Gap reference (by question or number)
+- Location in document (section/paragraph - be specific)
+- Specific edit instruction (what to add/modify/delete)
+- Expected improvement in document quality
+
+Provide the final instructions as a structured plan that can be executed to update the document. Be concise and specific."""
+
+        return await self.chat(
+            prompt=user_prompt,
+            system_prompt=system_prompt,
+            temperature=0.5,
+            timeout=60.0,
+        )
+
+    async def apply_proposal_instructions(
+        self,
+        document_title: str,
+        document_content: str,
+        instructions: str,
+    ) -> str:
+        """
+        Apply proposal instructions to a document using LLM.
+
+        Args:
+            document_title: Title of the document
+            document_content: Current content of the document
+            instructions: Proposal instructions to apply
+
+        Returns:
+            Updated document content
+        """
+        system_prompt = """You are an expert technical documentation editor. Your task is to apply specific edit instructions to a document. Output ONLY the updated document content, no explanations or commentary."""
+
+        user_prompt = f"""Document Title: {document_title}
+
+Current Document Content:
+{document_content}
+
+Edit Instructions to Apply:
+{instructions}
+
+Instructions:
+1. Apply the edit instructions to the document content
+2. Maintain the document's existing structure and style
+3. Ensure all changes are consistent with the instructions
+4. Output ONLY the updated document content
+5. Do not include any explanations, commentary, or metadata
+
+Output the complete updated document content."""
+
+        return await self.chat(
+            prompt=user_prompt,
+            system_prompt=system_prompt,
+            temperature=0.3,
+            timeout=90.0,
+        )

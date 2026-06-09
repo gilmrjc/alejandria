@@ -21,8 +21,8 @@ export function DocumentsPage() {
     setSearch('');
   };
 
-  const handleDocumentClick = (id: string) => {
-    navigate(`/documents/${id}`);
+  const handleDocumentClick = (slug: string) => {
+    navigate(`/documents/${slug}`);
   };
 
   const filteredDocuments = documents.filter((doc) =>

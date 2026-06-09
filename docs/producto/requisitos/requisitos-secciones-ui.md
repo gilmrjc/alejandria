@@ -71,11 +71,12 @@ Componentes de frontend React que implementan las vistas principales del sistema
 
 **Requisitos Pendientes:**
 
-- [PENDIENTE] Lista de preguntas organizadas por tema/sesión
+- [PENDIENTE] Lista de preguntas organizadas por tema
 - [PENDIENTE] Filtros por prioridad, tipo de gap, estado
 - [PENDIENTE] Vista detallada de pregunta individual
-- [PENDIENTE] Interfaz para responder pregunta (campo de respuesta pre-rellenada)
-- [PENDIENTE] Acciones por pregunta (aceptar sugerencia, modificar, rechazar con motivo)
+- [PENDIENTE] Interfaz para responder pregunta (campo de respuesta)
+- [PENDIENTE] Acciones por pregunta (responder, rechazar con motivo)
+- [POST-MVP] Interfaz de sesión interactiva - workflow usa proceso asíncrono
 
 ### Sección de Gaps
 
@@ -86,10 +87,10 @@ Componentes de frontend React que implementan las vistas principales del sistema
 **Requisitos Pendientes:**
 
 - [PENDIENTE] Dashboard de gaps detectados con filtros
-- [PENDIENTE] Agrupación de gaps por tema
-- [PENDIENTE] Metadata de sesiones (tema, subtema, prioridad)
-- [PENDIENTE] Vista de gaps por estado (detectado, en sesión, resuelto, verificado)
-- [PENDIENTE] Interfaz de sesión interactiva para resolución de gaps
+- [PENDIENTE] Agrupación de gaps por tema (tags deterministas)
+- [POST-MVP] Metadata de sesiones (tema, subtema, prioridad) - workflow usa proceso asíncrono sin sesiones
+- [PENDIENTE] Vista de gaps por estado (pending, responded, rejected)
+- [POST-MVP] Interfaz de sesión interactiva para resolución de gaps - workflow usa proceso asíncrono
 
 ### Sección de Propuestas
 

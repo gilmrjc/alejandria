@@ -8,13 +8,13 @@ from sqlalchemy.orm import Session
 
 from shared.auth.jwt import get_current_user
 from shared.db.models import Organization, Project, User
-from shared.db.session import get_db_session
+from shared.db.session import get_db_dependency
 from shared.schemas.project import ProjectCreate, ProjectListItem, ProjectResponse
 from shared.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-SessionDep = Annotated[Session, Depends(get_db_session)]
+SessionDep = Annotated[Session, Depends(get_db_dependency)]
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter(prefix="/projects", tags=["projects"])
