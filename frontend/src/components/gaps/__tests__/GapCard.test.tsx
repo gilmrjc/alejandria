@@ -7,6 +7,8 @@ describe('GapCard', () => {
   const mockGap: Gap = {
     id: '1',
     document_id: 'doc-1',
+    document_slug: 'doc-1',
+    document_title: 'Test Document',
     slug: 'test-gap',
     question: 'What is the purpose?',
     context_missing: 'Purpose statement',

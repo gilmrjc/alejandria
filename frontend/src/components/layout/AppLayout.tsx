@@ -79,7 +79,7 @@ export function AppLayout() {
               <p className="text-sm font-medium">{user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <Button variant="ghost" size="sm" onClick={handleLogout} aria-label="Cerrar sesión">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -88,27 +88,29 @@ export function AppLayout() {
 
       <div className="flex flex-1 overflow-hidden">
         <main className="flex-1 overflow-y-auto p-6">
-          <div className="mb-4">
-            <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-              {breadcrumbs.map((crumb, index) => (
-                <div key={crumb.path} className="flex items-center gap-2">
-                  {index > 0 && <ChevronRight className="h-4 w-4" />}
-                  <button
-                    onClick={() => handleBreadcrumbClick(crumb.path)}
-                    disabled={index === breadcrumbs.length - 1}
-                    className={cn(
-                      'hover:text-foreground transition-colors',
-                      index === breadcrumbs.length - 1
-                        ? 'text-foreground font-medium cursor-default'
-                        : 'cursor-pointer'
-                    )}
-                  >
-                    {crumb.label}
-                  </button>
-                </div>
-              ))}
-            </nav>
-          </div>
+          {breadcrumbs.length > 1 && (
+            <div className="mb-4">
+              <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+                {breadcrumbs.map((crumb, index) => (
+                  <div key={crumb.path} className="flex items-center gap-2">
+                    {index > 0 && <ChevronRight className="h-4 w-4" />}
+                    <button
+                      onClick={() => handleBreadcrumbClick(crumb.path)}
+                      disabled={index === breadcrumbs.length - 1}
+                      className={cn(
+                        'hover:text-foreground transition-colors',
+                        index === breadcrumbs.length - 1
+                          ? 'text-foreground font-medium cursor-default'
+                          : 'cursor-pointer'
+                      )}
+                    >
+                      {crumb.label}
+                    </button>
+                  </div>
+                ))}
+              </nav>
+            </div>
+          )}
           <Outlet />
         </main>
       </div>

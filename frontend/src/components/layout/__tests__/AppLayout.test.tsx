@@ -31,10 +31,10 @@ describe('AppLayout', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getAllByText('Dashboard')).toHaveLength(2); // One in sidebar, one in breadcrumbs
-    expect(screen.getAllByText('Documentos')).toHaveLength(1); // Only in sidebar
-    expect(screen.getAllByText('Gaps')).toHaveLength(1); // Only in sidebar
-    expect(screen.getAllByText('Propuestas')).toHaveLength(1); // Only in sidebar
+    expect(screen.getAllByText('Dashboard')).toHaveLength(1); // Only in sidebar; single breadcrumb is hidden
+    expect(screen.queryByText('Documentos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Gaps')).not.toBeInTheDocument();
+    expect(screen.queryByText('Propuestas')).not.toBeInTheDocument();
   });
 
   it('debe mostrar información de usuario', () => {
@@ -78,7 +78,7 @@ describe('AppLayout', () => {
       </MemoryRouter>
     );
 
-    const logoutButton = screen.getByText('Cerrar sesión');
+    const logoutButton = screen.getByLabelText('Cerrar sesión');
     fireEvent.click(logoutButton);
 
     expect(logoutMock).toHaveBeenCalled();
@@ -125,8 +125,10 @@ describe('AppLayout', () => {
       </MemoryRouter>
     );
 
+    // Without project context, only Dashboard appears in sidebar;
+    // Documentos and Detalle appear only in breadcrumbs
     expect(screen.getAllByText('Dashboard')).toHaveLength(2); // Sidebar + breadcrumbs
-    expect(screen.getAllByText('Documentos')).toHaveLength(2); // Sidebar + breadcrumbs
+    expect(screen.getAllByText('Documentos')).toHaveLength(1); // Breadcrumbs only
     expect(screen.getByText('Detalle')).toBeInTheDocument();
   });
 
@@ -149,9 +151,7 @@ describe('AppLayout', () => {
       </MemoryRouter>
     );
 
-    // El breadcrumb de Dashboard debería ser clickeable
-    const dashboardBreadcrumbs = screen.getAllByText('Dashboard');
-    const breadcrumbDashboard = dashboardBreadcrumbs.find(el => el.tagName === 'BUTTON');
-    expect(breadcrumbDashboard).toBeInTheDocument();
+    // Breadcrumb should render when there are multiple levels
+    expect(screen.getByRole('button', { name: 'Dashboard' })).toBeInTheDocument();
   });
 });

@@ -20,7 +20,7 @@ describe('documentsStore', () => {
 
   it('debe llamar documentsService.list en fetchDocuments', async () => {
     const mockResponse = {
-      items: [{ id: '1', title: 'Test', slug: 'test', filename: 'test.md', rating: 9, created_at: '2024-01-01', updated_at: '2024-01-01' }],
+      items: [{ id: '1', title: 'Test', slug: 'test', filename: 'test.md', rating: 9, created_at: '2024-01-01', updated_at: '2024-01-01', folder_id: null, folder_name: null, folder_path: null }],
       pagination: { page: 1, per_page: 10, total: 1, total_pages: 1 },
     };
     

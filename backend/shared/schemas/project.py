@@ -35,6 +35,16 @@ class ProjectResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ProjectMetrics(BaseModel):
+    """Summary metrics for a project displayed in list views."""
+
+    document_count: int = Field(default=0, description="Number of documents")
+    gap_count: int = Field(default=0, description="Number of gaps")
+    pending_gap_count: int = Field(default=0, description="Number of pending gaps")
+    avg_rating: float | None = Field(None, description="Average document rating")
+    healthy_percentage: int = Field(default=0, description="Percentage of healthy documents")
+
+
 class ProjectListItem(BaseModel):
     """Schema for project list item."""
 
@@ -44,5 +54,6 @@ class ProjectListItem(BaseModel):
     description: str | None = Field(description="Project description")
     organization_id: UUID = Field(description="Organization ID")
     created_at: datetime = Field(description="Creation timestamp")
+    metrics: ProjectMetrics = Field(default_factory=ProjectMetrics, description="Project summary metrics")
 
     model_config = {"from_attributes": True}

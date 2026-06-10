@@ -13,6 +13,8 @@ describe('GapResolutionPanel', () => {
     status: 'pending' as const,
     role_affected: 'developer',
     document_id: 'doc-1',
+    document_slug: 'doc-1',
+    document_title: 'Documento de prueba',
     created_at: '2024-01-01',
     updated_at: '2024-01-01',
     answer: null,

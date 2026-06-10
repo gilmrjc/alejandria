@@ -21,7 +21,7 @@ describe('gapsStore', () => {
 
   it('debe llamar gapsService.list en fetchGaps', async () => {
     const mockResponse = {
-      items: [{ id: '1', document_id: '1', slug: 'test', question: 'Test', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' } as Gap],
+      items: [{ id: '1', document_id: '1', document_slug: null, document_title: null, slug: 'test', question: 'Test', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' } as Gap],
       pagination: { page: 1, per_page: 10, total: 1, total_pages: 1 },
     };
     
@@ -49,7 +49,7 @@ describe('gapsStore', () => {
   });
 
   it('debe llamar gapsService.updateBySlug en updateGap', async () => {
-    const updatedGap: Gap = { id: '1', document_id: '1', slug: 'test', question: 'Test', priority: 'high', status: 'responded', answer: null, answered_at: null, context_missing: null, role_affected: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
+    const updatedGap: Gap = { id: '1', document_id: '1', document_slug: null, document_title: null, slug: 'test', question: 'Test', priority: 'high', status: 'responded', answer: null, answered_at: null, context_missing: null, role_affected: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
     
     vi.mocked(gapsService.updateBySlug).mockResolvedValue(updatedGap);
 
@@ -60,8 +60,8 @@ describe('gapsStore', () => {
   });
 
   it('debe actualizar gap en la lista al updateGap exitoso', async () => {
-    const initialGap: Gap = { id: '1', document_id: '1', slug: 'test', question: 'Test', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
-    const updatedGap: Gap = { id: '1', document_id: '1', slug: 'test', question: 'Test', priority: 'high', status: 'responded', answer: null, answered_at: null, context_missing: null, role_affected: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
+    const initialGap: Gap = { id: '1', document_id: '1', document_slug: null, document_title: null, slug: 'test', question: 'Test', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
+    const updatedGap: Gap = { id: '1', document_id: '1', document_slug: null, document_title: null, slug: 'test', question: 'Test', priority: 'high', status: 'responded', answer: null, answered_at: null, context_missing: null, role_affected: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
     
     useGapsStore.setState({ gaps: [initialGap] });
     vi.mocked(gapsService.updateBySlug).mockResolvedValue(updatedGap);
@@ -85,8 +85,8 @@ describe('gapsStore', () => {
   });
 
   it('debe manejar gap no encontrado en updateGap', async () => {
-    const initialGap: Gap = { id: '1', document_id: '1', slug: 'test', question: 'Test', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
-    const updatedGap: Gap = { id: '2', document_id: '1', slug: 'test2', question: 'Test2', priority: 'high', status: 'responded', answer: null, answered_at: null, context_missing: null, role_affected: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
+    const initialGap: Gap = { id: '1', document_id: '1', document_slug: null, document_title: null, slug: 'test', question: 'Test', priority: 'high', status: 'pending', context_missing: null, role_affected: null, answer: null, answered_at: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
+    const updatedGap: Gap = { id: '2', document_id: '1', document_slug: null, document_title: null, slug: 'test2', question: 'Test2', priority: 'high', status: 'responded', answer: null, answered_at: null, context_missing: null, role_affected: null, created_at: '2024-01-01', updated_at: '2024-01-01' };
     
     useGapsStore.setState({ gaps: [initialGap] });
     vi.mocked(gapsService.updateBySlug).mockResolvedValue(updatedGap);

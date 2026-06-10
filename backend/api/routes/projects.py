@@ -3,13 +3,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from shared.auth.jwt import get_current_user
-from shared.db.models import Organization, Project, User
+from shared.db.models import Document, Gap, Organization, Project, User
 from shared.db.session import get_db_dependency
-from shared.schemas.project import ProjectCreate, ProjectListItem, ProjectResponse
+from shared.schemas.project import ProjectCreate, ProjectListItem, ProjectMetrics, ProjectResponse
 from shared.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -104,11 +104,12 @@ def create_project(
 def list_projects(
     session: SessionDep,
     current_user: CurrentUserDep,
-) -> list[Project]:
+) -> list[ProjectListItem]:
     """
-    List projects for the current user.
+    List projects for the current user with summary metrics.
 
-    Returns all projects in organizations where the user is the creator.
+    Returns all projects in organizations where the user is the creator,
+    including document count, gap count, and average rating.
     """
     logger.info(
         "Listing projects",
@@ -133,12 +134,74 @@ def list_projects(
         .all()
     )
 
+    # Build response with metrics per project
+    result: list[ProjectListItem] = []
+    for project in projects:
+        # Document metrics
+        doc_count = (
+            session.execute(
+                select(func.count(Document.id)).where(Document.project_id == project.id)
+            ).scalar()
+            or 0
+        )
+        avg_rating = session.execute(
+            select(func.avg(Document.rating))
+            .where(Document.project_id == project.id, Document.rating.isnot(None))
+        ).scalar()
+        healthy_count = (
+            session.execute(
+                select(func.count(Document.id))
+                .where(Document.project_id == project.id, Document.rating >= 9)
+            ).scalar()
+            or 0
+        )
+
+        # Gap metrics
+        gap_count = (
+            session.execute(
+                select(func.count(Gap.id))
+                .join(Document, Gap.document_id == Document.id)
+                .where(Document.project_id == project.id)
+            ).scalar()
+            or 0
+        )
+        pending_gap_count = (
+            session.execute(
+                select(func.count(Gap.id))
+                .join(Document, Gap.document_id == Document.id)
+                .where(Document.project_id == project.id, Gap.status == "pending")
+            ).scalar()
+            or 0
+        )
+
+        healthy_percentage = round((healthy_count / doc_count) * 100) if doc_count else 0
+
+        metrics = ProjectMetrics(
+            document_count=doc_count,
+            gap_count=gap_count,
+            pending_gap_count=pending_gap_count,
+            avg_rating=round(avg_rating, 1) if avg_rating else None,
+            healthy_percentage=healthy_percentage,
+        )
+
+        result.append(
+            ProjectListItem(
+                id=project.id,
+                name=project.name,
+                slug=project.slug,
+                description=project.description,
+                organization_id=project.organization_id,
+                created_at=project.created_at,
+                metrics=metrics,
+            )
+        )
+
     logger.info(
         "Projects listed",
-        count=len(projects),
+        count=len(result),
     )
 
-    return projects
+    return result
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)

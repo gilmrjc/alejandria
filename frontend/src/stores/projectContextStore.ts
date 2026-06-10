@@ -71,7 +71,7 @@ export const useProjectContextStore = create<ProjectContextState>()(
 // Hook to get current project context from URL params
 // This synchronizes URL with the store
 export function useProjectContextFromParams(orgSlug?: string, projectSlug?: string) {
-  const { setProjectContext, currentOrganization, currentProject } = useProjectContextStore();
+  const { currentOrganization, currentProject } = useProjectContextStore();
 
   // If URL params are provided and different from current context, update it
   if (orgSlug && projectSlug) {

@@ -9,14 +9,20 @@ describe('SnapshotHistory', () => {
       created_at: '2024-01-01T00:00:00Z',
       created_by: 'user1',
       document_id: 'doc-1',
-      content: 'content',
+      old_content: null,
+      new_content: 'content',
+      diff_type: 'full' as const,
+      rating: 9,
     },
     {
       id: '2',
       created_at: '2024-01-02T00:00:00Z',
       created_by: 'user2',
       document_id: 'doc-1',
-      content: 'content',
+      old_content: 'old content',
+      new_content: 'new content',
+      diff_type: 'diff' as const,
+      rating: 8,
     },
   ];
 

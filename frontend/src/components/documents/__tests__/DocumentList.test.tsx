@@ -13,6 +13,9 @@ describe('DocumentList', () => {
       rating: 9.5,
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-02T00:00:00Z',
+      folder_id: null,
+      folder_name: null,
+      folder_path: null,
     },
   ];
 

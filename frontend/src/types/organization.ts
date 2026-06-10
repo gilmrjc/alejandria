@@ -8,6 +8,14 @@ export interface Organization {
   updated_at: string;
 }
 
+export interface ProjectMetrics {
+  document_count: number;
+  gap_count: number;
+  pending_gap_count: number;
+  avg_rating: number | null;
+  healthy_percentage: number;
+}
+
 export interface Project {
   id: string;
   organization_id: string;
@@ -17,6 +25,7 @@ export interface Project {
   created_by: string;
   created_at: string;
   updated_at: string;
+  metrics?: ProjectMetrics;
 }
 
 export interface CreateOrganizationDto {

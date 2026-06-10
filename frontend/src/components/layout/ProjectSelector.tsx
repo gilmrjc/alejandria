@@ -59,11 +59,6 @@ export function ProjectSelector() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Get projects for the selected organization
-  const orgProjects = currentOrganization
-    ? projects.filter((p) => p.organization_id === currentOrganization.id)
-    : [];
-
   const handleSelectProject = (org: Organization, project: Project) => {
     setProjectContext(org, project);
     setIsOpen(false);
